@@ -4,7 +4,6 @@
 #'
 #' @description Visualize time-based data over time.
 #' @details 'multi' version is for facetting.
-#' Inspired by \url{https://juliasilge.com/blog/ten-thousand-tweets/}.
 #' @param data data.frame.
 #' @param colname_x character. Name of column in \code{data} to use for x-axis.
 #' Probably something like 'yyyy', 'mm', etc.
@@ -12,18 +11,23 @@
 #' @param colname_color character. Name of column in \code{data} to use for color basis.
 #' Set to \code{NULL} by default although not actually required in order to simplify internal code.
 #' @param color chracter. Hex value of color. Default is provided.
+#' @param lab_title character. Default is provided.
 #' @param lab_subtitle character. Probably something like 'By Year', 'By Month', etc.
 #' Set to \code{NULL} by default although not actually required in order to simplify internal code.
+#' @param theme_base \code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}. Default is provided.
 #' @return gg
 #' @export
 #' @importFrom temisc theme_te_b
+#' @seealso \url{https://juliasilge.com/blog/ten-thousand-tweets/}.
 visualize_time <-
   function(data = NULL,
            colname_x = NULL,
            geom = c("bar", "hist"),
            colname_color = NULL,
            color = "grey50",
-           lab_subtitle = NULL) {
+           lab_title = "Count Over Time",
+           lab_subtitle = NULL,
+           theme_base = temisc::theme_te_b()) {
     if (is.null(data))
       stop("`data` must not be NULL.", call. = FALSE)
     if (is.null(colname_x))
@@ -37,15 +41,16 @@ visualize_time <-
       ggplot2::labs(
         x = NULL,
         y = NULL,
-        title = "Count Over Time",
+        title = lab_title,
         subtitle = lab_subtitle
       )
     viz_theme <-
-      temisc::theme_te_b() +
+      # temisc::theme_te_b() +
+      theme_base +
       ggplot2::theme(panel.grid.major.x = ggplot2::element_blank()) +
       ggplot2::theme(legend.position = "none")
 
-    viz <- ggplot2::ggplot(data, ggplot2::aes_string(x = colname_x))
+    viz <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = colname_x))
     if (geom == "bar") {
       viz <-
         viz +
@@ -66,23 +71,19 @@ visualize_time <-
   }
 
 #' @inheritParams visualize_time
+#' @param ... dots. Parameters to pass to \code{visualize_time()}.
 #' @param colname_multi character. Name of column in \code{data} to use for facetting.
 #' @rdname visualize_time
 #' @export
 #' @importFrom ggplot2 facet_wrap
 #' @importFrom temisc theme_te_b
-visualize_time_mulit <- function(..., colname_multi = NULL) {
-  if(is.null(colname_facet)) stop("`colname_multi` cannot be NULL.", call. = FALSE)
-  viz <- visualize_time(...)
-  viz_theme <-
-    temisc::theme_te_b_facet() +
-    ggplot2::theme(panel.grid.major.x = ggplot2::element_blank()) +
-    ggplot2::theme(legend.position = "none")
+visualize_time_multi <- function(..., theme_base = temisc::theme_te_b_facet(), colname_multi = NULL) {
+  if(is.null(colname_multi)) stop("`colname_multi` cannot be NULL.", call. = FALSE)
+  viz <- visualize_time(..., theme_base = theme_base)
 
   viz <-
     viz +
-    ggplot2::facet_wrap(paste0("~ ", colname_facet), scales = "free") +
-    viz_theme
+    ggplot2::facet_wrap(paste0("~ ", colname_multi), scales = "free")
   viz
 }
 

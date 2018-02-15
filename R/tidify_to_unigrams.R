@@ -18,8 +18,12 @@
 #' @param rgx_ignore_custom character. Custom regular expression to remove.
 #' @return data.frame. In tidy format.
 #' @importFrom rlang sym !!
+#' @importFrom dplyr mutate rename anti_join filter
+#' @importFrom stringr str_replace_all str_detect
 #' @importFrom tidytext unnest_tokens get_stopwords
-#' @importFrom dplyr rename anti_join
+#' @seealso \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
+#' \url{https://www.tidytextmining.com/ngrams.html}.
+#' \url{https://www.tidytextmining.com/twitter.html}.
 tidify_to_unigrams <-
   function(data = NULL,
            colname_text = "text",
@@ -40,8 +44,8 @@ tidify_to_unigrams <-
     out <- data
     if (!missing(rgx_pattern) & !missing(rgx_replacement)) {
       out <-
-        mutate(out,
-               text = str_replace_all(!!colname_text_quo, rgx_pattern, rgx_replacement))
+        dplyr:: mutate(out,
+               text = stringr::str_replace_all(!!colname_text_quo, rgx_pattern, rgx_replacement))
     }
 
     if (missing(rgx_unnest)) {
@@ -70,9 +74,9 @@ tidify_to_unigrams <-
 
     if (!missing(rgx_ignore_custom)) {
       out <-
-        filter(out, !str_detect(!!colname_word_quo, rgx_ignore_custom))
+        dplyr::filter(out, !stringr::str_detect(!!colname_word_quo, rgx_ignore_custom))
     }
 
-    out <- filter(out, str_detect(!!colname_word_quo, "[a-z]"))
+    out <- dplyr::filter(out, stringr::str_detect(!!colname_word_quo, "[a-z]"))
     out
   }

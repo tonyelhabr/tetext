@@ -11,30 +11,36 @@ tidify_to_unigrams(data = NULL, colname_text = "text",
 \arguments{
 \item{data}{data.frame. Not in 'tidy' format.}
 
-\item{colname_text}{character. Default: 'text'}
+\item{colname_text}{character. Name of column in \code{data} to parse. Default: 'text'}
 
-\item{colname_word}{character. Default: 'word'}
+\item{colname_word}{character. Name of output column for token. Default: 'word'}
 
 \item{rgx_pattern}{character. Regular expression to substitute.}
 
 \item{rgx_replacement}{character. Regular expression used as replacement.}
 
-\item{rgx_unnest}{character. Regular expression to use in \code{tidytext::unnest_tokens()}. If not specified, then
-not used.}
+\item{rgx_unnest}{character. Regular expression to use in \code{tidytext::unnest_tokens()}.
+If not specified, then not used.}
 
 \item{stopwords}{logical. Whether or not to remove stopwords. Default: TRUE}
 
-\item{stopwords_lexicon}{character. If not specified, then uses all stop words available in \code{tidytext} package.
+\item{stopwords_lexicon}{character. If not specified, then uses all stop words
+available in \code{tidytext} package.
 Otherwise, must be a lexicon available in the \code{tidytext} package.}
 
 \item{rgx_ignore_custom}{character. Custom regular expression to remove.}
 }
 \value{
-tidy data.frame.
+data.frame. In tidy format.
 }
 \description{
 Create a tidy data.frame of unigrams.
 }
 \details{
-Heavily influence by the _Tidy Text Mining with R_ book.
+Heavily influence by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
+}
+\seealso{
+\href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
+\url{https://www.tidytextmining.com/ngrams.html}.
+\url{https://www.tidytextmining.com/twitter.html}.
 }

@@ -5,7 +5,6 @@
 #' @description Create a tidy data.frame of unigrams.
 #' @details Heavily influence by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
 #' @inheritParams tidify_to_unigrams
-#' @param colname_words character. Name of output column for token. Default: 'bigram'
 #' @return data.frame. In tidy format. 'word1' and 'word2' columns are named
 #' 'first' and 'second' respectively.
 #' @export
@@ -17,7 +16,7 @@
 tidify_to_bigrams <-
   function(data = NULL,
            colname_text = "text",
-           colname_words = "bigram",
+           colname_word = "word",
            rgx_pattern,
            rgx_replacement,
            stopwords = TRUE,
@@ -26,7 +25,7 @@ tidify_to_bigrams <-
 
     if(is.null(data)) stop("`data` cannot be NULL.", call. = FALSE)
     colname_text_quo <- rlang::sym(colname_text)
-    colname_words_quo <- rlang::sym(colname_words)
+    colname_words_quo <- rlang::sym(colname_word)
     colname_word1_quo <- rlang::sym("first")
     colname_word2_quo <- rlang::sym("second")
 

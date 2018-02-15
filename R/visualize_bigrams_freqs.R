@@ -1,68 +1,77 @@
 
 
 
-visualize_bigrams_forx_freqs <-
+#' Visualize bigrams
+#'
+#' @description Visualize bigrams with dots.
+#' @details None.
+#' @inheritParams visualize_time
+#' @param colname_word character. Name of column in \code{data} to use for bigram. Default: 'word'
+#' @param colname_freq character. Name of column in \code{data} to use for ordering and sizing. Default: 'freq'
+#' @param num_top numeric.
+#' @return gg
+#' @export
+#' @importFrom rlang sym
+#' @importFrom dplyr group_by mutate row_number desc filter ungroup arrange
+#' @importFrom stringr str_to_title str_replace_all
+#' @importFrom forcats fct_reorder
+#' @importFrom ggplot2 labs theme ggplot geom_point scale_y_discrete scale_color_manual scale_size_area coord_flip
+#' @importFrom temisc theme_te_b
+#' @seealso \url{https://buzzfeednews.github.io/2018-01-trump-twitter-wars/}
+visualize_bigrams_freqs <-
   function(data = NULL,
            colname_x = NULL,
-           colname_bigram = "bigram",
+           colname_word = "word",
            colname_freq = "freq",
-           num_top = 10) {
+           color = "grey50",
+           num_top = 10,
+           lab_title = "Most Frequently Used Pairs of Words",
+           lab_subtitle = paste0("By ", stringr::str_to_title(colname_x)),
+           theme_base = temisc::theme_te_b()) {
 
     if(is.null(data)) stop("`data` cannot be NULL.", call. = FALSE)
     if(is.null(colname_x)) stop("`colname_x` cannot be NULL.", call. = FALSE)
 
+    freq <- word <- NULL
+
     colname_x_quo <- rlang::sym(colname_x)
-    colname_bigram_quo <- rlang::sym(colname_bigram)
+    colname_bigram_quo <- rlang::sym(colname_word)
     colname_freq_quo <- rlang::sym(colname_freq)
 
-    bigrams_freqs <-
-      data %>%
-      group_by(!!colname_x) %>%
-      mutate(rank = row_number(desc(freq))) %>%
-      filter(rank <= num_top) %>%
-      ungroup() %>%
-      arrange(!!colname_x) %>%
-      mutate(bigram = str_replace_all(bigram, " ", "\n")) %>%
-      mutate(bigram = forcats::fct_reorder(factor(bigram), freq))
+    data_proc <- dplyr::group_by(data, !!colname_x)
+    data_proc <- dplyr::mutate(data_proc, rank = dplyr::row_number(dplyr::desc(freq)))
+    data_proc <- dplyr::filter(data_proc, rank <= num_top)
+    data_proc <- dplyr::ungroup(data_proc)
+    data_proc <- dplyr::arrange(data_proc, !!colname_x)
+    data_proc <- dplyr::mutate(data_proc, word = stringr::str_replace_all(word, " ", "\n"))
+    data_proc <- dplyr::mutate(data_proc, word = forcats::fct_reorder(factor(word), freq))
 
-    bigrams_freqs_byx_viz %>%
-      ggplot(aes_string(x = colname_x, y = colname_bigram, color = colname_x, size = colname_freq)) +
-      geom_point() +
-      scale_y_discrete(position = "right") +
-      scale_color_manual(values = params$color_main) +
-      scale_size_area(max_size = 25) +
-      temisc::theme_te_b() +
-      theme(legend.position = "none") +
-      coord_flip() +
-      labs(x = NULL, y = NULL) +
-      labs(title = "Most Frequently Used Pairs of Words", subtitle = "By !!colname_x")
+    viz_labs <-
+      ggplot2::labs(
+        x = NULL,
+        y = NULL,
+        title = lab_title,
+        subtitle = lab_subtitle
+      )
+
+    viz_theme <-
+      theme_base +
+      ggplot2::theme(
+        legend.position = "none"
+      )
+
+    viz <-
+      ggplot2::ggplot(
+        data = data_proc,
+        aes_string(x = colname_x,
+                   y = colname_word,
+                   color = colname_x,
+                   size = colname_freq)
+        ) +
+      ggplot2::geom_point() +
+      ggplot2::scale_y_discrete(position = "right") +
+      ggplot2::scale_color_manual(values = color) +
+      ggplot2::scale_size_area(max_size = 25) +
+      ggplot2::coord_flip()
+    viz
   }
-
-
-visualize_bigrams_freqs_byx <- function() {
-
-}
-num_top <- 10
-bigrams_freqs_byx_viz <-
-  data %>%
-  group_by(!!colname_x) %>%
-  mutate(rank = row_number(desc(freq))) %>%
-  filter(rank <= num_top) %>%
-  ungroup() %>%
-  arrange(!!colname_x) %>%
-  mutate(bigram = str_replace_all(bigram, " ", "\n")) %>%
-  mutate(bigram = forcats::fct_reorder(factor(bigram), freq))
-
-viz_bigrams_freqs_byx <-
-  bigrams_freqs_byx_viz %>%
-  ggplot(aes(x = !!colname_x, y = bigram, color = !!colname_x, size = freq)) +
-  geom_point() +
-  scale_y_discrete(position = "right") +
-  scale_color_manual(values = params$color_main) +
-  scale_size_area(max_size = 25) +
-  temisc::theme_te_b() +
-  theme(legend.position = "none") +
-  coord_flip() +
-  labs(x = NULL, y = NULL) +
-  labs(title = "Most Frequently Used Pairs of Words", subtitle = "By !!colname_x")
-viz_bigrams_freqs_byx
