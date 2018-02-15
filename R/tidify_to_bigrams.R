@@ -3,10 +3,11 @@
 #' Prepare data for text analysis.
 #'
 #' @description Create a tidy data.frame of unigrams.
-#' @details Heavily influence by the _Tidy Text Mining with R_ book.
+#' @details Heavily influence by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
 #' @inheritParams tidify_to_unigrams
-#' @param colname_words character. Output column name of bigram. Default: 'bigram'
-#' @return data.frame.
+#' @param colname_words character. Name of output column for token. Default: 'bigram'
+#' @return data.frame. In tidy format. 'word1' and 'word2' columns are named
+#' 'first' and 'second' respectively.
 #' @export
 #' @importFrom rlang sym !!
 #' @importFrom dplyr mutate rename anti_join filter
@@ -39,7 +40,7 @@ tidify_to_bigrams <-
     }
     out <- tidytext::unnest_tokens(out, !!colname_words_quo, !!colname_text_quo, token = "ngrams", n = 2)
     out <- tidyr::separate(out, !!colname_words_quo,
-                           into = c("first", "Second"), sep = " ", remove = FALSE)
+                           into = c("first", "second"), sep = " ", remove = FALSE)
     if(stopwords) {
 
       if(missing(stopwords_lexicon)) {

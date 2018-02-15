@@ -4,17 +4,17 @@
 \alias{visualize_bytime}
 \title{Visualize by time period.}
 \usage{
-visualize_bytime(data, x_char = NULL, geom = c("bar", "hist"),
-  color_char = NULL, color = "grey50", lab_subtitle = NULL)
+visualize_bytime(data, colname_x = NULL, geom = c("bar", "hist"),
+  colname_color = NULL, color = "grey50", lab_subtitle = NULL)
 }
 \arguments{
 \item{data}{data.frame.}
 
-\item{x_char}{character. Probably something like 'timestamp', 'yyyy', 'mm', etc.}
+\item{colname_x}{character. Probably something like 'timestamp', 'yyyy', 'mm', etc.}
 
 \item{geom}{character. "bar" or "hist". "bar" is probably best for everything except Date objects.}
 
-\item{color_char}{character. Name of column in data.frame to use for color basis.}
+\item{colname_color}{character. Name of column in data.frame to use for color basis.}
 
 \item{color}{chracter. Hex value of color. Default is provided.}
 
@@ -27,6 +27,6 @@ ggplot
 Visualize time-based data over time.
 }
 \details{
-Even though \code{x_char} and \code{lab_subtitle} are not required, they
+Even though \code{colname_x} and \code{lab_subtitle} are not required, they
 are sent to \code{NULL} by default in order to simplify the internal code.
 }

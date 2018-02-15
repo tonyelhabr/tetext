@@ -4,7 +4,7 @@
 \alias{visualize_bytime_batched}
 \title{Visualize over multiple time periods}
 \usage{
-visualize_bytime_batched(data = NULL, x_chars = c("timestamp", "yyyy", "mm",
+visualize_bytime_batched(data = NULL, colnames_x = c("timestamp", "yyyy", "mm",
   "wd", "hh"), geoms = c("hist", "bar", "bar", "bar", "bar"),
   labs_subtitle = c("", "By Year", "By Month", "By Day of Week", "By Hour"),
   colors = rep("grey50", 5), color_chars)
@@ -12,7 +12,7 @@ visualize_bytime_batched(data = NULL, x_chars = c("timestamp", "yyyy", "mm",
 \arguments{
 \item{data}{data.frame (single).}
 
-\item{x_chars}{character (vector).}
+\item{colnames_x}{character (vector).}
 
 \item{geoms}{character (vector).}
 
