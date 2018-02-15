@@ -18,31 +18,31 @@
 #' @importFrom ggplot2 labs theme ggplot geom_point scale_y_discrete scale_color_manual scale_size_area coord_flip
 #' @importFrom temisc theme_te_b
 #' @seealso \url{https://buzzfeednews.github.io/2018-01-trump-twitter-wars/}
-visualize_bigrams_freqs <-
+visualize_bigrams_freqs_multi <-
   function(data = NULL,
-           colname_x = NULL,
+           colname_multi = NULL,
            colname_word = "word",
            colname_freq = "freq",
            color = "grey50",
            num_top = 10,
            lab_title = "Most Frequently Used Pairs of Words",
-           lab_subtitle = paste0("By ", stringr::str_to_title(colname_x)),
+           lab_subtitle = paste0("By ", stringr::str_to_title(colname_multi)),
            theme_base = temisc::theme_te_b()) {
 
     if(is.null(data)) stop("`data` cannot be NULL.", call. = FALSE)
-    if(is.null(colname_x)) stop("`colname_x` cannot be NULL.", call. = FALSE)
+    if(is.null(colname_multi)) stop("`colname_multi` cannot be NULL.", call. = FALSE)
 
     freq <- word <- NULL
 
-    colname_x_quo <- rlang::sym(colname_x)
+    colname_x_quo <- rlang::sym(colname_multi)
     colname_bigram_quo <- rlang::sym(colname_word)
     colname_freq_quo <- rlang::sym(colname_freq)
 
-    data_proc <- dplyr::group_by(data, !!colname_x)
+    data_proc <- dplyr::group_by(data, !!colname_multi)
     data_proc <- dplyr::mutate(data_proc, rank = dplyr::row_number(dplyr::desc(freq)))
     data_proc <- dplyr::filter(data_proc, rank <= num_top)
     data_proc <- dplyr::ungroup(data_proc)
-    data_proc <- dplyr::arrange(data_proc, !!colname_x)
+    data_proc <- dplyr::arrange(data_proc, !!colname_multi)
     data_proc <- dplyr::mutate(data_proc, word = stringr::str_replace_all(word, " ", "\n"))
     data_proc <- dplyr::mutate(data_proc, word = forcats::fct_reorder(factor(word), freq))
 
@@ -63,9 +63,9 @@ visualize_bigrams_freqs <-
     viz <-
       ggplot2::ggplot(
         data = data_proc,
-        aes_string(x = colname_x,
+        aes_string(x = colname_multi,
                    y = colname_word,
-                   color = colname_x,
+                   color = colname_multi,
                    size = colname_freq)
         ) +
       ggplot2::geom_point() +
@@ -75,3 +75,4 @@ visualize_bigrams_freqs <-
       ggplot2::coord_flip()
     viz
   }
+

@@ -16,12 +16,13 @@ Notes
 
 Here is a list of all functions in the package.
 
--   `visualize_time()`, `visualize_time_multi()` and `visualize_time_batched()`: used for 5 different temporal plots
--   `tidify_to_unigrams()` and \``tidify_to_bigrams()`: tidy to unigrams/bigrams
--   `visualize_cnts_wordcloud()` and `visualize_cnts_wordcloud_multi()`: visualize counts with wordclouds
--   `compute_freqs()` and `compute_freqs_multi()`: compute frequencies (of n-grams)
--   `visualize_cnt()` and `visualize_cnt_multi()`: create count plots of n-grams
--   `visualize_bigrams_freqs()`
+-   `visualize_time()`, `visualize_time_multi()` and `visualize_time_batched()`: Visualize data over time.
+-   `tidify_to_unigrams()` and \``tidify_to_bigrams()`: Tokenize data to tidy format with unigrams/bigrams.
+-   `visualize_cnts()` and `visualize_cnts_multi()`: visualize counts of n-grams.
+-   `visualize_cnts_wordcloud()` and `visualize_cnts_wordcloud_multi()`: visualize counts of n-grams with wordclouds.
+-   `compute_freqs()` and `compute_freqs_multi()`: Compute frequencies of n-grams.
+-   `visualize_bigrams_freqs_multi()`: Visualize bigrams with dots corresponding to frequency and rows/colors corresponding to a 'multi' variable.
+-   
 
 ### To Add
 
