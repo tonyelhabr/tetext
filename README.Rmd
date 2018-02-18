@@ -71,11 +71,9 @@ of n-grams with wordclouds.
 + `compute_freqs()` and `compute_freqs_multi()`: Compute frequencies of n-grams.
 + `visualize_bigrams_freqs_multi()`: Visualize bigrams with dots corresponding
 to frequency and rows/colors corresponding to a 'multi' variable.
-+ 
++ `compute_corrs()` and `visualize_corrs_network()`
 
 ### To Add
-+ `compute_corrs()` and `compute_corrs_network()`
-+ `visualize_corrs_network()`
 + `visualize_change()`
 + `model_lda()`
 + `visualize_lda_betas()`

@@ -1,4 +1,4 @@
-# library(testthat)
-# library(tetext)
+# library("testthat")
+# library("tetext")
 #
 # test_check("tetext")

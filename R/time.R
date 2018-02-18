@@ -5,7 +5,7 @@
 #' @description Visualize time-based data over time.
 #' @details 'multi' version is for facetting.
 #' @param data data.frame.
-#' @param colname_x character. Name of column in \code{data} to use for x-axis.
+#' @param colname_timebin character. Name of column in \code{data} to use for x-axis.
 #' Probably something like 'yyyy', 'mm', etc.
 #' @param geom character. 'bar' or 'hist'. 'bar' is probably best for everything except Date objects.
 #' @param colname_color character. Name of column in \code{data} to use for color basis.
@@ -17,21 +17,21 @@
 #' @param theme_base \code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}. Default is provided.
 #' @return gg
 #' @export
-#' @importFrom temisc theme_te_b
+#' @importFrom temisc theme_te_a
 #' @seealso \url{https://juliasilge.com/blog/ten-thousand-tweets/}.
 visualize_time <-
   function(data = NULL,
-           colname_x = NULL,
+           colname_timebin = NULL,
            geom = c("bar", "hist"),
            colname_color = NULL,
            color = "grey50",
            lab_title = "Count Over Time",
            lab_subtitle = NULL,
-           theme_base = temisc::theme_te_b()) {
+           theme_base = temisc::theme_te_a()) {
     if (is.null(data))
       stop("`data` must not be NULL.", call. = FALSE)
-    if (is.null(colname_x))
-      stop("`colname_x` must not be NULL.", call. = FALSE)
+    if (is.null(colname_timebin))
+      stop("`colname_timebin` must not be NULL.", call. = FALSE)
     if (is.null(colname_color)) {
       data$color <- "dummy"
       colname_color <- "color"
@@ -45,12 +45,12 @@ visualize_time <-
         subtitle = lab_subtitle
       )
     viz_theme <-
-      # temisc::theme_te_b() +
+      # temisc::theme_te_a() +
       theme_base +
       ggplot2::theme(panel.grid.major.x = ggplot2::element_blank()) +
       ggplot2::theme(legend.position = "none")
 
-    viz <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = colname_x))
+    viz <- ggplot2::ggplot(data = data, ggplot2::aes_string(x = colname_timebin))
     if (geom == "bar") {
       viz <-
         viz +
@@ -76,8 +76,8 @@ visualize_time <-
 #' @rdname visualize_time
 #' @export
 #' @importFrom ggplot2 facet_wrap
-#' @importFrom temisc theme_te_b
-visualize_time_multi <- function(..., theme_base = temisc::theme_te_b_facet(), colname_multi = NULL) {
+#' @importFrom temisc theme_te_a
+visualize_time_multi <- function(..., theme_base = temisc::theme_te_a_facet(), colname_multi = NULL) {
   if(is.null(colname_multi)) stop("`colname_multi` cannot be NULL.", call. = FALSE)
   viz <- visualize_time(..., theme_base = theme_base)
 
@@ -124,7 +124,7 @@ visualize_time_batched <-
     viz_bytime_params <-
       list(
         data = data_rep$data,
-        colname_x = colnames_x,
+        colname_timebin = colnames_x,
         geom = geoms,
         color = colors,
         lab_subtitle = labs_subtitle
@@ -138,14 +138,14 @@ visualize_time_batched <-
 
     helper_func <-
       function(data,
-               colname_x,
+               colname_timebin,
                geom,
                lab_subtitle,
                color,
                colname_color = NULL) {
         visualize_time(
           data = data,
-          colname_x = colname_x,
+          colname_timebin = colname_timebin,
           geom = geom,
           lab_subtitle = lab_subtitle,
           colname_color = colname_color,
