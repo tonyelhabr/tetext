@@ -3,12 +3,19 @@
 \name{compute_freqs}
 \alias{compute_freqs}
 \alias{compute_freqs_multi}
+\alias{visualize_bigram_freqs_multi}
 \title{Compute n-gram frequency}
 \usage{
 compute_freqs(data = NULL, colname_word = "word")
 
 compute_freqs_multi(data = NULL, colname_word = "word",
   colname_multi = NULL)
+
+visualize_bigram_freqs_multi(data = NULL, colname_word = "word",
+  colname_multi = NULL, colname_color = colname_multi, color = "grey50",
+  num_top = 3, lab_title = "Most Frequently Used Pairs of Words",
+  lab_subtitle = paste0("By ", stringr::str_to_title(colname_multi)),
+  lab_x = NULL, lab_y = NULL, theme_base = temisc::theme_te_a())
 }
 \arguments{
 \item{data}{data.frame.}
@@ -17,13 +24,42 @@ compute_freqs_multi(data = NULL, colname_word = "word",
 
 \item{colname_multi}{character. Name of column in \code{data} corresponding to group
 by which count is made.}
+
+\item{colname_color}{character. Name of column in \code{data} to use for color basis.
+Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+
+\item{color}{chracter. Hex value of color. Default is provided.}
+
+\item{num_top}{numeric. Number of words to show. Default is provided.}
+
+\item{lab_title}{character. Default is provided.}
+
+\item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
+Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+
+\item{lab_x}{character. Default is provided.}
+
+\item{lab_y}{character. Default is provided.}
+
+\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}. Default is provided.}
 }
 \value{
 data.frame.
+
+data.frame.
+
+gg.
 }
 \description{
 Compute the frequency of n-grams.
+
+Visualize bigrams with dots sized according to frequency.
 }
 \details{
 Inspired by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
+
+\code{compute_freqs_multi()} should NOT be called beforehand.
+}
+\seealso{
+\url{https://buzzfeednews.github.io/2018-01-trump-twitter-wars/}
 }

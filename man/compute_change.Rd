@@ -2,11 +2,17 @@
 % Please edit documentation in R/change.R
 \name{compute_change}
 \alias{compute_change}
+\alias{visualize_change}
 \title{Compute change}
 \usage{
 compute_change(data = NULL, colname_timebin = NULL, colname_word = "word",
-  timefloor = c("second", "year", "hour", "day", "week", "year"),
-  top_pct = 0.05)
+  timefloor = NULL, top_pct = 0.05, return_models = TRUE,
+  return_data = FALSE, return_both = FALSE)
+
+visualize_change(..., num_top = 5, colname_color = NULL,
+  color = rep("grey50", num_top),
+  lab_title = "Largest Changes in Word Frequency", lab_subtitle = NULL,
+  lab_x = NULL, lab_y = NULL, theme_base = temisc::theme_te_a())
 }
 \arguments{
 \item{data}{data.frame.}
@@ -19,16 +25,52 @@ to use to compute change.}
 \item{timefloor}{character. Passed directly to \code{lubridate::floor_date()} as\code{unit} parameter.}
 
 \item{top_pct}{numeric. Number between 0 and 1. Default is provided.}
+
+\item{return_models}{logical. Whether to return just the models. This is probably the preferred
+option when calling \code{compute_change()} directly. Default is provided.}
+
+\item{return_data}{logical. Whether to 'bytime' data which is used as
+the \code{data} parameter in \code{stats::glm()} for creating models. Default is provided.
+Needed when using \code{visualize_change()}.}
+
+\item{return_both}{logical. Set to \code{TRUE} when \code{visualize_change()}. Default is provided.}
+
+\item{...}{dots. Parameters passed to \code{compute_change()}.}
+
+\item{num_top}{numeric. Number of words to show. Default is provided.}
+
+\item{colname_color}{character. Name of column in \code{data} to use for color basis.
+Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+
+\item{color}{chracter. Hex value of color. Default is provided.}
+
+\item{lab_title}{character. Default is provided.}
+
+\item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
+Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+
+\item{lab_x}{character. Default is provided.}
+
+\item{lab_y}{character. Default is provided.}
+
+\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}. Default is provided.}
 }
 \value{
-data.frame
+data.frame.
+
+gg.
 }
 \description{
 Compute change in word usage over time.
+
+Visualize the words that have changed the most across \code{colname_timebin}
 }
 \details{
 None.
+
+Calls \code{compute_change()} internally. Works similarly to \code{visualize_corrs}.
+(Two data sets are returned from the list that is returned by the \code{compute_} function.)
 }
 \seealso{
-https://www.tidytextmining.com/twitter.html#changes-in-word-use
+\url{https://www.tidytextmining.com/twitter.html#changes-in-word-use}
 }

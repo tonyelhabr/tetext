@@ -5,8 +5,10 @@
 #' @description Compute the frequency of n-grams.
 #' @details Inspired by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
 #' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param colname_word character. Name of column in \code{data} to use for count. Default is provided
 #' @return data.frame.
+#' @rdname compute_freqs
 #' @export
 #' @importFrom dplyr n count mutate summarise arrange desc
 compute_freqs <- function(data = NULL, colname_word = "word") {
@@ -27,12 +29,16 @@ compute_freqs <- function(data = NULL, colname_word = "word") {
       dplyr::ungroup() %>%
       dplyr::arrange(dplyr::desc(freq))
     out
-  }
+}
 
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @inheritParams compute_freqs
 #' @param colname_multi character. Name of column in \code{data} corresponding to group
 #' by which count is made.
+#' @return data.frame.
 #' @rdname compute_freqs
+#' @export
 #' @importFrom dplyr left_join rename
 compute_freqs_multi <-
   function(data = NULL,
@@ -66,9 +72,10 @@ compute_freqs_multi <-
 #' @description Visualize bigrams with dots sized according to frequency.
 #' @details \code{compute_freqs_multi()} should NOT be called beforehand.
 #' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @inheritParams compute_freqs_multi
-#' @param num_top numeric. Default is provided.
-#' @return gg
+#' @return gg.
+#' @rdname compute_freqs
 #' @export
 #' @importFrom dplyr group_by mutate row_number desc filter ungroup arrange
 #' @importFrom stringr str_to_title str_replace_all
@@ -80,10 +87,13 @@ visualize_bigram_freqs_multi <-
   function(data = NULL,
            colname_word = "word",
            colname_multi = NULL,
+           colname_color = colname_multi,
            color = "grey50",
            num_top = 3,
            lab_title = "Most Frequently Used Pairs of Words",
            lab_subtitle = paste0("By ", stringr::str_to_title(colname_multi)),
+           lab_x = NULL,
+           lab_y = NULL,
            theme_base = temisc::theme_te_a()) {
 
     if(is.null(data)) stop("`data` cannot be NULL.", call. = FALSE)
@@ -96,13 +106,7 @@ visualize_bigram_freqs_multi <-
         colname_multi = colname_multi
       )
 
-    if (is.null(colname_color)) {
-      data_proc$color <- "dummy"
-      colname_color <- "color"
-      data_proc <- coerce_col_to_factor(data_proc, colname_color)
-    }
-
-    data_proc <- coerce_col_to_factor(data_proc, colname_multi)
+    data_proc <- wrangle_multi_col(data_proc, colname_multi)
 
     freq <- word <- NULL
 
@@ -119,10 +123,33 @@ visualize_bigram_freqs_multi <-
       dplyr::mutate(!!colname_word_quo := stringr::str_replace_all(!!colname_word_quo, " ", "\n")) %>%
       dplyr::mutate(!!colname_word_quo := forcats::fct_reorder(factor(!!colname_word_quo), freq))
 
+
+    if (is.null(colname_color)) {
+      data_viz$color <- "dummy"
+      colname_color <- "color"
+
+    }
+    data_viz <- wrangle_color_col(data_viz, colname_color)
+
+    viz <-
+      ggplot2::ggplot(
+        data = data_viz,
+        ggplot2::aes_string(
+          x = colname_multi,
+          y = colname_word,
+          color = colname_color,
+          size = "freq")
+      ) +
+      ggplot2::geom_point() +
+      ggplot2::scale_y_discrete(position = "right") +
+      ggplot2::scale_color_manual(values = color) +
+      ggplot2::scale_size_area(max_size = 25) +
+      ggplot2::coord_flip()
+
     viz_labs <-
       ggplot2::labs(
-        x = NULL,
-        y = NULL,
+        x = lab_x,
+        y = lab_y,
         title = lab_title,
         subtitle = lab_subtitle
       )
@@ -132,21 +159,6 @@ visualize_bigram_freqs_multi <-
       ggplot2::theme(
         legend.position = "none"
       )
-
-    viz <-
-      ggplot2::ggplot(
-        data = data_viz,
-        ggplot2::aes_string(
-          x = colname_multi,
-          y = colname_word,
-          color = colname_multi,
-          size = "freq")
-      ) +
-      ggplot2::geom_point() +
-      ggplot2::scale_y_discrete(position = "right") +
-      ggplot2::scale_color_manual(values = color) +
-      ggplot2::scale_size_area(max_size = 25) +
-      ggplot2::coord_flip()
 
     viz <-
       viz +

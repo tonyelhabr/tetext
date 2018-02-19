@@ -6,8 +6,9 @@
 \title{Visualize by time period.}
 \usage{
 visualize_time(data = NULL, colname_timebin = NULL, geom = c("bar",
-  "hist"), colname_color = NULL, color = "grey50",
-  lab_title = "Count Over Time", lab_subtitle = NULL,
+  "hist"), add_alpha = FALSE, alpha_range = c(0.25, 1),
+  colname_color = NULL, color = "grey50", lab_title = "Count Over Time",
+  lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
   theme_base = temisc::theme_te_a())
 
 visualize_time_multi(..., theme_base = temisc::theme_te_a_facet(),
@@ -21,6 +22,11 @@ Probably something like 'yyyy', 'mm', etc.}
 
 \item{geom}{character. 'bar' or 'hist'. 'bar' is probably best for everything except Date objects.}
 
+\item{add_alpha}{logical. Whether or not to use \code{ggplot2::scale_alpha()} based on count.}
+
+\item{alpha_range}{numeric (vector). Direct parameter passed to \code{range} parameter
+of \code{ggplot2::scale_alpha()}. Default is provided.}
+
 \item{colname_color}{character. Name of column in \code{data} to use for color basis.
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
 
@@ -30,6 +36,10 @@ Set to \code{NULL} by default although not actually required in order to simplif
 
 \item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+
+\item{lab_x}{character. Default is provided.}
+
+\item{lab_y}{character. Default is provided.}
 
 \item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}. Default is provided.}
 

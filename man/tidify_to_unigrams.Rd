@@ -2,11 +2,16 @@
 % Please edit documentation in R/tidify.R
 \name{tidify_to_unigrams}
 \alias{tidify_to_unigrams}
+\alias{tidify_to_bigrams}
 \title{Prepare data for text analysis.}
 \usage{
 tidify_to_unigrams(data = NULL, colname_text = "text",
   colname_word = "word", rgx_pattern, rgx_replacement, rgx_unnest,
   stopwords = TRUE, stopwords_lexicon, rgx_ignore_custom)
+
+tidify_to_bigrams(data = NULL, colname_text = "text",
+  colname_word = "word", rgx_pattern, rgx_replacement, stopwords = TRUE,
+  stopwords_lexicon, rgx_ignore_custom)
 }
 \arguments{
 \item{data}{data.frame. Not in 'tidy' format.}
@@ -31,12 +36,19 @@ Otherwise, must be a lexicon available in the \code{tidytext} package.}
 \item{rgx_ignore_custom}{character. Custom regular expression to remove.}
 }
 \value{
-data.frame. In tidy format.
+data.frame.
+
+data.frame. In tidy format. 'word1' and 'word2' columns are named
+'first' and 'second' respectively.
 }
 \description{
 Create a tidy data.frame of unigrams.
+
+Create a tidy data.frame of unigrams.
 }
 \details{
+Heavily influence by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
+
 Heavily influence by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
 }
 \seealso{

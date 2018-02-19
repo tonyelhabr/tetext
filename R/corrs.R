@@ -6,6 +6,7 @@
 #' @details Call \code{widyr::pairwise_cor()} internally.
 #' Is called by \code{visualize_corrs_network()}, so there is no need to call this directly.
 #' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param colname_word character. Name of column in \code{data} to use as \code{item}
 #' in \code{widyr::pairwise_cor()}. Default is provided.
 #' @param colname_feature character. Name of column in \code{data} to use as \code{feature}
@@ -21,10 +22,11 @@
 #' @param return_both logical. Useful when creating a network visualization so that
 #' words can be used as nodes and correlations can be used weights.
 #' @return data.frame.
+#' @rdname compute_corrs
 #' @export
 #' @importFrom dplyr count mutate row_number desc filter semi_join rename
 #' @importFrom widyr pairwise_cor
-#' @seealso \url{http://varianceexplained.org/r/seven-fav-packages/}
+#' @seealso \url{http://varianceexplained.org/r/seven-fav-packages/}.
 compute_corrs <-
   function(data = NULL,
            colname_word = "word",
@@ -70,7 +72,7 @@ compute_corrs <-
         upper = FALSE
       )
 
-    data_corrs_top<-
+    data_corrs_top <-
       data_corrs %>%
       dplyr::mutate(rank = dplyr::row_number(dplyr::desc(correlation))) %>%
       dplyr::filter(rank <= num_top_corrs)
@@ -89,6 +91,8 @@ compute_corrs <-
 #' Visualize correlations
 #'
 #' @description Visualize correlations with a network
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param ... dots. Parameters passed directly to \code{compute_corrs()}.
 #' @param resize_points logical. Indicates whether or not to make size of points
 #' correspond to count of words.
@@ -98,13 +102,14 @@ compute_corrs <-
 #' @param shape_point numeric. Default is provided.
 #' @param seed numeric. Used to by \code{ggraph::ggraph}. Default is provided.
 #' @inheritParams visualize_time
-#' @return gg
+#' @return gg.
+#' @rdname compute_corrs
 #' @export
 #' @importFrom ggplot2 theme_void labs theme aes_string
 #' @importFrom igraph graph_from_data_frame
 #' @importFrom ggraph ggraph geom_edge_link geom_node_point geom_node_text
 #' @seealso \url{https://www.tidytextmining.com/ngrams.html}.
-#' \url{http://varianceexplained.org/r/seven-fav-packages/}
+#' \url{http://varianceexplained.org/r/seven-fav-packages/}.
 visualize_corrs_network <-
   function(...,
            resize_points = TRUE,
@@ -115,6 +120,8 @@ visualize_corrs_network <-
            seed = 42,
            lab_title = "Network of Pairwise Correlations",
            lab_subtitle = NULL,
+           lab_x = NULL,
+           lab_y = NULL,
            theme_base = ggplot2::theme_void()) {
 
     corrs <-
@@ -126,19 +133,6 @@ visualize_corrs_network <-
       igraph::graph_from_data_frame(
         d = corrs$corrs,
         vertices = corrs$words
-      )
-
-    viz_labs <-
-      ggplot2::labs(
-        x = NULL,
-        y = NULL,
-        title = lab_title,
-        subtitle = lab_subtitle
-      )
-    viz_theme <-
-      theme_base +
-      ggplot2::theme(
-        legend.position = "none"
       )
 
     set.seed(seed)
@@ -167,6 +161,19 @@ visualize_corrs_network <-
         viz +
         ggraph::geom_node_text(ggplot2::aes_string(label = colname_label), repel = TRUE)
     }
+
+    viz_labs <-
+      ggplot2::labs(
+        x = lab_x,
+        y = lab_y,
+        title = lab_title,
+        subtitle = lab_subtitle
+      )
+    viz_theme <-
+      theme_base +
+      ggplot2::theme(
+        legend.position = "none"
+      )
 
     viz <-
       viz +

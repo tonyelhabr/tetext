@@ -2,11 +2,18 @@
 % Please edit documentation in R/corrs.R
 \name{compute_corrs}
 \alias{compute_corrs}
+\alias{visualize_corrs_network}
 \title{Compute correlations}
 \usage{
 compute_corrs(data = NULL, colname_word = "word", colname_feature = NULL,
   num_top_ngrams = 50, num_top_corrs = 50, return_corrs = TRUE,
   return_words = FALSE, return_both = FALSE)
+
+visualize_corrs_network(..., resize_points = TRUE, colname_size_point = "n",
+  add_point_labels = TRUE, color_point = "grey50", shape_point = 21,
+  seed = 42, lab_title = "Network of Pairwise Correlations",
+  lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
+  theme_base = ggplot2::theme_void())
 }
 \arguments{
 \item{data}{data.frame.}
@@ -31,17 +38,50 @@ the correlations. Useful when creating a network visualization.}
 
 \item{return_both}{logical. Useful when creating a network visualization so that
 words can be used as nodes and correlations can be used weights.}
+
+\item{...}{dots. Parameters passed directly to \code{compute_corrs()}.}
+
+\item{resize_points}{logical. Indicates whether or not to make size of points
+correspond to count of words.}
+
+\item{colname_size_point}{character. Name of column in \code{data} to use for point sizing.}
+
+\item{add_point_labels}{logical. Indicates whether or not to add labels to points.}
+
+\item{color_point}{character. Hex value of color for points. Default is provided.}
+
+\item{shape_point}{numeric. Default is provided.}
+
+\item{seed}{numeric. Used to by \code{ggraph::ggraph}. Default is provided.}
+
+\item{lab_title}{character. Default is provided.}
+
+\item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
+Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+
+\item{lab_x}{character. Default is provided.}
+
+\item{lab_y}{character. Default is provided.}
+
+\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}. Default is provided.}
 }
 \value{
 data.frame.
+
+gg.
 }
 \description{
 Compute correlations among pairs of words.
+
+Visualize correlations with a network
 }
 \details{
 Call \code{widyr::pairwise_cor()} internally.
 Is called by \code{visualize_corrs_network()}, so there is no need to call this directly.
 }
 \seealso{
-\url{http://varianceexplained.org/r/seven-fav-packages/}
+\url{http://varianceexplained.org/r/seven-fav-packages/}.
+
+\url{https://www.tidytextmining.com/ngrams.html}.
+\url{http://varianceexplained.org/r/seven-fav-packages/}.
 }

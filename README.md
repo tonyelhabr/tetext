@@ -9,35 +9,42 @@ This package containts functions that I often use.
 
 ### Installation
 
-`devtools::install_github("aelhabr/temisc")`.
+`devtools::install_github("tonyelhabr/temisc")`.
 
 Notes
 -----
 
 Here is a list of all functions in the package.
 
--   `visualize_time()`, `visualize_time_multi()` and `visualize_time_batched()`: Visualize data over time.
--   `tidify_to_unigrams()` and \``tidify_to_bigrams()`: Tokenize data to tidy format with unigrams/bigrams.
--   `visualize_cnts()` and `visualize_cnts_multi()`: visualize counts of n-grams.
--   `visualize_cnts_wordcloud()` and `visualize_cnts_wordcloud_multi()`: visualize counts of n-grams with wordclouds.
--   `compute_freqs()` and `compute_freqs_multi()`: Compute frequencies of n-grams.
--   `visualize_bigrams_freqs_multi()`: Visualize bigrams with dots corresponding to frequency and rows/colors corresponding to a 'multi' variable.
--   
+Here are some short descriptions. Functions are listed in order of recommended use in a script.
 
-### To Add
+-   **time:** `visualize_time()`, `visualize_time_multi()`, `visualize_time_batched()`: Visualize data over time.
+-   **tidify:** `tidify_to_unigrams()`, `tidify_to_bigrams()`: Tokenize data to tidy format with unigrams/bigrams.
+-   **cnts:** `visualize_cnts()`, `visualize_cnts_multi()`, `visualize_cnts_wordcloud()`, `visualize_cnts_wordcloud_multi()`: Visualize counts of n-grams.
+-   **freqs:** `compute_freqs()`, `compute_freqs_multi()`,`visualize_bigrams_freqs_multi()`: Compute and visualize frequencies of n-grams.
+-   **corrs:** `compute_corrs()`, `visualize_corrs_network()`: Compute and visualize pairwise correlations (of bigrams).
+-   **tfidf:** `compute_tfidf()`, `visualize_tfidf_multi()`: Compute and visualize change in n-gram usage across documents.
+-   **change:** `compute_change()`, `visualize_change()`: Compute and visualize change in n-gram usage across documents.
 
--   `compute_corrs()` and `compute_corrs_network()`
--   `visualize_corrs_network()`
--   `visualize_change()`
--   `model_lda()`
--   `visualize_lda_betas()`
--   `visualize_lda_gammas()`
+### To Add?
+
+#### In Progress
+
+-   `get_xy_grid()`, `filter_xy_grid()`, `preprocess_xy_data()`, `postprocess_xy_data()`, `wrapper_func()`, `add_dummy_cols()`: See the functions with the same names in my `tetweets` project.
+
+#### Somewhat Likely
+
+-   `model_lda()`, `visualize_lda_betas()`, `visualize_lda_gammas()`
 
 #### Low Priority
 
--   `compute_logratio()` and `compute_logratio_multi()`
--   `compute_corrs_multi()`
--   Other sentiment analysis functions.
+-   `compute_freqs_wide()`: See `compute_unigrams_freqs()` in my `tetweets` project. Then create `compute_freqs_wide_multi()` using `wrapper_funct()`.
+-   `compute_logratios()`: See the function with the same name in my `tetweets` project. Then create `compute_logratios_multi()`using `wrapper_funct()`.
+-   `create_sents_ratios_wide()`, `visualize_sents_ratios()`: See the functions with the same names in my `tetweets` project.
+
+#### Very Unlikely
+
+-   ~~`compute_sentdiff_poisson()`, `prepare_sents_diffs_poisson()`, `visualize_sents_diffs_poission()`~~
 
 Examples
 --------

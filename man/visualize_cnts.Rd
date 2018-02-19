@@ -7,20 +7,22 @@
 \usage{
 visualize_cnts(data = NULL, colname_word = "word", num_top = 10,
   colname_color = NULL, color = "grey50", lab_title = "Count of Words",
-  lab_subtitle = NULL, theme_base = temisc::theme_te_a())
+  lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
+  theme_base = temisc::theme_te_a())
 
 visualize_cnts_multi(data = NULL, colname_word = "word", num_top = 10,
   colname_color = NULL, color = "grey50", lab_title = "Count of Words",
   lab_subtitle = paste0("By ", stringr::str_to_title(colname_multi)),
-  theme_base = temisc::theme_te_a_facet(), colname_multi)
+  lab_x = NULL, lab_y = NULL, theme_base = temisc::theme_te_a_facet(),
+  colname_multi)
 }
 \arguments{
 \item{data}{data.frame.}
 
-\item{colname_word}{character. Name of column in \code{data} to use for x-axis.
+\item{colname_word}{character. Name of column in \code{data} to use for words.
 Probably something like 'word' or 'bigram'. Default is provided.}
 
-\item{num_top}{numeric. Default is provided.}
+\item{num_top}{numeric. Number of words to show. Default is provided.}
 
 \item{colname_color}{character. Name of column in \code{data} to use for color basis.
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
@@ -32,18 +34,28 @@ Set to \code{NULL} by default although not actually required in order to simplif
 \item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
 
+\item{lab_x}{character. Default is provided.}
+
+\item{lab_y}{character. Default is provided.}
+
 \item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}. Default is provided.}
 
 \item{colname_multi}{character. Name of column to use as 'facetting' variable. Not used
 if not specified.}
 }
 \value{
-gg
+gg.
 
-gg
+gg.
 }
 \description{
 Visualize n-gram counts.
+}
+\details{
+'multi' version is for facetting. 'y' value is calculated internally
+with \code{dplyr::count()}.
+
+Unfortunately, it seems difficult to combine this with \code{visualize_cnts()}
 }
 \seealso{
 \url{https://github.com/dgrtwo/dgrtwo.github.com/blob/master/_R/2016-08-09-trump-data.Rmd}.

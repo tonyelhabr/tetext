@@ -4,26 +4,43 @@
 \alias{visualize_time_batched}
 \title{Visualize over multiple time periods}
 \usage{
-visualize_time_batched(data = NULL, colnames_x = c("timestamp", "yyyy",
-  "mm", "wd", "hh"), geoms = c("hist", "bar", "bar", "bar", "bar"),
-  labs_subtitle = c("", "By Year", "By Month", "By Day of Week", "By Hour"),
-  colors = rep("grey50", 5), color_chars)
+visualize_time_batched(data = NULL, colnames_timebin = c("timestamp",
+  "yyyy", "mm", "wd", "hh"), geoms = c("hist", "bar", "bar", "bar", "bar"),
+  add_alphas = c(FALSE, rep(TRUE, length(colnames_timebin) - 1)),
+  colnames_color = rep(NA, length(colnames_timebin)), colors = rep("grey50",
+  length(colnames_timebin)), labs_title = rep("Count Over Time",
+  length(colnames_timebin)), labs_subtitle = c("", "By Year", "By Month",
+  "By Day of Week", "By Hour"), labs_x = rep("", length(colnames_timebin)),
+  labs_y = rep("", length(colnames_timebin)), arrange = FALSE,
+  show = FALSE)
 }
 \arguments{
 \item{data}{data.frame (single).}
 
-\item{colnames_x}{character (vector).}
+\item{colnames_timebin}{character (vector).}
 
 \item{geoms}{character (vector).}
 
-\item{labs_subtitle}{character (vector).}
+\item{add_alphas}{logical (vector).}
+
+\item{colnames_color}{character (vector).}
 
 \item{colors}{character (vector).}
 
-\item{color_chars}{character (vector).}
+\item{labs_title}{character (vector).}
+
+\item{labs_subtitle}{character (vector).}
+
+\item{labs_x}{character (vector).}
+
+\item{labs_y}{character (vector).}
+
+\item{arrange}{logical. Whether or not to plot in an arranged format.}
+
+\item{show}{logical. Whether or not to show plots.}
 }
 \value{
-gg
+ggs (or gtable, if \code{arrange = TRUE})
 }
 \description{
 Visualize time-based data over time.

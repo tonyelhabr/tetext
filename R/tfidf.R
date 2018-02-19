@@ -5,10 +5,13 @@
 #' @description Compute term-frequency, inverse-document-frequency.
 #' @details Calls \code{tidytext::bind_tf_idf()} internally.
 #' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param colname_word character. Name of column in \code{data} to use
 #' as \code{term} in \code{tidytext::bind_tf_idf()}. Default is provided.
 #' @param colname_doc character. Name of column in \code{data} to use
 #' as \code{document} in \code{tidytext::bind_tf_idf()}. Default is provided.
+#' @return data.frame.
+#' @rdname compute_tfidf
 #' @export
 #' @importFrom dplyr count arrange desc
 #' @importFrom tidytext bind_tf_idf
@@ -22,7 +25,7 @@ compute_tfidf <-
     colname_word_quo <- rlang::sym(colname_word)
     colname_doc_quo <- rlang::sym(colname_doc)
 
-    n <- NULL
+    n <- tf_idf <- NULL
 
     out <-
       data %>%
@@ -36,8 +39,13 @@ compute_tfidf <-
 #'
 #' @description Visualize term-frequency, inverse-document-frequency.
 #' @details Calls \code{compute_tfidf()} internally.
+#' Cannot pass dots to \code{compute_tfidf()} internally because parameters
+#' are used in subsequent processing.
+#' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
 #' @param colname_tfidf character Name of column in \code{data} to use for y-axis. Default is provided.
+#' @return gg.
+#' @rdname compute_tfidf
 #' @export
 #' @importFrom dplyr group_by top_n ungroup mutate
 #' @importFrom drlib reorder_within scale_x_reordered
@@ -45,13 +53,13 @@ compute_tfidf <-
 #' @importFrom temisc theme_te_a_facet
 #' @importFrom ggplot2 labs theme element_blank ggplot aes_string geom_col scale_fill_manual facet_wrap coord_flip
 #' @importFrom stats as.formula
-#' @seealso \url(https://www.tidytextmining.com/tfidf.html}.
+#' @seealso \url{https://www.tidytextmining.com/tfidf.html}.
 #' \url{https://juliasilge.com/blog/sherlock-holmes-stm/}
 visualize_tfidf_multi <-
   function(data = NULL,
            colname_word = "word",
-           colname_tfidf = "tf_idf",
            colname_doc = "document",
+           colname_tfidf = "tf_idf",
            colname_multi = colname_doc,
            num_top = 10,
            colname_color = colname_multi,
@@ -59,9 +67,6 @@ visualize_tfidf_multi <-
            lab_title = "Highest TF-IDF Words",
            lab_subtitle = paste0("By ", stringr::str_to_title(colname_multi)),
            theme_base = temisc::theme_te_a_facet()) {
-    if (is.null(data))
-      stop("`data` cannot be NULL.", call. = FALSE)
-
     data_proc <-
       compute_tfidf(
         data = data,
@@ -72,14 +77,6 @@ visualize_tfidf_multi <-
     colname_word_quo <- rlang::sym(colname_word)
     colname_tfidf_quo <- rlang::sym(colname_tfidf)
     colname_multi_quo <- rlang::sym(colname_multi)
-
-    data_proc <- coerce_col_to_factor(data_proc, colname_multi)
-
-    if (is.null(colname_color)) {
-      data_proc$color <- "dummy"
-      colname_color <- "color"
-      data_proc <- coerce_col_to_factor(data_proc, colname_color)
-    }
 
     data_viz <-
       data_proc %>%
@@ -92,17 +89,12 @@ visualize_tfidf_multi <-
           drlib::reorder_within(!!colname_word_quo, !!colname_tfidf_quo, !!colname_multi_quo)
       )
 
-    viz_labs <-
-      ggplot2::labs(
-        x = NULL,
-        y = NULL,
-        title = lab_title,
-        subtitle = lab_subtitle
-      )
-    viz_theme <-
-      theme_base +
-      ggplot2::theme(legend.position = "none",
-                     axis.text.x = ggplot2::element_blank())
+    if (is.null(colname_color)) {
+      data_viz$color <- "dummy"
+      colname_color <- "color"
+
+    }
+    data_viz <- wrangle_color_col(data_viz, colname_color)
 
     viz <-
       data_viz %>%
@@ -112,6 +104,21 @@ visualize_tfidf_multi <-
       ggplot2::facet_wrap(stats::as.formula(paste0("~ ", colname_multi)), scales = "free") +
       drlib::scale_x_reordered() +
       ggplot2::coord_flip()
+
+
+    viz_labs <-
+      ggplot2::labs(
+        x = NULL,
+        y = NULL,
+        title = lab_title,
+        subtitle = lab_subtitle
+      )
+    viz_theme <-
+      theme_base +
+      ggplot2::theme(
+        legend.position = "none",
+        axis.text.x = ggplot2::element_blank()
+      )
 
     viz <-
       viz +

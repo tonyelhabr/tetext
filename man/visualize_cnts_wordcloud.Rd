@@ -32,7 +32,9 @@ a separate wordcloud.}
 specified by \code{colname_multi}.}
 }
 \value{
-plot
+plot.
+
+plots.
 }
 \description{
 Visualize n-gram counts with a word cloud.

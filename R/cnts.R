@@ -3,12 +3,13 @@
 #'
 #' @description Visualize n-gram counts.
 #' @details 'multi' version is for facetting. 'y' value is calculated internally
-#' with \code{dplyr::count{)}.
+#' with \code{dplyr::count()}.
 #' @inheritParams visualize_time
-#' @param colname_word character. Name of column in \code{data} to use for x-axis.
+#' @param colname_word character. Name of column in \code{data} to use for words.
 #' Probably something like 'word' or 'bigram'. Default is provided.
-#' @param num_top numeric. Default is provided.
-#' @return gg
+#' @param num_top numeric. Number of words to show. Default is provided.
+#' @return gg.
+#' @rdname visualize_cnts
 #' @export
 #' @importFrom dplyr count filter row_number desc mutate
 #' @importFrom stats reorder
@@ -23,26 +24,39 @@ visualize_cnts <- function(data = NULL,
                            color = "grey50",
                            lab_title = "Count of Words",
                            lab_subtitle = NULL,
+                           lab_x = NULL,
+                           lab_y = NULL,
                            theme_base = temisc::theme_te_a()) {
   if (is.null(data))
     stop("`data` cannot be NULL.", call. = FALSE)
 
   colname_word_quo <- rlang::sym(colname_word)
-  if (is.null(colname_color)) {
-    data$color <- "dummy"
-    colname_color <- "color"
-    data <- coerce_col_to_factor(data, colname_color)
-  }
 
   data_viz <-
     data %>%
     dplyr::count(!!colname_word_quo) %>%
     dplyr::filter(dplyr::row_number(dplyr::desc(n)) <= num_top) %>%
     dplyr::mutate(!!colname_word_quo := stats::reorder(!!colname_word_quo, n))
+
+
+  if (is.null(colname_color)) {
+    data_viz$color <- "dummy"
+    colname_color <- "color"
+  }
+  data_viz <- wrangle_color_col(data_viz, colname_color)
+
+  viz <-
+    ggplot2::ggplot(
+      data = data_viz,
+      ggplot2::aes_string(x = colname_word, y = "n", color = colname_color)) +
+    ggalt::geom_lollipop(size = 2, point.size = 4) +
+    ggplot2::scale_color_manual(values = color) +
+    ggplot2::coord_flip()
+
   viz_labs <-
     ggplot2::labs(
-      x = NULL,
-      y = NULL,
+      x = lab_x,
+      y = lab_y,
       title = lab_title,
       subtitle = lab_subtitle
     )
@@ -52,13 +66,6 @@ visualize_cnts <- function(data = NULL,
       legend.position = "none",
       panel.grid.major.y = ggplot2::element_blank()
     )
-  viz <-
-    ggplot2::ggplot(
-      data = data_viz,
-      ggplot2::aes_string(x = colname_word, y = "n", color = colname_color)) +
-    ggalt::geom_lollipop(size = 2, point.size = 4) +
-    ggplot2::scale_color_manual(values = color) +
-    ggplot2::coord_flip()
 
   viz <-
     viz +
@@ -67,11 +74,13 @@ visualize_cnts <- function(data = NULL,
   viz
 }
 
+#' @details Unfortunately, it seems difficult to combine this with \code{visualize_cnts()}
+#' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
 #' @param colname_multi character. Name of column to use as 'facetting' variable. Not used
 #' if not specified.
 #' @rdname visualize_cnts
-#' @return gg
+#' @return gg.
 #' @export
 #' @importFrom stringr str_to_title
 #' @importFrom temisc theme_te_a_facet
@@ -83,6 +92,8 @@ visualize_cnts_multi <- function(data = NULL,
                                  color = "grey50",
                                  lab_title = "Count of Words",
                                  lab_subtitle = paste0("By ", stringr::str_to_title(colname_multi)),
+                                 lab_x = NULL,
+                                 lab_y = NULL,
                                  theme_base = temisc::theme_te_a_facet(),
                                  colname_multi) {
   if (is.null(data))
@@ -90,16 +101,7 @@ visualize_cnts_multi <- function(data = NULL,
 
   colname_word_quo <- rlang::sym(colname_word)
   colname_multi_quo <- rlang::sym(colname_multi)
-
-  if (is.null(colname_color)) {
-    data$color <- "dummy"
-    colname_color <- "color"
-    data <- coerce_col_to_factor(data, colname_color)
-  }
-
-  colname_multi_quo <- rlang::sym(colname_multi)
-
-  data <- coerce_col_to_factor(data, colname_multi)
+  data <- wrangle_multi_col(data, colname_multi)
 
   data_viz <-
     data %>%
@@ -113,19 +115,13 @@ visualize_cnts_multi <- function(data = NULL,
     # dplyr::mutate(word = drlib::reorder_within(word, n, yyyy)) %>%
     dplyr::ungroup()
 
-  viz_labs <-
-    ggplot2::labs(
-      x = NULL,
-      y = NULL,
-      title = lab_title,
-      subtitle = lab_subtitle
-    )
-  viz_theme <-
-    theme_base +
-    ggplot2::theme(
-      legend.position = "none",
-      panel.grid.major.y = ggplot2::element_blank()
-    )
+
+  if (is.null(colname_color)) {
+    data_viz$color <- "dummy"
+    colname_color <- "color"
+  }
+  data_viz <- wrangle_color_col(data_viz, colname_color)
+
   viz <-
     ggplot2::ggplot(
       data = data_viz,
@@ -135,6 +131,20 @@ visualize_cnts_multi <- function(data = NULL,
     ggplot2::scale_color_manual(values = color) +
     ggplot2::facet_wrap(stats::as.formula(paste0("~", colname_multi)), scales = "free") +
     ggplot2::coord_flip()
+
+  viz_labs <-
+    ggplot2::labs(
+      x = lab_x,
+      y = lab_y,
+      title = lab_title,
+      subtitle = lab_subtitle
+    )
+  viz_theme <-
+    theme_base +
+    ggplot2::theme(
+      legend.position = "none",
+      panel.grid.major.y = ggplot2::element_blank()
+    )
 
   viz <-
     viz +
@@ -152,12 +162,15 @@ visualize_cnts_multi <- function(data = NULL,
 #' @details 'multi' version is for creating multiple plots simulatenously
 #' (probably using a \code{purrr} 'map' function).
 #' Fairly original function.
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param colname_word character. Name of column in \code{data} to use for words. Default is provided.
 #' @param num_top numeric. Number of words to show.
 #' @param random_order logical. Passed directly to \code{random.order} parameter
 #' in \code{wordcloud::wordcloud()}
 #' @inheritParams visualize_time
-#' @return plot
+#' @return plot.
+#' @rdname visualize_cnts_wordcloud
 #' @export
 #' @importFrom dplyr count pull
 #' @importFrom wordcloud wordcloud
@@ -185,12 +198,15 @@ visualize_cnts_wordcloud <-
     viz
   }
 
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @inheritParams visualize_cnts_wordcloud
 #' @param ... dots. Parameters to pass to \code{visualize_cnts_wordcloud()}.
 #' @param colname_multi character. Name of column in \code{data} to use to create
 #' a separate wordcloud.
 #' @param value_multi charater or numeric. Value by which to filter the column
 #' specified by \code{colname_multi}.
+#' @return plots.
 #' @rdname visualize_cnts_wordcloud
 #' @export
 #' @importFrom dplyr filter

@@ -2,10 +2,19 @@
 % Please edit documentation in R/tfidf.R
 \name{compute_tfidf}
 \alias{compute_tfidf}
+\alias{visualize_tfidf_multi}
 \title{Compute TF-IDF}
 \usage{
 compute_tfidf(data = NULL, colname_word = "word",
   colname_doc = "document")
+
+visualize_tfidf_multi(data = NULL, colname_word = "word",
+  colname_doc = "document", colname_tfidf = "tf_idf",
+  colname_multi = colname_doc, num_top = 10,
+  colname_color = colname_multi, color = "grey50",
+  lab_title = "Highest TF-IDF Words", lab_subtitle = paste0("By ",
+  stringr::str_to_title(colname_multi)),
+  theme_base = temisc::theme_te_a_facet())
 }
 \arguments{
 \item{data}{data.frame.}
@@ -15,10 +24,43 @@ as \code{term} in \code{tidytext::bind_tf_idf()}. Default is provided.}
 
 \item{colname_doc}{character. Name of column in \code{data} to use
 as \code{document} in \code{tidytext::bind_tf_idf()}. Default is provided.}
+
+\item{colname_tfidf}{character Name of column in \code{data} to use for y-axis. Default is provided.}
+
+\item{colname_multi}{character. Name of column in \code{data} to use for facetting.}
+
+\item{num_top}{numeric. Number of words to show. Default is provided.}
+
+\item{colname_color}{character. Name of column in \code{data} to use for color basis.
+Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+
+\item{color}{chracter. Hex value of color. Default is provided.}
+
+\item{lab_title}{character. Default is provided.}
+
+\item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
+Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+
+\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}. Default is provided.}
+}
+\value{
+data.frame.
+
+gg.
 }
 \description{
 Compute term-frequency, inverse-document-frequency.
+
+Visualize term-frequency, inverse-document-frequency.
 }
 \details{
 Calls \code{tidytext::bind_tf_idf()} internally.
+
+Calls \code{compute_tfidf()} internally.
+Cannot pass dots to \code{compute_tfidf()} internally because parameters
+are used in subsequent processing.
+}
+\seealso{
+\url{https://www.tidytextmining.com/tfidf.html}.
+\url{https://juliasilge.com/blog/sherlock-holmes-stm/}
 }

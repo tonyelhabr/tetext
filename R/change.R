@@ -1,16 +1,23 @@
 
-
 #' Compute change
 #'
 #' @description Compute change in word usage over time.
 #' @details None.
 #' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param colname_timebin character. Name of column in \code{data} specifying temporal period
 #' to use to compute change.
 #' @param colname_word character. Name of column in \code{data} corresponding to n-gram.
 #' @param timefloor character. Passed directly to \code{lubridate::floor_date()} as\code{unit} parameter.
 #' @param top_pct numeric. Number between 0 and 1. Default is provided.
-#' @return data.frame
+#' @param return_models logical. Whether to return just the models. This is probably the preferred
+#' option when calling \code{compute_change()} directly. Default is provided.
+#' @param return_data logical. Whether to 'bytime' data which is used as
+#' the \code{data} parameter in \code{stats::glm()} for creating models. Default is provided.
+#' Needed when using \code{visualize_change()}.
+#' @param return_both logical. Set to \code{TRUE} when \code{visualize_change()}. Default is provided.
+#' @return data.frame.
+#' @rdname compute_change
 #' @export
 #' @importFrom dplyr mutate group_by summarise ungroup filter arrange
 #' @importFrom lubridate floor_date
@@ -18,19 +25,23 @@
 #' @importFrom tidyr nest unnest
 #' @importFrom purrr map
 #' @importFrom broom tidy
-#' @seealso https://www.tidytextmining.com/twitter.html#changes-in-word-use
+#' @seealso \url{https://www.tidytextmining.com/twitter.html#changes-in-word-use}
 compute_change <-
   function(data = NULL,
            colname_timebin = NULL,
            colname_word = "word",
-           timefloor = c("second", "year", "hour", "day", "week", "year"),
-           top_pct = 0.05) {
+           timefloor = NULL,
+           top_pct = 0.05,
+           return_models = TRUE,
+           return_data = FALSE,
+           return_both = FALSE) {
     if (is.null(data))
       stop("`data` cannot be NULL.", call. = FALSE)
     if (is.null(colname_timebin))
       stop("`colname_timebin` cannot be NULL.", call. = FALSE)
-    timefloor <- match.arg(timefloor)
-    if ((top_pct < 0) |
+    if (is.null(timefloor))
+      stop("`ctimefloor` cannot be NULL.", call. = FALSE)
+     if ((top_pct < 0) |
         (top_pct > 1))
       stop("`top_pct` is not valid.", call. = FALSE)
 
@@ -58,7 +69,6 @@ compute_change <-
       dplyr::filter(word_total >= stats::quantile(word_total, 1 - top_pct)) %>%
       dplyr::arrange(dplyr::desc(word_total))
 
-    # NOTE: Not sure if tidyr::nest() will work with this syntax!
     data_bytime_models <-
       data_bytime %>%
       tidyr::nest(-!!colname_word_quo) %>%
@@ -67,11 +77,99 @@ compute_change <-
                         cbind(n, time_total) ~ time_floor, ., family = "binomial"
                       )))
 
-    out <-
+    data_bytime_models <-
       data_bytime_models %>%
       tidyr::unnest(purrr::map(models, broom::tidy)) %>%
       dplyr::filter(term == "time_floor") %>%
       dplyr::mutate(adjusted_p_value = stats::p.adjust(p.value)) %>%
       dplyr::arrange(adjusted_p_value)
+
+    if(return_both | (return_data & return_models)) {
+      out <- list(data = data_bytime, models = data_bytime_models)
+    } else if (return_data) {
+      out <- data_bytime
+    } else if (return_models) {
+      out <- data_bytime_models
+    }
     out
   }
+
+
+#' Visualize change
+#'
+#' @description Visualize the words that have changed the most across \code{colname_timebin}
+#' @details Calls \code{compute_change()} internally. Works similarly to \code{visualize_corrs}.
+#' (Two data sets are returned from the list that is returned by the \code{compute_} function.)
+#' @param ... dots. Parameters passed to \code{compute_change()}.
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
+#' @return gg.
+#' @rdname compute_change
+#' @export
+#' @importFrom dplyr inner_join mutate if_else
+#' @importFrom ggplot2 labs theme ggplot aes scale_color_manual geom_line scale_y_continuous
+#' @importFrom ggrepel geom_label_repel
+#' @importFrom scales percent_format
+#' @importFrom temisc theme_te_a
+visualize_change <-
+  function(...,
+           num_top = 5,
+           colname_color = NULL,
+           color = rep("grey50", num_top),
+           lab_title = "Largest Changes in Word Frequency",
+           lab_subtitle = NULL,
+           lab_x = NULL,
+           lab_y = NULL,
+           theme_base = temisc::theme_te_a()) {
+
+    data_list <-
+      compute_change(
+        ...,
+        return_both = TRUE
+      )
+    data <- data_list$data
+    data_models <- data_list$models
+
+    data_models_top <-
+      data_models %>%
+      dplyr::top_n(num_top, -adjusted_p_value)
+
+    if (is.null(colname_color)) {
+      data_models_top$color <- "dummy"
+      colname_color <- "color"
+    }
+    data_models_top <- wrangle_color_col(data_models_top, colname_color)
+
+    adjusted_p_value <- time_total <- time_floor <- word <- pct <- label <- NULL
+
+    viz <-
+      data %>%
+      dplyr::inner_join(data_models_top, by = c("word")) %>%
+      dplyr::mutate(pct = n / time_total) %>%
+      dplyr::mutate(label = dplyr::if_else(time_floor == max(time_floor), word, NA_character_)) %>%
+      ggplot2::ggplot(ggplot2::aes(x = time_floor, y = pct, color = word)) +
+      ggplot2::scale_color_manual(values = color) +
+      ggplot2::geom_line(size = 1.5) +
+      ggrepel::geom_label_repel(ggplot2::aes(label = label), nudge_x = 1, na.rm = TRUE) +
+      ggplot2::scale_y_continuous(labels = scales::percent_format())
+
+    viz_labs <-
+      ggplot2::labs(
+        x = lab_x,
+        y = lab_y,
+        title = lab_title,
+        subtitle = lab_subtitle
+      )
+    viz_theme <-
+      theme_base +
+      ggplot2::theme(
+        legend.position = "none"
+      )
+    viz <-
+      viz +
+      viz_labs +
+      viz_theme
+    viz
+}
+
+
