@@ -31,6 +31,7 @@ visualize_cnts <- function(data = NULL,
   if (is.null(colname_color)) {
     data$color <- "dummy"
     colname_color <- "color"
+    data <- coerce_col_to_factor(data, colname_color)
   }
 
   data_viz <-
@@ -77,7 +78,6 @@ visualize_cnts <- function(data = NULL,
 #' @importFrom drlib reorder_within scale_x_reordered
 visualize_cnts_multi <- function(data = NULL,
                                  colname_word = "word",
-                                 # colname_y = "n",
                                  num_top = 10,
                                  colname_color = NULL,
                                  color = "grey50",
@@ -94,12 +94,15 @@ visualize_cnts_multi <- function(data = NULL,
   if (is.null(colname_color)) {
     data$color <- "dummy"
     colname_color <- "color"
+    data <- coerce_col_to_factor(data, colname_color)
   }
 
   colname_multi_quo <- rlang::sym(colname_multi)
+
+  data <- coerce_col_to_factor(data, colname_multi)
+
   data_viz <-
     data %>%
-    dplyr::mutate(!!colname_multi_quo := factor(!!colname_multi_quo)) %>%
     dplyr::count(!!colname_multi_quo, !!colname_word_quo) %>%
     dplyr::group_by(!!colname_multi_quo) %>%
     dplyr::filter(dplyr::row_number(dplyr::desc(n)) <= num_top) %>%
@@ -161,7 +164,6 @@ visualize_cnts_multi <- function(data = NULL,
 visualize_cnts_wordcloud <-
   function(data = NULL,
            colname_word = "word",
-           # colname_freq = "n",
            color = "grey50",
            num_top = 50,
            random_order = FALSE) {

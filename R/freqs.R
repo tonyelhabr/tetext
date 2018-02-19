@@ -59,16 +59,6 @@ compute_freqs_multi <-
   }
 
 
-coerce_to_factor <- function(data, colname) {
-  classes <- sapply(names(data), class)
-  class_i <- classes[names(classes) == colname]
-  nm_i <- names(class_i)
-  if(class_i != "factor") {
-    data <- data %>% dplyr::mutate_at(dplyr::vars(dplyr::contains(nm_i)), dplyr::funs(factor))
-    message(sprintf("Coercing %s to a factor.", nm_i))
-  }
-  data
-}
 
 
 #' Visualize bigrams
@@ -106,13 +96,19 @@ visualize_bigram_freqs_multi <-
         colname_multi = colname_multi
       )
 
-    data <- coerce_to_factor(data, colname_multi)
+    if (is.null(colname_color)) {
+      data_proc$color <- "dummy"
+      colname_color <- "color"
+      data_proc <- coerce_col_to_factor(data_proc, colname_color)
+    }
+
+    data_proc <- coerce_col_to_factor(data_proc, colname_multi)
 
     freq <- word <- NULL
 
     colname_word_quo <- rlang::sym(colname_word)
     colname_multi_quo <- rlang::sym(colname_multi)
-    browser()
+
     data_viz <-
       data_proc %>%
       dplyr::group_by(!!colname_multi_quo) %>%

@@ -10,7 +10,7 @@
 #' @param colname_doc character. Name of column in \code{data} to use
 #' as \code{document} in \code{tidytext::bind_tf_idf()}. Default is provided.
 #' @export
-#' @importFrom dplyr count
+#' @importFrom dplyr count arrange desc
 #' @importFrom tidytext bind_tf_idf
 compute_tfidf <-
   function(data = NULL,
@@ -27,16 +27,17 @@ compute_tfidf <-
     out <-
       data %>%
       dplyr::count(!!colname_doc_quo, !!colname_word_quo, sort = TRUE) %>%
-      tidytext::bind_tf_idf(!!colname_word_quo, !!colname_doc_quo, n)
+      tidytext::bind_tf_idf(!!colname_word_quo, !!colname_doc_quo, n) %>%
+      dplyr::arrange(!!colname_doc_quo, dplyr::desc(tf_idf))
     out
   }
 
 #' Visualize TF-IDF
 #'
 #' @description Visualize term-frequency, inverse-document-frequency.
-#' @details Does not call \code{compute_tfidf()} internally.
+#' @details Calls \code{compute_tfidf()} internally.
 #' @inheritParams visualize_cnts
-#' @param colname_tfidf character Name of column in \code{data} to use for y-axis. Default is provided
+#' @param colname_tfidf character Name of column in \code{data} to use for y-axis. Default is provided.
 #' @export
 #' @importFrom dplyr group_by top_n ungroup mutate
 #' @importFrom drlib reorder_within scale_x_reordered
@@ -49,8 +50,9 @@ compute_tfidf <-
 visualize_tfidf_multi <-
   function(data = NULL,
            colname_word = "word",
-           colname_tfidf = "tfidf",
-           colname_multi = "document",
+           colname_tfidf = "tf_idf",
+           colname_doc = "document",
+           colname_multi = colname_doc,
            num_top = 10,
            colname_color = colname_multi,
            color = "grey50",
@@ -60,24 +62,34 @@ visualize_tfidf_multi <-
     if (is.null(data))
       stop("`data` cannot be NULL.", call. = FALSE)
 
+    data_proc <-
+      compute_tfidf(
+        data = data,
+        colname_word = colname_word,
+        colname_doc = colname_doc
+      )
+
     colname_word_quo <- rlang::sym(colname_word)
     colname_tfidf_quo <- rlang::sym(colname_tfidf)
     colname_multi_quo <- rlang::sym(colname_multi)
 
+    data_proc <- coerce_col_to_factor(data_proc, colname_multi)
+
     if (is.null(colname_color)) {
-      data$color <- "dummy"
+      data_proc$color <- "dummy"
       colname_color <- "color"
+      data_proc <- coerce_col_to_factor(data_proc, colname_color)
     }
 
     data_viz <-
-      data %>%
+      data_proc %>%
       dplyr::group_by(!!colname_multi_quo) %>%
       dplyr::top_n(num_top, !!colname_tfidf_quo) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate(!!colname_multi_quo := factor(!!colname_multi_quo)) %>%
+      # dplyr::mutate(!!colname_multi_quo := factor(!!colname_multi_quo)) %>%
       dplyr::mutate(
         !!colname_word_quo :=
-          drlib::reorder_within(colname_word_quo, !!colname_tfidf_quo, !!colname_multi_quo)
+          drlib::reorder_within(!!colname_word_quo, !!colname_tfidf_quo, !!colname_multi_quo)
       )
 
     viz_labs <-
@@ -99,7 +111,10 @@ visualize_tfidf_multi <-
       ggplot2::scale_fill_manual(values = color) +
       ggplot2::facet_wrap(stats::as.formula(paste0("~ ", colname_multi)), scales = "free") +
       drlib::scale_x_reordered() +
-      ggplot2::coord_flip() +
+      ggplot2::coord_flip()
+
+    viz <-
+      viz +
       viz_labs +
       viz_theme
 

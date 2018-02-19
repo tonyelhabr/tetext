@@ -35,6 +35,7 @@ visualize_time <-
     if (is.null(colname_color)) {
       data$color <- "dummy"
       colname_color <- "color"
+      data <- coerce_col_to_factor(data, colname_color)
     }
     geom <- match.arg(geom)
     viz_labs <-
@@ -45,7 +46,6 @@ visualize_time <-
         subtitle = lab_subtitle
       )
     viz_theme <-
-      # temisc::theme_te_a() +
       theme_base +
       ggplot2::theme(panel.grid.major.x = ggplot2::element_blank()) +
       ggplot2::theme(legend.position = "none")
