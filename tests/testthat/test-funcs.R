@@ -38,15 +38,52 @@ unigrams <- readRDS(file = filepath_unigrams)
 bigrams <- readRDS(file = filepath_bigrams)
 
 color_main <- "firebrick"
-get_rpal_colors <- function(name) {
-  paste0(name, c("", as.character(seq(1, 4, 1))))
-}
-colors_main <- get_rpal_colors(color_main)
+colors_main <- temisc::get_rpal_colors(color_main)
 colors_te <- temisc::colors_te
 
 message("Tests are in order of likely usage in script.")
 
+clean_tweets <-
+  function(data,
+           trim = TRUE,
+           cols_extra = "name") {
+    cols_keep <-
+      c(
+        "status_id",
+        "created_at",
+        "user_id",
+        "screen_name",
+        "text",
+        "display_text_width",
+        "reply_to_status_id",
+        "is_quote",
+        "is_retweet",
+        "favorite_count",
+        "retweet_count",
+        "hashtags",
+        "symbols",
+        "urls_url",
+        "urls_expanded_url",
+        "media_expanded_url",
+        "ext_media_expanded_url"
+      )
 
+    if(trim) {
+    data <-
+      data %>%
+      select(one_of(c(cols_extra, cols_keep)))
+    }
+    out <-
+      data %>%
+      mutate_if(is.list, funs(as.character)) %>%
+      mutate(timestamp = lubridate::ymd_hms(created_at)) %>%
+      mutate(timestamp = lubridate::with_tz(timestamp, "America/Chicago")) %>%
+      # mutate(time = round_time(timestamp, 60 * 60)) %>%
+      mutate(time = lubridate::hour(timestamp) + lubridate::minute(timestamp) / 60)
+
+    out
+  }
+data_multi <- clean_tweets(data_multi)
 testhat::test_that(
   "time",
   {
@@ -68,6 +105,20 @@ testhat::test_that(
       )
     viz_time_all
     testthat::expect_true(ggplot2::is.ggplot(viz_time_all))
+
+    viz_time_multi_all <-
+      visualize_time_multi_at(
+        data = data_multi,
+        timebin = "timestamp",
+        geom = "hist",
+        color = "name",
+        color_value = colors_te,
+        multi = "name",
+        ncol = 1,
+        scales = "fixed"
+      )
+    viz_time_multi_all
+
     viz_time_yyyy <-
       visualize_time_at(
         data = data,
@@ -120,8 +171,9 @@ testhat::test_that(
         data = data,
         arrange = TRUE
       )
-    gridExtra::grid.arrange(viz_time_list)
-    testthat::expect_true(!ggplot2::is.ggplot(viz_time_list))
+    # gridExtra::grid.arrange(viz_time_list)
+    t# estthat::expect_true(!ggplot2::is.ggplot(viz_time_list))
+
     # TODO: Add a test for visualize_time_multi_at().
 
   })

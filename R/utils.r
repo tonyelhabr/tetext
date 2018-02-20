@@ -42,4 +42,7 @@ wrangle_color_col <-
     coerce_col_to_factor(data, colname)
   }
 
-wrangle_multi_col <- wrangle_color_col
+wrangle_multi_col <-
+  function(data, colname) {
+    coerce_col_to_factor(data, colname)
+  }

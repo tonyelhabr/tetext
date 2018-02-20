@@ -51,11 +51,11 @@ visualize_time_at <-
       color <- "color_value"
 
     }
-    data <- wrangle_color_col(data, color)
-
+    # data <- wrangle_color_col(data, color)
 
     viz <-
       ggplot2::ggplot(data = data, ggplot2::aes_string(x = timebin))
+
     if (geom == "bar") {
       if (!add_alpha) {
         viz <-
@@ -108,17 +108,29 @@ visualize_time_at <-
 #' @export
 #' @importFrom ggplot2 facet_wrap
 #' @importFrom temisc theme_te_a
+#' @importFrom stats as.formulas
 visualize_time_multi_at <-
-  function(...,
+  function(data = data,
+           ...,
            theme_base = temisc::theme_te_a_facet(),
-           multi = NULL) {
+           multi = NULL,
+           ncol = 3,
+           nrow = NULL,
+           scales = "free") {
     if (is.null(multi))
       stop("`multi` cannot be NULL.", call. = FALSE)
-    viz <- visualize_time_at(..., theme_base = theme_base)
+    # data <- wrangle_multi_col(data, multi)
+    viz <-
+      visualize_time_at(data = data, ..., theme_base = theme_base)
 
     viz <-
       viz +
-      ggplot2::facet_wrap(paste0("~ ", multi), scales = "free")
+      ggplot2::facet_wrap(
+        stats::as.formula(paste0("~ ", multi)),
+        ncol = ncol,
+        nrow = nrow,
+        scales = scales
+      )
     viz
   }
 
