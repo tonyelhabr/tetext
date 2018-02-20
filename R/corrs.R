@@ -4,12 +4,12 @@
 #'
 #' @description Compute correlations among pairs of words.
 #' @details Call \code{widyr::pairwise_cor()} internally.
-#' Is called by \code{visualize_corrs_network()}, so there is no need to call this directly.
-#' @inheritParams visualize_time
-#' @inheritParams visualize_cnts
-#' @param colname_word character. Name of column in \code{data} to use as \code{item}
+#' Is called by \code{visualize_corrs_network_at()}, so there is no need to call this directly.
+#' @inheritParams visualize_time_at
+#' @inheritParams visualize_cnts_at
+#' @param word character. Name of column in \code{data} to use as \code{item}
 #' in \code{widyr::pairwise_cor()}. Default is provided.
-#' @param colname_feature character. Name of column in \code{data} to use as \code{feature}
+#' @param feature character. Name of column in \code{data} to use as \code{feature}
 #' in \code{widyr::pairwise_cor()}. No default is provided
 #' @param num_top_ngrams numeric. Useful primarily to prevent \code{widyr::pairwise_cor()}
 #' from hanging up. Default is provided.
@@ -22,15 +22,15 @@
 #' @param return_both logical. Useful when creating a network visualization so that
 #' words can be used as nodes and correlations can be used weights.
 #' @return data.frame.
-#' @rdname compute_corrs
+#' @rdname compute_corrs_at
 #' @export
 #' @importFrom dplyr count mutate row_number desc filter semi_join rename
 #' @importFrom widyr pairwise_cor
 #' @seealso \url{http://varianceexplained.org/r/seven-fav-packages/}.
-compute_corrs <-
+compute_corrs_at <-
   function(data = NULL,
-           colname_word = "word",
-           colname_feature = NULL,
+           word = "word",
+           feature = NULL,
            num_top_ngrams = 50,
            num_top_corrs = 50,
            return_corrs = TRUE,
@@ -38,29 +38,29 @@ compute_corrs <-
            return_both = FALSE) {
     if(is.null(data))
       stop("`data` cannot be NULL.", call. = FALSE)
-    if(is.null(colname_word))
-      stop("`colname_word` cannot be NULL.", call. = FALSE)
-    if(is.null(colname_feature))
-      stop("`colname_feature` cannot be NULL.", call. = FALSE)
+    if(is.null(word))
+      stop("`word` cannot be NULL.", call. = FALSE)
+    if(is.null(feature))
+      stop("`feature` cannot be NULL.", call. = FALSE)
 
     word <- feature <- correlation <- NULL
 
-    colname_word_quo <- rlang::sym(colname_word)
-    colname_feature_quo <- rlang::sym(colname_feature)
+    word_quo <- rlang::sym(word)
+    feature_quo <- rlang::sym(feature)
 
     data_cnt_top <-
-      dplyr::count(data, !!colname_word_quo, sort = TRUE) %>%
+      dplyr::count(data, !!word_quo, sort = TRUE) %>%
       dplyr::mutate(rank = dplyr::row_number(dplyr::desc(n))) %>%
       dplyr::filter(rank <= num_top_ngrams)
 
     data_joined <-
-      dplyr::semi_join(data, data_cnt_top, by = colname_word)
+      dplyr::semi_join(data, data_cnt_top, by = word)
 
     data_joined_renamed <-
       dplyr::rename(
         data_joined,
-        word = !!colname_word_quo,
-        feature = !!colname_feature_quo
+        word = !!word_quo,
+        feature = !!feature_quo
       )
 
     data_corrs <-
@@ -91,31 +91,31 @@ compute_corrs <-
 #' Visualize correlations
 #'
 #' @description Visualize correlations with a network
-#' @inheritParams visualize_time
-#' @inheritParams visualize_cnts
-#' @param ... dots. Parameters passed directly to \code{compute_corrs()}.
+#' @inheritParams visualize_time_at
+#' @inheritParams visualize_cnts_at
+#' @param ... dots. Parameters passed directly to \code{compute_corrs_at()}.
 #' @param resize_points logical. Indicates whether or not to make size of points
 #' correspond to count of words.
-#' @param colname_size_point character. Name of column in \code{data} to use for point sizing.
+#' @param size_point character. Name of column in \code{data} to use for point sizing.
 #' @param add_point_labels logical. Indicates whether or not to add labels to points.
-#' @param color_point character. Hex value of color for points. Default is provided.
+#' @param color_point character. Hex value of color_value for points. Default is provided.
 #' @param shape_point numeric. Default is provided.
 #' @param seed numeric. Used to by \code{ggraph::ggraph}. Default is provided.
-#' @inheritParams visualize_time
+#' @inheritParams visualize_time_at
 #' @return gg.
-#' @rdname compute_corrs
+#' @rdname visualize_corrs_at
 #' @export
 #' @importFrom ggplot2 theme_void labs theme aes_string
 #' @importFrom igraph graph_from_data_frame
 #' @importFrom ggraph ggraph geom_edge_link geom_node_point geom_node_text
 #' @seealso \url{https://www.tidytextmining.com/ngrams.html}.
 #' \url{http://varianceexplained.org/r/seven-fav-packages/}.
-visualize_corrs_network <-
+visualize_corrs_network_at <-
   function(...,
            resize_points = TRUE,
-           colname_size_point = "n",
+           size_point = "n",
            add_point_labels = TRUE,
-           color_point = "grey50",
+           color_point = "grey80",
            shape_point = 21,
            seed = 42,
            lab_title = "Network of Pairwise Correlations",
@@ -125,7 +125,7 @@ visualize_corrs_network <-
            theme_base = ggplot2::theme_void()) {
 
     corrs <-
-      compute_corrs(
+      compute_corrs_at(
         ...,
         return_both = TRUE
       )
@@ -144,7 +144,7 @@ visualize_corrs_network <-
       viz <-
         viz +
         ggraph::geom_node_point(
-          ggplot2::aes_string(size = colname_size_point),
+          ggplot2::aes_string(size = size_point),
           fill = color_point,
           shape = shape_point
         )
@@ -156,10 +156,10 @@ visualize_corrs_network <-
 
     if (add_point_labels) {
       # NOTE: This is from `data_viz`, not `data`.
-      colname_label <- "name"
+      label <- "name"
       viz <-
         viz +
-        ggraph::geom_node_text(ggplot2::aes_string(label = colname_label), repel = TRUE)
+        ggraph::geom_node_text(ggplot2::aes_string(label = label), repel = TRUE)
     }
 
     viz_labs <-

@@ -3,49 +3,51 @@
 #' Compute TF-IDF
 #'
 #' @description Compute term-frequency, inverse-document-frequency.
-#' @details Calls \code{tidytext::bind_tf_idf()} internally.
-#' @inheritParams visualize_time
-#' @inheritParams visualize_cnts
-#' @param colname_word character. Name of column in \code{data} to use
+#' @details Calls \code{tidytext::bind_tf_idf()} internally. Note that the
+#' output 'tfidf' column is named \code{tf_idf} because this is the convention
+#' of the \code{tidytext} package.
+#' @inheritParams visualize_time_at
+#' @inheritParams visualize_cnts_at
+#' @param word character. Name of column in \code{data} to use
 #' as \code{term} in \code{tidytext::bind_tf_idf()}. Default is provided.
-#' @param colname_doc character. Name of column in \code{data} to use
+#' @param doc character. Name of column in \code{data} to use
 #' as \code{document} in \code{tidytext::bind_tf_idf()}. Default is provided.
 #' @return data.frame.
-#' @rdname compute_tfidf
+#' @rdname compute_tfidf_at
 #' @export
 #' @importFrom dplyr count arrange desc
 #' @importFrom tidytext bind_tf_idf
-compute_tfidf <-
+compute_tfidf_at <-
   function(data = NULL,
-           colname_word = "word",
-           colname_doc = "document") {
+           word = "word",
+           doc = "document") {
     if (is.null(data))
       stop("`data` cannot be NULL.", call. = FALSE)
 
-    colname_word_quo <- rlang::sym(colname_word)
-    colname_doc_quo <- rlang::sym(colname_doc)
+    word_quo <- rlang::sym(word)
+    doc_quo <- rlang::sym(doc)
 
     n <- tf_idf <- NULL
 
     out <-
       data %>%
-      dplyr::count(!!colname_doc_quo, !!colname_word_quo, sort = TRUE) %>%
-      tidytext::bind_tf_idf(!!colname_word_quo, !!colname_doc_quo, n) %>%
-      dplyr::arrange(!!colname_doc_quo, dplyr::desc(tf_idf))
+      dplyr::count(!!doc_quo, !!word_quo, sort = TRUE) %>%
+      tidytext::bind_tf_idf(!!word_quo, !!doc_quo, n) %>%
+      dplyr::arrange(!!doc_quo, dplyr::desc(tf_idf))
     out
   }
 
 #' Visualize TF-IDF
 #'
 #' @description Visualize term-frequency, inverse-document-frequency.
-#' @details Calls \code{compute_tfidf()} internally.
-#' Cannot pass dots to \code{compute_tfidf()} internally because parameters
+#' @details Calls \code{compute_tfidf_at()} internally.
+#' Cannot pass dots to \code{compute_tfidf_at()} internally because parameters
 #' are used in subsequent processing.
-#' @inheritParams visualize_time
-#' @inheritParams visualize_cnts
-#' @param colname_tfidf character Name of column in \code{data} to use for y-axis. Default is provided.
+#' @inheritParams visualize_time_at
+#' @inheritParams visualize_cnts_at
+#' @inheritParams compute_tfidf_at
 #' @return gg.
-#' @rdname compute_tfidf
+#' @rdname visualize_tfidf_at
 #' @export
 #' @importFrom dplyr group_by top_n ungroup mutate
 #' @importFrom drlib reorder_within scale_x_reordered
@@ -55,53 +57,54 @@ compute_tfidf <-
 #' @importFrom stats as.formula
 #' @seealso \url{https://www.tidytextmining.com/tfidf.html}.
 #' \url{https://juliasilge.com/blog/sherlock-holmes-stm/}
-visualize_tfidf_multi <-
+visualize_tfidf_at <-
   function(data = NULL,
-           colname_word = "word",
-           colname_doc = "document",
-           colname_tfidf = "tf_idf",
-           colname_multi = colname_doc,
+           word = "word",
+           doc = "document",
+           multi = doc,
            num_top = 10,
-           colname_color = colname_multi,
-           color = "grey50",
+           color = multi,
+           color_value = "grey80",
            lab_title = "Highest TF-IDF Words",
-           lab_subtitle = paste0("By ", stringr::str_to_title(colname_multi)),
+           lab_subtitle = paste0("By ", stringr::str_to_title(multi)),
            theme_base = temisc::theme_te_a_facet()) {
     data_proc <-
-      compute_tfidf(
+      compute_tfidf_at(
         data = data,
-        colname_word = colname_word,
-        colname_doc = colname_doc
+        word = word,
+        doc = doc
       )
 
-    colname_word_quo <- rlang::sym(colname_word)
-    colname_tfidf_quo <- rlang::sym(colname_tfidf)
-    colname_multi_quo <- rlang::sym(colname_multi)
+    word_quo <- rlang::sym(word)
+    # tfidf_quo <- rlang::sym(tfidf)
+    multi_quo <- rlang::sym(multi)
+
+    tf_idf <- NULL
 
     data_viz <-
       data_proc %>%
-      dplyr::group_by(!!colname_multi_quo) %>%
-      dplyr::top_n(num_top, !!colname_tfidf_quo) %>%
+      dplyr::group_by(!!multi_quo) %>%
+      dplyr::top_n(num_top, tf_idf) %>%
       dplyr::ungroup() %>%
-      # dplyr::mutate(!!colname_multi_quo := factor(!!colname_multi_quo)) %>%
+      # dplyr::mutate(!!multi_quo := factor(!!multi_quo)) %>%
       dplyr::mutate(
-        !!colname_word_quo :=
-          drlib::reorder_within(!!colname_word_quo, !!colname_tfidf_quo, !!colname_multi_quo)
+        !!word_quo :=
+          drlib::reorder_within(!!word_quo, tf_idf, !!multi_quo)
       )
 
-    if (is.null(colname_color)) {
-      data_viz$color <- "dummy"
-      colname_color <- "color"
+    if (is.null(color)) {
+      data_viz$color_value <- "dummy"
+      color <- "color_value"
 
     }
-    data_viz <- wrangle_color_col(data_viz, colname_color)
+    data_viz <- wrangle_color_col(data_viz, color)
 
     viz <-
       data_viz %>%
-      ggplot2::ggplot(ggplot2::aes_string(x = colname_word, y = colname_tfidf, fill = colname_color)) +
+      ggplot2::ggplot(ggplot2::aes_string(x = word, y = tf_idf, fill = color)) +
       ggplot2::geom_col() +
-      ggplot2::scale_fill_manual(values = color) +
-      ggplot2::facet_wrap(stats::as.formula(paste0("~ ", colname_multi)), scales = "free") +
+      ggplot2::scale_fill_manual(values = color_value) +
+      ggplot2::facet_wrap(stats::as.formula(paste0("~ ", multi)), scales = "free") +
       drlib::scale_x_reordered() +
       ggplot2::coord_flip()
 

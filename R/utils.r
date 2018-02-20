@@ -1,6 +1,6 @@
 
 
-# NOTE: Need this because NULLs cannot be used with lists, which would break visualize_time_batched().
+# NOTE: Need this because NULLs cannot be used with lists, which would break visualize_time_batch_at().
 is_nothing <- function(x) {
   any(is.null(x)) || any(is.na(x)) || any(is.nan(x))
 }
@@ -20,19 +20,19 @@ coerce_col_to_factor <- function(data, colname) {
 
 # wrangle_color_col <-
 #   function(data,
-#            colname_color,
-#            colname_dummy = "color",
+#            color,
+#            dummy = "color_value",
 #            value_dummy = "dummy") {
-#     if (!is.null(colname_color)) {
-#       out <- list(data = data, colname_color = colname_color)
+#     if (!is.null(color)) {
+#       out <- list(data = data, color = color)
 #     } else {
-#       colname_dummy_quo <- rlang::sym(colname_dummy)
+#       dummy_quo <- rlang::sym(dummy)
 #       value_dummy_quo <- rlang::sym(value_dummy)
-#       data <- data %>% dplyr::mutate(!!colname_dummy := !!value_dummy)
-#       data_proc <- coerce_col_to_factor(data_proc, colname_color)
-#       out <- list(data = data, colname_color = colname_dummy)
+#       data <- data %>% dplyr::mutate(!!dummy := !!value_dummy)
+#       data_proc <- coerce_col_to_factor(data_proc, color)
+#       out <- list(data = data, color = dummy)
 #     }
-#     data <- coerce_col_to_factor(data, colname_color)
+#     data <- coerce_col_to_factor(data, color)
 #     out
 #   }
 

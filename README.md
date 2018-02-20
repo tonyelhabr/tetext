@@ -18,13 +18,13 @@ Here is a list of all functions in the package.
 
 Here are some short descriptions. Functions are listed in order of recommended use in a script.
 
--   **time:** `visualize_time()`, `visualize_time_multi()`, `visualize_time_batched()`: Visualize data over time.
--   **tidify:** `tidify_to_unigrams()`, `tidify_to_bigrams()`: Tokenize data to tidy format with unigrams/bigrams.
--   **cnts:** `visualize_cnts()`, `visualize_cnts_multi()`, `visualize_cnts_wordcloud()`, `visualize_cnts_wordcloud_multi()`: Visualize counts of n-grams.
--   **freqs:** `compute_freqs()`, `compute_freqs_multi()`,`visualize_bigrams_freqs_multi()`: Compute and visualize frequencies of n-grams.
--   **corrs:** `compute_corrs()`, `visualize_corrs_network()`: Compute and visualize pairwise correlations (of bigrams).
--   **tfidf:** `compute_tfidf()`, `visualize_tfidf_multi()`: Compute and visualize change in n-gram usage across documents.
--   **change:** `compute_change()`, `visualize_change()`: Compute and visualize change in n-gram usage across documents.
+-   **time:** `visualize_time_at()`, `visualize_time_multi_at()`, `visualize_time_batch()`: Visualize data over time.
+-   **tidify:** `tidify_to_unigrams_at()`, `tidify_to_bigrams_at()`: Tokenize data to tidy format with unigrams/bigrams.
+-   **cnts:** `visualize_cnts_at()`, `visualize_cnts_multi_at()`, `visualize_cnts_wordcloud_at()`, `visualize_cnts_wordcloud_multi_at()`: Visualize counts of n-grams.
+-   **freqs:** `compute_freqs_at()`, `compute_freqs_multi_at()`, `visualize_bigrams_freqs_multi_at()`: Compute and visualize frequencies of n-grams.
+-   **corrs:** `compute_corrs_at()`, `visualize_corrs_network_at()`: Compute and visualize pairwise correlations (of bigrams).
+-   **tfidf:** `compute_tfidf_at()`, `visualize_tfidf_at()`: Compute and visualize change in n-gram usage across documents.
+-   **change:** `compute_change_at()`, `visualize_change_at()`: Compute and visualize change in n-gram usage across documents.
 
 ### To Add?
 

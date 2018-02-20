@@ -3,7 +3,7 @@
 #   wrapper_func(xy_grid = xy_grid, xy_nms = xy_nms, data = data, func = compute_ratios)
 # }
 #
-# compute_freqs_multi <- function() {}
+# compute_freqs_multi_at <- function() {}
 #
 # get_xy_grid <- function(xy_nms) {
 #   xy_grid <-

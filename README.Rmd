@@ -63,19 +63,20 @@ Here is a list of all functions in the package.
 Here are some short descriptions. Functions are listed in order of
 recommended use in a script.
 
-+ __time:__ `visualize_time()`, `visualize_time_multi()`, `visualize_time_batched()`: 
++ __time:__ `visualize_time_at()`, `visualize_time_multi_at()`, `visualize_time_batch()`: 
 Visualize data over time.
-+ __tidify:__ `tidify_to_unigrams()`, `tidify_to_bigrams()`: 
++ __tidify:__ `tidify_to_unigrams_at()`, `tidify_to_bigrams_at()`: 
 Tokenize data to tidy format with unigrams/bigrams.
-+ __cnts:__ `visualize_cnts()`, `visualize_cnts_multi()`, 
-`visualize_cnts_wordcloud()`, `visualize_cnts_wordcloud_multi()`: Visualize counts of n-grams.
-+ __freqs:__ `compute_freqs()`, `compute_freqs_multi()`,`visualize_bigrams_freqs_multi()`: 
++ __cnts:__ `visualize_cnts_at()`, `visualize_cnts_multi_at()`, 
+`visualize_cnts_wordcloud_at()`, `visualize_cnts_wordcloud_multi_at()`: Visualize counts of n-grams.
++ __freqs:__ `compute_freqs_at()`, `compute_freqs_multi_at()`,
+`visualize_bigrams_freqs_multi_at()`: 
 Compute and visualize frequencies of n-grams.
-+ __corrs:__ `compute_corrs()`, `visualize_corrs_network()`: 
++ __corrs:__ `compute_corrs_at()`, `visualize_corrs_network_at()`: 
 Compute and visualize pairwise correlations (of bigrams).
-+ __tfidf:__ `compute_tfidf()`, `visualize_tfidf_multi()`: 
++ __tfidf:__ `compute_tfidf_at()`, `visualize_tfidf_at()`: 
 Compute and visualize change in n-gram usage across documents.
-+ __change:__ `compute_change()`, `visualize_change()`: 
++ __change:__ `compute_change_at()`, `visualize_change_at()`: 
 Compute and visualize change in n-gram usage across documents.
 
 ### To Add?
