@@ -11,13 +11,14 @@ visualize_time_at(data = NULL, timebin = NULL, geom = c("bar", "hist"),
   lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
   theme_base = temisc::theme_te_a())
 
-visualize_time_multi_at(..., theme_base = temisc::theme_te_a_facet(),
-  multi = NULL)
+visualize_time_multi_at(data = data, ...,
+  theme_base = temisc::theme_te_a_facet(), multi = NULL, ncol = 3,
+  nrow = NULL, scales = "free")
 }
 \arguments{
 \item{data}{data.frame.}
 
-\item{timebin}{character. Name of column in \code{data} to use for x-axis.
+\item{timebin}{character. Name of column in \code{data} to use for time axis.
 Probably something like 'yyyy', 'mm', etc.}
 
 \item{geom}{character. 'bar' or 'hist'. 'bar' is probably best for everything except Date objects.}
@@ -45,9 +46,13 @@ Set to \code{NULL} by default although not actually required in order to simplif
 \item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.
 Default is provided.}
 
-\item{...}{dots. Parameters to pass to \code{visualize_time_at()}.}
+\item{...}{dots. Parameters to pass directly to \code{visualize_time_at()}.}
 
 \item{multi}{character. Name of column in \code{data} to use for facetting.}
+
+\item{ncol, nrow}{numeric. Direct parameters to \code{ggplot2::facet_wrap()}. Default is provided.}
+
+\item{scales}{character. Direct parameter to \code{ggplot2::facet_wrap()}. Default is provided.}
 }
 \value{
 gg

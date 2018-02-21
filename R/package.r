@@ -6,7 +6,7 @@
 #' @name tetext
 #' @docType package
 #' @importFrom dplyr %>%
-#' @importFrom rlang !! !!! := sym
+#' @importFrom rlang !! !!! := sym syms
 NULL
 
 utils::globalVariables(c("."))

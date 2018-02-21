@@ -1,21 +1,21 @@
 
-
-
-# Modified from a SO answer.
-#' Title
+#' Compute time difference
 #'
-#' @param date_start
-#' @param date_end
-#' @param type
-#'
-#' @return
+#' @description Computes the difference in time between two Date-time values
+#' in a specified time 'unit'.
+#' @details Called in \code{compute_timefilter_multi_at()}.
+#' @param date_start Date-time (or character that can be converted to Date-time).
+#' @param date_end Date-time (or character that can be converted to Date-time).
+#' @param type character. 'unit' to use to calculate time difference.
+#' One of 'year', 'month', 'day', or 'hour'.
+#' @return numeric.
+#' @rdname compute_time_elapsed
 #' @export
-#'
-#' @examples
+#' @seealso https://stackoverflow.com/
 compute_time_elapsed <-
   function(date_start = NULL,
            date_end = NULL,
-           type = c("year", "month" "day", "hour")) {
+           type = c("year", "month", "day", "hour")) {
     if (is.null(date_start))
       stop("`date_start` cannot be NULL.", call. = FALSE)
     if (is.null(date_end))
@@ -42,16 +42,25 @@ compute_time_elapsed <-
     out
   }
 
-#' Title
+#' Add time-related columns
 #'
-#' @param data
-#' @param timebin
-#' @param multi
-#'
-#' @return
+#' @description Adds useful columns for subsequent time calculations and filtering.
+#' @details Adds columns for years, months, days, and hours elapsed.
+#' (Calls in \code{compute_time_elapsed()} multiple times.)
+#' Returns list, where \code{data} is augmented data.frame,
+#' \code{date_start} is the very LAST Date-time value, and \code{date_end}
+#' is the very FIRST Date-time value. The \code{date_start} and \code{date_end}
+#' values are defined in this manner such that all data for each 'multi' variable
+#' fits in a singular frame (i.e. there are not 'gaps' where data exists
+#' for one 'multi' variable and not all others). This determination assumes
+#' that the data is continuous.
+#' @param data data.frame.
+#' @param timebin character. Name of column in \code{data} to use for time axis.
+#' @param multi character. Name of column in \code{data} used for facetting.
+#' @return list
+#' @rdname compute_timeilfter_multi_at
 #' @export
-#'
-#' @examples
+#' @importFrom dplyr group_by arrange mutate first last ungroup select mutate
 compute_timefilter_multi_at <-
   function(data = NULL,
            timebin = NULL,
@@ -74,11 +83,11 @@ compute_timefilter_multi_at <-
       data %>%
       dplyr::group_by(!!multi) %>%
       dplyr::arrange(!!timebin) %>%
-      dplyr::mutate(date_start = first(!!timebin),
-                    date_end = last(!!timebin)) %>%
+      dplyr::mutate(date_start = dplyr::first(!!timebin),
+                    date_end = dplyr::last(!!timebin)) %>%
       dplyr::slice(1) %>%
       dplyr::ungroup() %>%
-      dplyr::select(name, date_start, date_end) %>%
+      dplyr::select(!!multi, date_start, date_end) %>%
       dplyr::mutate(
         yyyy_elapsed = compute_time_elapsed(date_start, date_end, "year"),
         mm_elapsed = compute_time_elapsed(date_start, date_end, "month"),
@@ -95,19 +104,22 @@ compute_timefilter_multi_at <-
     out
   }
 
-# This is "original" processing needed to trim data appropriately/dynamically
-# given an unknown data set.
-#' Title
+#
+#' Trim data.frame by time
 #'
-#' @param data
-#' @param timebin
-#' @param start
-#' @param end
-#'
-#' @return
+#' @description Trim a data.frame to 'fit' within specified 'start' and 'end' Date-time values.
+#' @details Should be used to a trim data.frame appropriately/dynamically
+#' given an unknown data set where visualization across a single, appropriate time period
+#' is desired. (The unkown data set may have different 'max' and 'min' times
+#' for each 'multi' column.
+#' @param data data.frame.
+#' @param timebin character. Name of columin in \code{data} to use for time filtering.
+#' @param start Date-time.
+#' @param end Date-time.
+#' @return data.frame.
+#' @rdname trim_data_bytime_at
 #' @export
-#'
-#' @examples
+#' @importFrom dplyr filter
 trim_data_bytime_at <-
   function(data = NULL,
            timebin = NULL,

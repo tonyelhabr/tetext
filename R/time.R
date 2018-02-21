@@ -4,7 +4,7 @@
 #' @description Visualize time-based data over time.
 #' @details 'multi' version is for facetting.
 #' @param data data.frame.
-#' @param timebin character. Name of column in \code{data} to use for x-axis.
+#' @param timebin character. Name of column in \code{data} to use for time axis.
 #' Probably something like 'yyyy', 'mm', etc.
 #' @param geom character. 'bar' or 'hist'. 'bar' is probably best for everything except Date objects.
 #' @param add_alpha logical. Whether or not to use \code{ggplot2::scale_alpha()} based on count.
@@ -102,13 +102,15 @@ visualize_time_at <-
 
 #' @inheritParams visualize_time_at
 #' @inheritParams visualize_cnts_at
-#' @param ... dots. Parameters to pass to \code{visualize_time_at()}.
+#' @param ... dots. Parameters to pass directly to \code{visualize_time_at()}.
 #' @param multi character. Name of column in \code{data} to use for facetting.
+#' @param ncol,nrow numeric. Direct parameters to \code{ggplot2::facet_wrap()}. Default is provided.
+#' @param scales character. Direct parameter to \code{ggplot2::facet_wrap()}. Default is provided.
 #' @rdname visualize_time_at
 #' @export
 #' @importFrom ggplot2 facet_wrap
 #' @importFrom temisc theme_te_a
-#' @importFrom stats as.formulas
+#' @importFrom stats as.formula
 visualize_time_multi_at <-
   function(data = data,
            ...,
