@@ -4,18 +4,13 @@
 #' @description Visualize n-gram counts.
 #' @details 'multi' version is for facetting. 'y' value is calculated internally
 #' with \code{dplyr::count()}.
-#' @inheritParams visualize_time_at
+#' @inheritParams visualize_time
 #' @param word character. Name of column in \code{data} to use for words.
 #' Probably something like 'word' or 'bigram'. Default is provided.
 #' @param num_top numeric. Number of words to show. Default is provided.
 #' @return gg.
-#' @rdname visualize_cnts_at
+#' @rdname visualize_cnts
 #' @export
-#' @importFrom dplyr count filter row_number desc mutate
-#' @importFrom stats reorder
-#' @importFrom ggplot2 ggplot aes_string scale_color_manual coord_flip labs theme element_blank
-#' @importFrom ggalt geom_lollipop
-#' @importFrom temisc theme_te_a
 #' @seealso \url{https://github.com/dgrtwo/dgrtwo.github.com/blob/master/_R/2016-08-09-trump-data.Rmd}.
 visualize_cnts_at <- function(data = NULL,
                            word = "word",
@@ -31,6 +26,8 @@ visualize_cnts_at <- function(data = NULL,
     stop("`data` cannot be NULL.", call. = FALSE)
 
   word_quo <- rlang::sym(word)
+
+  n <- NULL
 
   data_viz <-
     data %>%
@@ -74,17 +71,18 @@ visualize_cnts_at <- function(data = NULL,
   viz
 }
 
+#' @rdname visualize_cnts
+#' @export
+visualize_cnts <- visualize_cnts_at
+
 #' @details Unfortunately, it seems difficult to combine this with \code{visualize_cnts_at()}
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param multi character. Name of column to use as 'facetting' variable. Not used
 #' if not specified.
-#' @rdname visualize_cnts_at
 #' @return gg.
+#' @rdname visualize_cnts
 #' @export
-#' @importFrom stringr str_to_title
-#' @importFrom temisc theme_te_a_facet
-#' @importFrom drlib reorder_within scale_x_reordered
 visualize_cnts_multi_at <- function(data = NULL,
                                  word = "word",
                                  num_top = 10,
@@ -102,6 +100,8 @@ visualize_cnts_multi_at <- function(data = NULL,
   word_quo <- rlang::sym(word)
   multi_quo <- rlang::sym(multi)
   data <- wrangle_multi_col(data, multi)
+
+  n <- NULL
 
   data_viz <-
     data %>%
@@ -154,7 +154,9 @@ visualize_cnts_multi_at <- function(data = NULL,
   viz
 }
 
-
+#' @rdname visualize_cnts
+#' @export
+visualize_cnts_multi <- visualize_cnts_multi_at
 
 #' Visualize counts
 #'
@@ -162,18 +164,16 @@ visualize_cnts_multi_at <- function(data = NULL,
 #' @details 'multi' version is for creating multiple plots simulatenously
 #' (probably using a \code{purrr} 'map' function).
 #' Fairly original function.
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param word character. Name of column in \code{data} to use for words. Default is provided.
 #' @param num_top numeric. Number of words to show.
 #' @param random_order logical. Passed directly to \code{random.order} parameter
 #' in \code{wordcloud::wordcloud()}
-#' @inheritParams visualize_time_at
+#' @inheritParams visualize_time
 #' @return plot.
-#' @rdname visualize_cnts_wordcloud_at
+#' @rdname visualize_cnts_wordcloud
 #' @export
-#' @importFrom dplyr count pull
-#' @importFrom wordcloud wordcloud
 visualize_cnts_wordcloud_at <-
   function(data = NULL,
            word = "word",
@@ -185,6 +185,7 @@ visualize_cnts_wordcloud_at <-
     word_quo <- rlang::sym(word)
     data_viz <- data %>% dplyr::count(!!word_quo)
 
+    n <- NULL
     words <- dplyr::pull(data_viz, !!word_quo)
     freqs <- dplyr::pull(data_viz, n)
     viz <-
@@ -198,6 +199,10 @@ visualize_cnts_wordcloud_at <-
     viz
   }
 
+#' @rdname visualize_cnts_wordcloud
+#' @export
+visualize_cnts_wordcloud <- visualize_cnts_wordcloud_at
+
 #' @inheritParams visualize_time_at
 #' @inheritParams visualize_cnts_at
 #' @inheritParams visualize_cnts_wordcloud_at
@@ -207,9 +212,8 @@ visualize_cnts_wordcloud_at <-
 #' @param value_multi charater or numeric. Value by which to filter the column
 #' specified by \code{multi}.
 #' @return plots.
-#' @rdname visualize_cnts_wordcloud_at
+#' @rdname visualize_cnts_wordcloud
 #' @export
-#' @importFrom dplyr filter
 visualize_cnts_wordcloud_multi_at <-
   function(data = NULL, ..., multi = NULL, value_multi = NULL) {
     if (is.null(data))
@@ -226,6 +230,8 @@ visualize_cnts_wordcloud_multi_at <-
     viz
   }
 
-
+#' @rdname visualize_cnts_wordcloud
+#' @export
+visualize_cnts_wordcloud_multi <- visualize_cnts_wordcloud_multi_at
 
 

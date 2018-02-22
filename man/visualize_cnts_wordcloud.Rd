@@ -2,13 +2,21 @@
 % Please edit documentation in R/cnts.R
 \name{visualize_cnts_wordcloud_at}
 \alias{visualize_cnts_wordcloud_at}
+\alias{visualize_cnts_wordcloud}
 \alias{visualize_cnts_wordcloud_multi_at}
+\alias{visualize_cnts_wordcloud_multi}
 \title{Visualize counts}
 \usage{
 visualize_cnts_wordcloud_at(data = NULL, word = "word",
   color_value = "grey80", num_top = 50, random_order = FALSE)
 
+visualize_cnts_wordcloud(data = NULL, word = "word",
+  color_value = "grey80", num_top = 50, random_order = FALSE)
+
 visualize_cnts_wordcloud_multi_at(data = NULL, ..., multi = NULL,
+  value_multi = NULL)
+
+visualize_cnts_wordcloud_multi(data = NULL, ..., multi = NULL,
   value_multi = NULL)
 }
 \arguments{

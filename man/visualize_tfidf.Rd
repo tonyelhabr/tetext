@@ -2,9 +2,15 @@
 % Please edit documentation in R/tfidf.R
 \name{visualize_tfidf_at}
 \alias{visualize_tfidf_at}
+\alias{visualize_tfidf}
 \title{Visualize TF-IDF}
 \usage{
 visualize_tfidf_at(data = NULL, word = "word", doc = "document",
+  multi = doc, num_top = 10, color = multi, color_value = "grey80",
+  lab_title = "Highest TF-IDF Words", lab_subtitle = paste0("By ",
+  stringr::str_to_title(multi)), theme_base = temisc::theme_te_a_facet())
+
+visualize_tfidf(data = NULL, word = "word", doc = "document",
   multi = doc, num_top = 10, color = multi, color_value = "grey80",
   lab_title = "Highest TF-IDF Words", lab_subtitle = paste0("By ",
   stringr::str_to_title(multi)), theme_base = temisc::theme_te_a_facet())

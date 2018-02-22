@@ -6,17 +6,15 @@
 #' @details Calls \code{tidytext::bind_tf_idf()} internally. Note that the
 #' output 'tfidf' column is named \code{tf_idf} because this is the convention
 #' of the \code{tidytext} package.
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param word character. Name of column in \code{data} to use
 #' as \code{term} in \code{tidytext::bind_tf_idf()}. Default is provided.
 #' @param doc character. Name of column in \code{data} to use
 #' as \code{document} in \code{tidytext::bind_tf_idf()}. Default is provided.
 #' @return data.frame.
-#' @rdname compute_tfidf_at
+#' @rdname compute_tfidf
 #' @export
-#' @importFrom dplyr count arrange desc
-#' @importFrom tidytext bind_tf_idf
 compute_tfidf_at <-
   function(data = NULL,
            word = "word",
@@ -37,24 +35,22 @@ compute_tfidf_at <-
     out
   }
 
+#' @rdname compute_tfidf
+#' @export
+compute_tfidf <- compute_tfidf_at
+
 #' Visualize TF-IDF
 #'
 #' @description Visualize term-frequency, inverse-document-frequency.
 #' @details Calls \code{compute_tfidf_at()} internally.
 #' Cannot pass dots to \code{compute_tfidf_at()} internally because parameters
 #' are used in subsequent processing.
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
-#' @inheritParams compute_tfidf_at
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
+#' @inheritParams compute_tfidf
 #' @return gg.
-#' @rdname visualize_tfidf_at
+#' @rdname visualize_tfidf
 #' @export
-#' @importFrom dplyr group_by top_n ungroup mutate
-#' @importFrom drlib reorder_within scale_x_reordered
-#' @importFrom stringr str_to_title
-#' @importFrom temisc theme_te_a_facet
-#' @importFrom ggplot2 labs theme element_blank ggplot aes_string geom_col scale_fill_manual facet_wrap coord_flip
-#' @importFrom stats as.formula
 #' @seealso \url{https://www.tidytextmining.com/tfidf.html}.
 #' \url{https://juliasilge.com/blog/sherlock-holmes-stm/}
 visualize_tfidf_at <-
@@ -130,3 +126,9 @@ visualize_tfidf_at <-
 
     viz
   }
+
+#' @rdname visualize_tfidf
+#' @export
+visualize_tfidf <- visualize_tfidf_at
+
+

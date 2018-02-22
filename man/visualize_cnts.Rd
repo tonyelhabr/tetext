@@ -2,7 +2,9 @@
 % Please edit documentation in R/cnts.R
 \name{visualize_cnts_at}
 \alias{visualize_cnts_at}
+\alias{visualize_cnts}
 \alias{visualize_cnts_multi_at}
+\alias{visualize_cnts_multi}
 \title{Visualize counts}
 \usage{
 visualize_cnts_at(data = NULL, word = "word", num_top = 10,
@@ -10,7 +12,17 @@ visualize_cnts_at(data = NULL, word = "word", num_top = 10,
   lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
   theme_base = temisc::theme_te_a())
 
+visualize_cnts(data = NULL, word = "word", num_top = 10, color = NULL,
+  color_value = "grey80", lab_title = "Count of Words",
+  lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
+  theme_base = temisc::theme_te_a())
+
 visualize_cnts_multi_at(data = NULL, word = "word", num_top = 10,
+  color = NULL, color_value = "grey80", lab_title = "Count of Words",
+  lab_subtitle = paste0("By ", stringr::str_to_title(multi)), lab_x = NULL,
+  lab_y = NULL, theme_base = temisc::theme_te_a_facet(), multi)
+
+visualize_cnts_multi(data = NULL, word = "word", num_top = 10,
   color = NULL, color_value = "grey80", lab_title = "Count of Words",
   lab_subtitle = paste0("By ", stringr::str_to_title(multi)), lab_x = NULL,
   lab_y = NULL, theme_base = temisc::theme_te_a_facet(), multi)

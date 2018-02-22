@@ -2,19 +2,19 @@
 % Please edit documentation in R/tidify.R
 \name{tidify_to_bigrams_at}
 \alias{tidify_to_bigrams_at}
+\alias{tidify_to_bigrams}
 \title{Prepare data for text analysis.}
 \usage{
-tidify_to_bigrams_at(data = NULL, text = "text", word = "word",
-  rgx_pattern, rgx_replacement, stopwords = TRUE, stopwords_lexicon,
-  rgx_ignore_custom)
+tidify_to_bigrams_at(data = NULL, text = "text", rgx_pattern,
+  rgx_replacement, stopwords = TRUE, stopwords_lexicon, rgx_ignore_custom)
+
+tidify_to_bigrams(data = NULL, text = "text", rgx_pattern, rgx_replacement,
+  stopwords = TRUE, stopwords_lexicon, rgx_ignore_custom)
 }
 \arguments{
 \item{data}{data.frame.}
 
-\item{text}{character. Name of column in \code{data} to parse. Default: 'text'}
-
-\item{word}{character. Name of column in \code{data} to use for words.
-Probably something like 'word' or 'bigram'. Default is provided.}
+\item{text}{character. Name of column in \code{data} to parse. Default is provided.}
 
 \item{rgx_pattern}{character. Regular expression to substitute.}
 
@@ -29,12 +29,13 @@ Otherwise, must be a lexicon available in the \code{tidytext} package.}
 \item{rgx_ignore_custom}{character. Custom regular expression to remove.}
 }
 \value{
-data.frame. In tidy format. 'word1' and 'word2' columns are named
-'first' and 'second' respectively.
+data.frame.
 }
 \description{
 Create a tidy data.frame of unigrams.
 }
 \details{
-Heavily influence by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
+Heavily influenced by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
+Creates output columns 'word', 'word1', and 'word2'.
+('word' is simply 'word1' and 'word2' toegether.)
 }

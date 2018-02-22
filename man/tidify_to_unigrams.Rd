@@ -2,18 +2,20 @@
 % Please edit documentation in R/tidify.R
 \name{tidify_to_unigrams_at}
 \alias{tidify_to_unigrams_at}
+\alias{tidify_to_unigrams}
 \title{Prepare data for text analysis.}
 \usage{
-tidify_to_unigrams_at(data = NULL, text = "text", word = "word",
-  rgx_pattern, rgx_replacement, rgx_unnest, stopwords = TRUE,
-  stopwords_lexicon, rgx_ignore_custom)
+tidify_to_unigrams_at(data = NULL, text = "text", rgx_pattern,
+  rgx_replacement, rgx_unnest, stopwords = TRUE, stopwords_lexicon,
+  rgx_ignore_custom)
+
+tidify_to_unigrams(data = NULL, text = "text", rgx_pattern, rgx_replacement,
+  rgx_unnest, stopwords = TRUE, stopwords_lexicon, rgx_ignore_custom)
 }
 \arguments{
 \item{data}{data.frame. Not in 'tidy' format.}
 
-\item{text}{character. Name of column in \code{data} to parse. Default: 'text'}
-
-\item{word}{character. Name of output column for token. Default: 'word'}
+\item{text}{character. Name of column in \code{data} to parse. Default is provided.}
 
 \item{rgx_pattern}{character. Regular expression to substitute.}
 
@@ -37,7 +39,8 @@ data.frame.
 Create a tidy data.frame of unigrams.
 }
 \details{
-Heavily influence by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
+Heavily influenced by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
+Creates output column 'word'.
 }
 \seealso{
 \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.

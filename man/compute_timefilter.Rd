@@ -2,9 +2,15 @@
 % Please edit documentation in R/trim.R
 \name{compute_timefilter_multi_at}
 \alias{compute_timefilter_multi_at}
+\alias{compute_timefilter_at}
+\alias{compute_timefilter}
 \title{Add time-related columns}
 \usage{
 compute_timefilter_multi_at(data = NULL, timebin = NULL, multi = NULL)
+
+compute_timefilter_at(data, timebin, multi)
+
+compute_timefilter(data, timebin, multi)
 }
 \arguments{
 \item{data}{data.frame.}
@@ -15,11 +21,14 @@ compute_timefilter_multi_at(data = NULL, timebin = NULL, multi = NULL)
 }
 \value{
 list
+
+list
 }
 \description{
 Adds useful columns for subsequent time calculations and filtering.
 }
 \details{
+Calls \code{compute_timefilter_multi_at()}. (Adds a dummy 'multi' column if none is specified.)
 Adds columns for years, months, days, and hours elapsed.
 (Calls in \code{compute_time_elapsed()} multiple times.)
 Returns list, where \code{data} is augmented data.frame,

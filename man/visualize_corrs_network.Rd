@@ -2,9 +2,16 @@
 % Please edit documentation in R/corrs.R
 \name{visualize_corrs_network_at}
 \alias{visualize_corrs_network_at}
+\alias{visualize_corrs_network}
 \title{Visualize correlations}
 \usage{
 visualize_corrs_network_at(..., resize_points = TRUE, size_point = "n",
+  add_point_labels = TRUE, color_point = "grey80", shape_point = 21,
+  seed = 42, lab_title = "Network of Pairwise Correlations",
+  lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
+  theme_base = ggplot2::theme_void())
+
+visualize_corrs_network(..., resize_points = TRUE, size_point = "n",
   add_point_labels = TRUE, color_point = "grey80", shape_point = 21,
   seed = 42, lab_title = "Network of Pairwise Correlations",
   lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,

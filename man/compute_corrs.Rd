@@ -2,9 +2,14 @@
 % Please edit documentation in R/corrs.R
 \name{compute_corrs_at}
 \alias{compute_corrs_at}
+\alias{compute_corrs}
 \title{Compute correlations}
 \usage{
 compute_corrs_at(data = NULL, word = "word", feature = NULL,
+  num_top_ngrams = 50, num_top_corrs = 50, return_corrs = TRUE,
+  return_words = FALSE, return_both = FALSE)
+
+compute_corrs(data = NULL, word = "word", feature = NULL,
   num_top_ngrams = 50, num_top_corrs = 50, return_corrs = TRUE,
   return_words = FALSE, return_both = FALSE)
 }

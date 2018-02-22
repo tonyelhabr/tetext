@@ -1,4 +1,5 @@
 
+
 #' Visualize by time period.
 #'
 #' @description Visualize time-based data over time.
@@ -22,9 +23,8 @@
 #' @param theme_base \code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.
 #' Default is provided.
 #' @return gg
+#' @rdname visualize_time
 #' @export
-#' @importFrom temisc theme_te_a
-#' @importFrom ggplot2 labs element_blank theme ggplot aes_string geom_bar scale_alpha geom_histogram scale_fill_manual
 #' @seealso \url{https://juliasilge.com/blog/ten-thousand-tweets/}.
 visualize_time_at <-
   function(data = NULL,
@@ -100,17 +100,18 @@ visualize_time_at <-
     viz
   }
 
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
+#' @rdname visualize_time
+#' @export
+visualize_time <- visualize_time_at
+
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param ... dots. Parameters to pass directly to \code{visualize_time_at()}.
 #' @param multi character. Name of column in \code{data} to use for facetting.
 #' @param ncol,nrow numeric. Direct parameters to \code{ggplot2::facet_wrap()}. Default is provided.
 #' @param scales character. Direct parameter to \code{ggplot2::facet_wrap()}. Default is provided.
-#' @rdname visualize_time_at
+#' @rdname visualize_time
 #' @export
-#' @importFrom ggplot2 facet_wrap
-#' @importFrom temisc theme_te_a
-#' @importFrom stats as.formula
 visualize_time_multi_at <-
   function(data = data,
            ...,
@@ -136,12 +137,16 @@ visualize_time_multi_at <-
     viz
   }
 
+#' @rdname visualize_time
+#' @export
+visualize_time_multi <- visualize_time_multi_at
+
 #' Visualize over multiple time periods
 #'
 #' @description Visualize time-based data over time.
 #' @details Calls \code{visualize_time_at()}.
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param data data.frame (single).
 #' @param colnames_timebin character (vector).
 #' @param geoms character (vector).
@@ -155,9 +160,8 @@ visualize_time_multi_at <-
 #' @param arrange logical. Whether or not to plot in an arranged format.
 #' @param show logical. Whether or not to show plots.
 #' @return ggs (or gtable, if \code{arrange = TRUE})
+#' @rdname visualize_time_batch
 #' @export
-#' @importFrom purrr pmap
-#' @importFrom gridExtra arrangeGrob grid.arrange
 visualize_time_batch_at <-
   function(data = NULL,
            colnames_timebin = c("timestamp", "yyyy", "mm", "wd", "hh"),
@@ -188,7 +192,7 @@ visualize_time_batch_at <-
     data_proc <- data %>% tidyr::nest()
     # This is temisc::repeat_df().
     num_rep <- length(colnames_timebin)
-    data_rep <- data_proc[rep(seq_len(nrow(data_proc)), num_rep), ]
+    data_rep <- data_proc[rep(seq_len(nrow(data_proc)), num_rep),]
     viz_time_params <-
       list(
         data = data_rep$data,
@@ -212,11 +216,12 @@ visualize_time_batch_at <-
     }
 
     viz_time_list <- purrr::pmap(viz_time_params, visualize_time_at)
-    if(arrange) {
+    if (arrange) {
       num_viz <- length(viz_time_list)
       num_cols <- floor(sqrt(num_viz))
       # out <- do.call(gridExtra::grid.arrange, c(viz_time_list, ncol = num_cols)
-      out <- do.call(gridExtra::arrangeGrob, c(viz_time_list, ncol = num_cols))
+      out <-
+        do.call(gridExtra::arrangeGrob, c(viz_time_list, ncol = num_cols))
       # out <-
       #   gridExtra::arrangeGrob(
       #     viz_time_list[[1]],
@@ -228,14 +233,93 @@ visualize_time_batch_at <-
       #     nrow = 3,
       #     layout_matrix = rbind(c(1, 1), c(2, 2), c(3, 3)
       #   )
-      if(show) {
+      if (show) {
         gridExtra::grid.arrange(out)
       }
     } else {
       out <- viz_time_list
-      if(show) {
+      if (show) {
         print(out)
       }
     }
     invisible(out)
   }
+
+#' @rdname visualize_time_batch
+#' @export
+visualize_time_batch <- visualize_time_batch_at
+
+#' Visualize hourly data
+#'
+#' @description Visualize time-based data aggregated over hours.
+#' @details This function is 'unique' because it calls \code{ggplot2::geom_violin()}.
+#' @inheritParams visualize_time
+#' @inheritParams visualize_time
+#' @inheritParams visualize_time_multi
+#' @param multi character. Name of column in \code{data} to use one of main axes, not for facetting.
+#' @param timebin character. Name of column in \code{data} to use for time. Probably likely something like 'hh' or 'hour'.
+#' @rdname visualize_hh_multi
+#' @export
+visualize_hh_multi_at <-
+  function(data = NULL,
+           # timebin = intersect(names(data), c("hh", "hour")),
+           timebin = NULL,
+           multi = NULL,
+           color = multi,
+           color_value = "grey80",
+           lab_title = "Count Over Time",
+           lab_subtitle = "By Time of Day",
+           lab_x = NULL,
+           lab_y = NULL,
+           theme_base = temisc::theme_te_a()) {
+    if (is.null(data))
+      stop("`data` must not be NULL.", call. = FALSE)
+    if (is_nothing(timebin))
+      stop("`timebin` must not be NULL.", call. = FALSE)
+    if (is.null(multi))
+      stop("`multi` cannot be NULL.", call. = FALSE)
+
+    if (is_nothing(color)) {
+      data$color_value <- "dummy"
+      color <- "color_value"
+
+    }
+    # data <- wrangle_color_col(data, color)
+
+    viz <-
+      data %>%
+      ggplot2::ggplot(ggplot2::aes_string(x = multi, y = timebin, fill = color)) +
+      ggplot2::scale_y_continuous(
+        limits = c(1, 24),
+        breaks = c(6, 12, 18),
+        labels = c("6am", "Noon", "6pm")
+      ) +
+      ggplot2::scale_fill_manual(values = color_value) +
+      ggplot2::geom_violin(size = 0) +
+      ggplot2::geom_hline(yintercept = seq(3, 24, by = 3),
+                          color = "grey80",
+                          size = 0.1) +
+      ggplot2::coord_flip()
+
+    viz_labs <-
+      ggplot2::labs(
+        x = lab_x,
+        y = lab_y,
+        title = lab_title,
+        subtitle = lab_subtitle
+      )
+    viz_theme <-
+      theme_base +
+      ggplot2::theme(panel.grid = ggplot2::element_blank())
+
+    viz <-
+      viz +
+      viz_labs +
+      viz_theme
+    viz
+  }
+
+#' @rdname visualize_hh_multi
+#' @export
+visualize_hh_multi <- visualize_hh_multi_at
+

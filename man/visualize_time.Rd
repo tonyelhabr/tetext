@@ -2,7 +2,9 @@
 % Please edit documentation in R/time.R
 \name{visualize_time_at}
 \alias{visualize_time_at}
+\alias{visualize_time}
 \alias{visualize_time_multi_at}
+\alias{visualize_time_multi}
 \title{Visualize by time period.}
 \usage{
 visualize_time_at(data = NULL, timebin = NULL, geom = c("bar", "hist"),
@@ -11,7 +13,17 @@ visualize_time_at(data = NULL, timebin = NULL, geom = c("bar", "hist"),
   lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
   theme_base = temisc::theme_te_a())
 
+visualize_time(data = NULL, timebin = NULL, geom = c("bar", "hist"),
+  add_alpha = FALSE, alpha_range = c(0.25, 1), color = NULL,
+  color_value = "grey80", lab_title = "Count Over Time",
+  lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
+  theme_base = temisc::theme_te_a())
+
 visualize_time_multi_at(data = data, ...,
+  theme_base = temisc::theme_te_a_facet(), multi = NULL, ncol = 3,
+  nrow = NULL, scales = "free")
+
+visualize_time_multi(data = data, ...,
   theme_base = temisc::theme_te_a_facet(), multi = NULL, ncol = 3,
   nrow = NULL, scales = "free")
 }

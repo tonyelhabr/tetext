@@ -2,9 +2,14 @@
 % Please edit documentation in R/change.R
 \name{compute_change_at}
 \alias{compute_change_at}
+\alias{compute_change}
 \title{Compute change}
 \usage{
 compute_change_at(data = NULL, timebin = NULL, word = "word",
+  timefloor = NULL, top_pct = 0.05, return_models = TRUE,
+  return_data = FALSE, return_both = FALSE)
+
+compute_change(data = NULL, timebin = NULL, word = "word",
   timefloor = NULL, top_pct = 0.05, return_models = TRUE,
   return_data = FALSE, return_both = FALSE)
 }

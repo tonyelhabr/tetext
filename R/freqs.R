@@ -4,13 +4,13 @@
 #'
 #' @description Compute the frequency of n-grams.
 #' @details Inspired by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param word character. Name of column in \code{data} to use for count. Default is provided
 #' @return data.frame.
-#' @rdname compute_freqs_at
+#' @rdname compute_freqs
 #' @export
-#' @importFrom dplyr n count mutate summarise arrange desc
+
 compute_freqs_at <- function(data = NULL, word = "word") {
 
     if(is.null(data)) stop("`data` cannot be NULL.", call. = FALSE)
@@ -31,15 +31,19 @@ compute_freqs_at <- function(data = NULL, word = "word") {
     out
 }
 
+
+#' @rdname compute_freqs
+#' @export
+compute_freqs <- compute_freqs_at
+
 #' @inheritParams visualize_time_at
 #' @inheritParams visualize_cnts_at
 #' @inheritParams compute_freqs_at
 #' @param multi character. Name of column in \code{data} corresponding to group
 #' by which count is made.
 #' @return data.frame.
-#' @rdname compute_freqs_at
+#' @rdname compute_freqs
 #' @export
-#' @importFrom dplyr left_join rename
 compute_freqs_multi_at <-
   function(data = NULL,
            word = "word",
@@ -64,24 +68,21 @@ compute_freqs_multi_at <-
     out
   }
 
-
+#' @rdname compute_freqs
+#' @export
+compute_freqs_multi <- compute_freqs_multi_at
 
 
 #' Visualize bigrams
 #'
 #' @description Visualize bigrams with dots sized according to frequency.
 #' @details \code{compute_freqs_multi_at()} should NOT be called beforehand.
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
-#' @inheritParams compute_freqs_multi_at
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
+#' @inheritParams compute_freqs_multi
 #' @return gg.
-#' @rdname visualize_bigram_freqs_multi_at
+#' @rdname visualize_bigram_freqs_multi
 #' @export
-#' @importFrom dplyr group_by mutate row_number desc filter ungroup arrange
-#' @importFrom stringr str_to_title str_replace_all
-#' @importFrom forcats fct_reorder
-#' @importFrom ggplot2 labs theme ggplot geom_point aes_string scale_y_discrete scale_color_manual scale_size_area coord_flip
-#' @importFrom temisc theme_te_a
 #' @seealso \url{https://buzzfeednews.github.io/2018-01-trump-twitter-wars/}
 visualize_bigram_freqs_multi_at <-
   function(data = NULL,
@@ -167,6 +168,7 @@ visualize_bigram_freqs_multi_at <-
     viz
   }
 
-
-
+#' @rdname visualize_bigram_freqs_multi
+#' export
+visualize_bigram_freqs_multi <- visualize_bigram_freqs_multi_at
 

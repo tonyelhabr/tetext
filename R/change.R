@@ -3,8 +3,8 @@
 #'
 #' @description Compute change in word usage over time.
 #' @details None.
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param timebin character. Name of column in \code{data} specifying temporal period
 #' to use to compute change.
 #' @param word character. Name of column in \code{data} corresponding to n-gram.
@@ -17,14 +17,8 @@
 #' Needed when using \code{visualize_change_at()}.
 #' @param return_both logical. Set to \code{TRUE} when \code{visualize_change_at()}. Default is provided.
 #' @return data.frame.
-#' @rdname compute_change_at
+#' @rdname compute_change
 #' @export
-#' @importFrom dplyr mutate group_by summarise ungroup filter arrange
-#' @importFrom lubridate floor_date
-#' @importFrom stats quantile glm p.adjust
-#' @importFrom tidyr nest unnest
-#' @importFrom purrr map
-#' @importFrom broom tidy
 #' @seealso \url{https://www.tidytextmining.com/twitter.html#changes-in-word-use}
 compute_change_at <-
   function(data = NULL,
@@ -94,6 +88,9 @@ compute_change_at <-
     out
   }
 
+#' @rdname compute_change
+#' @export
+compute_change <- compute_change_at
 
 #' Visualize change
 #'
@@ -101,16 +98,11 @@ compute_change_at <-
 #' @details Calls \code{compute_change_at()} internally. Works similarly to \code{visualize_corrs}.
 #' (Two data sets are returned from the list that is returned by the \code{compute_} function.)
 #' @param ... dots. Parameters passed to \code{compute_change_at()}.
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @return gg.
-#' @rdname visualize_change_at
+#' @rdname visualize_change
 #' @export
-#' @importFrom dplyr inner_join mutate if_else
-#' @importFrom ggplot2 labs theme ggplot aes scale_color_manual geom_line scale_y_continuous
-#' @importFrom ggrepel geom_label_repel
-#' @importFrom scales percent_format
-#' @importFrom temisc theme_te_a
 visualize_change_at <-
   function(...,
            num_top = 5,
@@ -140,7 +132,7 @@ visualize_change_at <-
     }
     data_models_top <- wrangle_color_col(data_models_top, color)
 
-    adjusted_p_value <- time_total <- time_floor <- word <- pct <- label <- NULL
+    adjusted_p_value <- time_total <- time_floor <- word <- pct <- label <- n <- NULL
 
     viz <-
       data %>%
@@ -172,4 +164,7 @@ visualize_change_at <-
     viz
 }
 
+#' @rdname visualize_change
+#' @export
+visualize_change <- visualize_change_at
 

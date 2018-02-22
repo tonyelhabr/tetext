@@ -2,9 +2,12 @@
 % Please edit documentation in R/tfidf.R
 \name{compute_tfidf_at}
 \alias{compute_tfidf_at}
+\alias{compute_tfidf}
 \title{Compute TF-IDF}
 \usage{
 compute_tfidf_at(data = NULL, word = "word", doc = "document")
+
+compute_tfidf(data = NULL, word = "word", doc = "document")
 }
 \arguments{
 \item{data}{data.frame.}

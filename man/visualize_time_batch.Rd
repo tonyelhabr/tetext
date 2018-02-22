@@ -2,10 +2,21 @@
 % Please edit documentation in R/time.R
 \name{visualize_time_batch_at}
 \alias{visualize_time_batch_at}
+\alias{visualize_time_batch}
 \title{Visualize over multiple time periods}
 \usage{
 visualize_time_batch_at(data = NULL, colnames_timebin = c("timestamp",
   "yyyy", "mm", "wd", "hh"), geoms = c("hist", "bar", "bar", "bar", "bar"),
+  add_alphas = c(FALSE, rep(TRUE, length(colnames_timebin) - 1)),
+  colnames_color = rep(NA, length(colnames_timebin)),
+  color_values = rep("grey80", length(colnames_timebin)),
+  labs_title = rep("Count Over Time", length(colnames_timebin)),
+  labs_subtitle = c("", "By Year", "By Month", "By Day of Week", "By Hour"),
+  labs_x = rep("", length(colnames_timebin)), labs_y = rep("",
+  length(colnames_timebin)), arrange = FALSE, show = FALSE)
+
+visualize_time_batch(data = NULL, colnames_timebin = c("timestamp", "yyyy",
+  "mm", "wd", "hh"), geoms = c("hist", "bar", "bar", "bar", "bar"),
   add_alphas = c(FALSE, rep(TRUE, length(colnames_timebin) - 1)),
   colnames_color = rep(NA, length(colnames_timebin)),
   color_values = rep("grey80", length(colnames_timebin)),

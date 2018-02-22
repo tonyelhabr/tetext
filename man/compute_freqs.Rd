@@ -2,12 +2,18 @@
 % Please edit documentation in R/freqs.R
 \name{compute_freqs_at}
 \alias{compute_freqs_at}
+\alias{compute_freqs}
 \alias{compute_freqs_multi_at}
+\alias{compute_freqs_multi}
 \title{Compute n-gram frequency}
 \usage{
 compute_freqs_at(data = NULL, word = "word")
 
+compute_freqs(data = NULL, word = "word")
+
 compute_freqs_multi_at(data = NULL, word = "word", multi = NULL)
+
+compute_freqs_multi(data = NULL, word = "word", multi = NULL)
 }
 \arguments{
 \item{data}{data.frame.}

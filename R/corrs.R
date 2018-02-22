@@ -5,8 +5,8 @@
 #' @description Compute correlations among pairs of words.
 #' @details Call \code{widyr::pairwise_cor()} internally.
 #' Is called by \code{visualize_corrs_network_at()}, so there is no need to call this directly.
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param word character. Name of column in \code{data} to use as \code{item}
 #' in \code{widyr::pairwise_cor()}. Default is provided.
 #' @param feature character. Name of column in \code{data} to use as \code{feature}
@@ -22,10 +22,8 @@
 #' @param return_both logical. Useful when creating a network visualization so that
 #' words can be used as nodes and correlations can be used weights.
 #' @return data.frame.
-#' @rdname compute_corrs_at
+#' @rdname compute_corrs
 #' @export
-#' @importFrom dplyr count mutate row_number desc filter semi_join rename
-#' @importFrom widyr pairwise_cor
 #' @seealso \url{http://varianceexplained.org/r/seven-fav-packages/}.
 compute_corrs_at <-
   function(data = NULL,
@@ -43,7 +41,7 @@ compute_corrs_at <-
     if(is.null(feature))
       stop("`feature` cannot be NULL.", call. = FALSE)
 
-    word <- feature <- correlation <- NULL
+    word <- feature <- correlation <- n <- NULL
 
     word_quo <- rlang::sym(word)
     feature_quo <- rlang::sym(feature)
@@ -87,12 +85,15 @@ compute_corrs_at <-
     out
   }
 
+#' @rdname compute_corrs
+#' @export
+compute_corrs <- compute_corrs_at
 
 #' Visualize correlations
 #'
 #' @description Visualize correlations with a network
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param ... dots. Parameters passed directly to \code{compute_corrs_at()}.
 #' @param resize_points logical. Indicates whether or not to make size of points
 #' correspond to count of words.
@@ -101,13 +102,10 @@ compute_corrs_at <-
 #' @param color_point character. Hex value of color_value for points. Default is provided.
 #' @param shape_point numeric. Default is provided.
 #' @param seed numeric. Used to by \code{ggraph::ggraph}. Default is provided.
-#' @inheritParams visualize_time_at
+#' @inheritParams visualize_time
 #' @return gg.
-#' @rdname visualize_corrs_at
+#' @rdname visualize_corrs_network
 #' @export
-#' @importFrom ggplot2 theme_void labs theme aes_string
-#' @importFrom igraph graph_from_data_frame
-#' @importFrom ggraph ggraph geom_edge_link geom_node_point geom_node_text
 #' @seealso \url{https://www.tidytextmining.com/ngrams.html}.
 #' \url{http://varianceexplained.org/r/seven-fav-packages/}.
 visualize_corrs_network_at <-
@@ -182,4 +180,6 @@ visualize_corrs_network_at <-
     viz
   }
 
-
+#' @rdname visualize_corrs_network
+#' @export
+visualize_corrs_network <- visualize_corrs_network_at

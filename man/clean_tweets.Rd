@@ -2,9 +2,17 @@
 % Please edit documentation in R/tweet.R
 \name{clean_tweets_at}
 \alias{clean_tweets_at}
+\alias{clean_tweets}
 \title{Clean (and augment) \code{rtweet} data.frame}
 \usage{
 clean_tweets_at(data = NULL, multi, trim = TRUE, colnames = c("status_id",
+  "created_at", "user_id", "screen_name", "text", "display_text_width",
+  "reply_to_status_id", "is_quote", "is_retweet", "favorite_count",
+  "retweet_count", "hashtags", "symbols", "urls_url", "urls_expanded_url",
+  "media_expanded_url", "ext_media_expanded_url"),
+  timezone = "America/Chicago")
+
+clean_tweets(data = NULL, multi, trim = TRUE, colnames = c("status_id",
   "created_at", "user_id", "screen_name", "text", "display_text_width",
   "reply_to_status_id", "is_quote", "is_retweet", "favorite_count",
   "retweet_count", "hashtags", "symbols", "urls_url", "urls_expanded_url",

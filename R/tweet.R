@@ -19,10 +19,8 @@
 #' @param timezone character. Passed directly to \code{lubridate::with_tz()} as \code{tzone} parameter.
 #' Default is provided.
 #' @return data.frame
-#' @rdname clean_tweets_at
+#' @rdname clean_tweets
 #' @export
-#' @importFrom dplyr select one_of mutate_if funs mutate
-#' @importFrom lubridate ymd_hms with_tz hour minute
 #' @seealso \url{https://juliasilge.com/blog/ten-thousand-data/}.
 #' \url{https://buzzfeednews.github.io/2018-01-trump-twitter-wars/}.
 clean_tweets_at <-
@@ -77,17 +75,21 @@ clean_tweets_at <-
     out
   }
 
+#' @rdname clean_tweets
+#' @export
+clean_tweets <- clean_tweets_at
+
 #' Augment \code{rtweet} data.frame
 #'
 #' @description Add columns to \code{rtweet} data.frame for 'kind' data.
 #' @details The columns added include
 #' 'hashtag', 'link', 'rt', 'quote', and 'reply', all of which are logicals.
 #' A 'type' column is also added--it is a factored version of 'rt', 'quote', and 'reply'.
-#' @inheritParams clean_tweets_at
+#' @inheritParams clean_tweets
 #' @return data.frame
 #' @rdname add_tweet_kind_cols
 #' @export
-#' @importFrom dplyr mutate if_else case_when
+
 #' @seealso \url{https://juliasilge.com/blog/ten-thousand-data/}.
 add_tweet_kind_cols <- function(data = NULL) {
   if (is.null(data))

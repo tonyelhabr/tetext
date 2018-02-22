@@ -4,12 +4,12 @@
 #' Prepare data for text analysis.
 #'
 #' @description Create a tidy data.frame of unigrams.
-#' @details Heavily influence by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
+#' @details Heavily influenced by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
+#' Creates output column 'word'.
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
 #' @param data data.frame. Not in 'tidy' format.
-#' @param text character. Name of column in \code{data} to parse. Default: 'text'
-#' @param word character. Name of output column for token. Default: 'word'
+#' @param text character. Name of column in \code{data} to parse. Default is provided.
 #' @param rgx_pattern character. Regular expression to substitute.
 #' @param rgx_replacement character. Regular expression used as replacement.
 #' @param rgx_unnest character. Regular expression to use in \code{tidytext::unnest_tokens()}.
@@ -20,18 +20,14 @@
 #' Otherwise, must be a lexicon available in the \code{tidytext} package.
 #' @param rgx_ignore_custom character. Custom regular expression to remove.
 #' @return data.frame.
-#' @rdname tidify_to_unigrams_at
+#' @rdname tidify_to_unigrams
 #' @export
-#' @importFrom dplyr mutate rename anti_join filter
-#' @importFrom stringr str_replace_all str_detect
-#' @importFrom tidytext unnest_tokens get_stopwords
 #' @seealso \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
 #' \url{https://www.tidytextmining.com/ngrams.html}.
 #' \url{https://www.tidytextmining.com/twitter.html}.
 tidify_to_unigrams_at <-
   function(data = NULL,
            text = "text",
-           word = "word",
            rgx_pattern,
            rgx_replacement,
            rgx_unnest,
@@ -42,8 +38,6 @@ tidify_to_unigrams_at <-
       stop("`data` cannot be NULL.", call. = FALSE)
 
     text_quo <- rlang::sym(text)
-    word_quo <- rlang::sym(word)
-
     word <- NULL
 
     out <- data
@@ -56,11 +50,11 @@ tidify_to_unigrams_at <-
     if (missing(rgx_unnest)) {
       out <-
         out %>%
-        tidytext::unnest_tokens(!!word_quo, !!text_quo)
+        tidytext::unnest_tokens(word, !!text_quo)
     } else {
       out <-
         out %>%
-        tidytext::unnest_tokens(!!word_quo, !!text_quo, rgx_unnest)
+        tidytext::unnest_tokens(word, !!text_quo, token = "regex", pattern = rgx_unnest)
     }
 
     if (stopwords) {
@@ -69,50 +63,43 @@ tidify_to_unigrams_at <-
       } else {
         stop_words <- tidytext::get_stopwords(source = stopwords_lexicon)
       }
-
-      # NOTE: Not sure why, but tidyeval is not wokring with `dplyr::anti_join()`,
-      # so using a work-around.
-      # out <- dplyr::anti_join(out, stop_words, by = c(word = "word"))
+      # NOTE: Not sure why, but tidyeval does not seem to work with `dplyr::anti_join()`.
       out <-
         out %>%
-        dplyr::rename(word = !!word_quo) %>%
-        dplyr::anti_join(stop_words, by = "word") %>%
-        dplyr::rename(!!word_quo := word)
+        dplyr::anti_join(stop_words, by = "word")
     }
 
     if (!missing(rgx_ignore_custom)) {
       out <-
         out %>%
-        dplyr::filter(!stringr::str_detect(!!word_quo, rgx_ignore_custom))
+        dplyr::filter(!stringr::str_detect(word, rgx_ignore_custom))
     }
 
     out <-
       out %>%
-      dplyr::filter(stringr::str_detect(!!word_quo, "[a-z]"))
+      dplyr::filter(stringr::str_detect(word, "[a-z]"))
     out
   }
 
-
+#' @rdname tidify_to_unigrams
+#' @export
+tidify_to_unigrams <- tidify_to_unigrams_at
 
 #' Prepare data for text analysis.
 #'
 #' @description Create a tidy data.frame of unigrams.
-#' @details Heavily influence by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
-#' @inheritParams tidify_to_unigrams_at
-#' @return data.frame. In tidy format. 'word1' and 'word2' columns are named
-#' 'first' and 'second' respectively.
-#' @rdname tidify_to_bigrams_at
+#' @details Heavily influenced by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
+#' Creates output columns 'word', 'word1', and 'word2'.
+#' ('word' is simply 'word1' and 'word2' toegether.)
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
+#' @inheritParams tidify_to_unigrams
+#' @return data.frame.
+#' @rdname tidify_to_bigrams
 #' @export
-#' @importFrom dplyr mutate rename anti_join filter
-#' @importFrom stringr str_replace_all str_detect
-#' @importFrom tidytext unnest_tokens get_stopwords
-#' @importFrom tidyr separate
 tidify_to_bigrams_at <-
   function(data = NULL,
            text = "text",
-           word = "word",
            rgx_pattern,
            rgx_replacement,
            stopwords = TRUE,
@@ -120,12 +107,9 @@ tidify_to_bigrams_at <-
            rgx_ignore_custom) {
     if (is.null(data))
       stop("`data` cannot be NULL.", call. = FALSE)
-    text_quo <- rlang::sym(text)
-    words_quo <- rlang::sym(word)
-    word1_quo <- rlang::sym("first")
-    word2_quo <- rlang::sym("second")
 
-    word <- NULL
+    text_quo <- rlang::sym(text)
+    word <- word1 <- word2 <- NULL
 
     out <- data
     if (!missing(rgx_pattern) & !missing(rgx_replacement)) {
@@ -135,15 +119,15 @@ tidify_to_bigrams_at <-
     }
     out <-
       out %>%
-      tidytext::unnest_tokens(!!words_quo,
+      tidytext::unnest_tokens(word,
                               !!text_quo,
                               token = "ngrams",
                               n = 2)
     out <-
       out %>%
       tidyr::separate(
-        !!words_quo,
-        into = c("first", "second"),
+        word,
+        into = c("word1", "word2"),
         sep = " ",
         remove = FALSE
       )
@@ -153,28 +137,24 @@ tidify_to_bigrams_at <-
       } else {
         stop_words <- tidytext::get_stopwords(source = stopwords_lexicon)
       }
-      out <-
-        out %>%
-        dplyr::rename(word = !!word1_quo) %>%
-        dplyr::anti_join(stop_words, by = "word") %>%
-        dplyr::rename(!!word1_quo := word)
-
-      out <-
-        out %>%
-        dplyr::rename(word = !!word2_quo) %>%
-        dplyr::anti_join(stop_words, by = "word") %>%
-        dplyr::rename(!!word2_quo := word)
+      out <- out %>% dplyr::anti_join(stop_words, by = "word")
+      out <- out %>% dplyr::anti_join(stop_words, by = "word")
     }
     if (!missing(rgx_ignore_custom)) {
       out <-
         out %>%
-        dplyr::filter(!stringr::str_detect(!!word1_quo, rgx_ignore_custom)) %>%
-        dplyr::filter(!stringr::str_detect(!!word2_quo, rgx_ignore_custom))
+        dplyr::filter(!stringr::str_detect(word1, rgx_ignore_custom)) %>%
+        dplyr::filter(!stringr::str_detect(word2, rgx_ignore_custom))
     }
 
     out <-
       out %>%
-      dplyr::filter(stringr::str_detect(!!word1_quo, "[a-z]")) %>%
-      dplyr::filter(stringr::str_detect(!!word2_quo, "[a-z]"))
+      dplyr::filter(stringr::str_detect(word1, "[a-z]")) %>%
+      dplyr::filter(stringr::str_detect(word2, "[a-z]"))
     out
   }
+
+#' @rdname tidify_to_bigrams
+#' @export
+tidify_to_bigrams <- tidify_to_bigrams_at
+
