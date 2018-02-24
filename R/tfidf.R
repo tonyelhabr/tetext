@@ -84,8 +84,7 @@ visualize_tfidf_at <-
       dplyr::ungroup() %>%
       # dplyr::mutate(!!multi_quo := factor(!!multi_quo)) %>%
       dplyr::mutate(
-        !!word_quo :=
-          drlib::reorder_within(!!word_quo, tf_idf, !!multi_quo)
+        !!word_quo := reorder_within(!!word_quo, tf_idf, !!multi_quo)
       )
 
     if (is.null(color)) {
@@ -101,7 +100,7 @@ visualize_tfidf_at <-
       ggplot2::geom_col() +
       ggplot2::scale_fill_manual(values = color_value) +
       ggplot2::facet_wrap(stats::as.formula(paste0("~ ", multi)), scales = "free") +
-      drlib::scale_x_reordered() +
+      scale_x_reordered() +
       ggplot2::coord_flip()
 
 

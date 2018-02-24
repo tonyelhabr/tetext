@@ -108,11 +108,9 @@ visualize_cnts_multi_at <- function(data = NULL,
     dplyr::count(!!multi_quo, !!word_quo) %>%
     dplyr::group_by(!!multi_quo) %>%
     dplyr::filter(dplyr::row_number(dplyr::desc(n)) <= num_top) %>%
-    dplyr::mutate(!!word_quo :=
-                    drlib::reorder_within(!!word_quo,
+    dplyr::mutate(!!word_quo := reorder_within(!!word_quo,
                                           n,
                                           !!multi_quo)) %>%
-    # dplyr::mutate(word = drlib::reorder_within(word, n, yyyy)) %>%
     dplyr::ungroup()
 
 
@@ -127,7 +125,7 @@ visualize_cnts_multi_at <- function(data = NULL,
       data = data_viz,
       ggplot2::aes_string(x = word, y = "n", color_value = color)) +
     ggalt::geom_lollipop(size = 2, point.size = 4) +
-    drlib::scale_x_reordered() +
+    scale_x_reordered() +
     ggplot2::scale_color_manual(values = color_value) +
     ggplot2::facet_wrap(stats::as.formula(paste0("~", multi)), scales = "free") +
     ggplot2::coord_flip()
