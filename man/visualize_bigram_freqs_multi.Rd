@@ -2,9 +2,16 @@
 % Please edit documentation in R/freqs.R
 \name{visualize_bigram_freqs_multi_at}
 \alias{visualize_bigram_freqs_multi_at}
+\alias{visualize_bigram_freqs_multi}
 \title{Visualize bigrams}
 \usage{
 visualize_bigram_freqs_multi_at(data = NULL, word = "word", multi = NULL,
+  color = multi, color_value = "grey80", num_top = 3,
+  lab_title = "Most Frequently Used Pairs of Words",
+  lab_subtitle = paste0("By ", stringr::str_to_title(multi)), lab_x = NULL,
+  lab_y = NULL, theme_base = temisc::theme_te_a())
+
+visualize_bigram_freqs_multi(data = NULL, word = "word", multi = NULL,
   color = multi, color_value = "grey80", num_top = 3,
   lab_title = "Most Frequently Used Pairs of Words",
   lab_subtitle = paste0("By ", stringr::str_to_title(multi)), lab_x = NULL,

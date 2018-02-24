@@ -137,8 +137,8 @@ tidify_to_bigrams_at <-
       } else {
         stop_words <- tidytext::get_stopwords(source = stopwords_lexicon)
       }
-      out <- out %>% dplyr::anti_join(stop_words, by = "word")
-      out <- out %>% dplyr::anti_join(stop_words, by = "word")
+      out <- out %>% dplyr::anti_join(stop_words %>% dplyr::rename(word1 = word), by = "word1")
+      out <- out %>% dplyr::anti_join(stop_words %>% dplyr::rename(word2 = word), by = "word2")
     }
     if (!missing(rgx_ignore_custom)) {
       out <-

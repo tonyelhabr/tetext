@@ -169,6 +169,6 @@ visualize_bigram_freqs_multi_at <-
   }
 
 #' @rdname visualize_bigram_freqs_multi
-#' export
+#' @export
 visualize_bigram_freqs_multi <- visualize_bigram_freqs_multi_at
 
