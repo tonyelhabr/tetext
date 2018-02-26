@@ -41,10 +41,10 @@ compute_corrs_at <-
     if(is.null(feature))
       stop("`feature` cannot be NULL.", call. = FALSE)
 
-    word <- feature <- correlation <- n <- NULL
-
     word_quo <- rlang::sym(word)
     feature_quo <- rlang::sym(feature)
+
+    word <- feature <- correlation <- n <- NULL
 
     data_cnt_top <-
       dplyr::count(data, !!word_quo, sort = TRUE) %>%
@@ -122,6 +122,8 @@ visualize_corrs_network_at <-
            lab_y = NULL,
            theme_base = ggplot2::theme_void()) {
 
+    require_ns("ggraph")
+
     corrs <-
       compute_corrs_at(
         ...,
@@ -134,6 +136,7 @@ visualize_corrs_network_at <-
       )
 
     set.seed(seed)
+    # browser()
     viz <-
       ggraph::ggraph(data_viz, layout = "fr") +
       ggraph::geom_edge_link(edge_width = 1)

@@ -45,9 +45,9 @@ visualize_cnts_at <- function(data = NULL,
   viz <-
     ggplot2::ggplot(
       data = data_viz,
-      ggplot2::aes_string(x = word, y = "n", color_value = color)) +
-    ggalt::geom_lollipop(size = 2, point.size = 4) +
-    ggplot2::scale_color_manual(values = color_value) +
+      ggplot2::aes_string(x = word, y = "n", fill = color)) +
+    ggplot2::geom_col() +
+    ggplot2::scale_fill_manual(values = color_value) +
     ggplot2::coord_flip()
 
   viz_labs <-
@@ -101,18 +101,19 @@ visualize_cnts_multi_at <- function(data = NULL,
   multi_quo <- rlang::sym(multi)
   data <- wrangle_multi_col(data, multi)
 
-  n <- NULL
+  n <- rank <- NULL
 
   data_viz <-
     data %>%
     dplyr::count(!!multi_quo, !!word_quo) %>%
     dplyr::group_by(!!multi_quo) %>%
-    dplyr::filter(dplyr::row_number(dplyr::desc(n)) <= num_top) %>%
-    dplyr::mutate(!!word_quo := reorder_within(!!word_quo,
-                                          n,
-                                          !!multi_quo)) %>%
-    dplyr::ungroup()
-
+    # dplyr::arrange(rank = dplyr::row_number(dplyr::desc(n))) %>%
+    # dplyr::filter(rank <= num_top) %>%
+    dplyr::top_n(num_top, n) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(
+      !!word_quo := reorder_within(!!word_quo, n, !!multi_quo)
+    )
 
   if (is.null(color)) {
     data_viz$color_value <- "dummy"
@@ -123,10 +124,10 @@ visualize_cnts_multi_at <- function(data = NULL,
   viz <-
     ggplot2::ggplot(
       data = data_viz,
-      ggplot2::aes_string(x = word, y = "n", color_value = color)) +
-    ggalt::geom_lollipop(size = 2, point.size = 4) +
+      ggplot2::aes_string(x = word, y = "n", fill = color)) +
+    ggplot2::geom_col() +
     scale_x_reordered() +
-    ggplot2::scale_color_manual(values = color_value) +
+    ggplot2::scale_fill_manual(values = color_value) +
     ggplot2::facet_wrap(stats::as.formula(paste0("~", multi)), scales = "free") +
     ggplot2::coord_flip()
 

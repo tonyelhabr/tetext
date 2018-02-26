@@ -39,7 +39,7 @@ colors_te <- temisc::colors_te
 
 message("Tests are in order of likely usage in script.")
 
-testhat::test_that(
+testthat::test_that(
   "time",
   {
     lab_subtitle_all <-
@@ -107,18 +107,19 @@ testhat::test_that(
         data = data
       )
     viz_time_list
-    testthat::expect_true(ggplot2::is.ggplot(viz_time_list))
+    testthat::expect_true(is.list(viz_time_list))
+    testthat::expect_true(ggplot2::is.ggplot(viz_time_list[[1]]))
     viz_time_list <-
       visualize_time_batch_at(
         data = data,
         arrange = TRUE
       )
     # gridExtra::grid.arrange(viz_time_list)
-    # testthat::expect_true(!ggplot2::is.ggplot(viz_time_list))
+    testthat::expect_true(!ggplot2::is.ggplot(viz_time_list))
 
   })
 
-testhat::test_that(
+testthat::test_that(
   "cnts",
   {
     viz_cnts <-
@@ -140,14 +141,14 @@ testhat::test_that(
         multi = "yyyy"
       )
     viz_cnts_multi
-    testthat::expect_true(ggplot2::is.ggplot(viz_multi))
+    testthat::expect_true(ggplot2::is.ggplot(viz_cnts_multi))
     viz_cnts_wordcloud <-
       visualize_cnts_wordcloud_at(
         data = unigrams,
         color_value = colors_main,
         num_top = 50
       )
-
+    # viz_cnts_wordcloud
     # TODO: Generate wordclouds for all 'multi' values.
     viz_cnts_wordcloud_multi <-
       visualize_cnts_wordcloud_multi_at(
@@ -158,10 +159,11 @@ testhat::test_that(
         multi = "yyyy",
         value_multi = 2011
       )
+    # viz_cnts_wordcloud_multi
   })
 
 
-testhat::test_that(
+testthat::test_that(
   "freqs",
   {
     bigrams_freqs <-
@@ -171,16 +173,19 @@ testhat::test_that(
     testthat::expect_equal(actual, expect)
 
     viz_bigram_freqs_multi <-
-      visualize_bigram_freqs_multi_at(data = bigrams,
-                                   multi = "yyyy",
-                                   color_value = colors_te)
+      visualize_bigram_freqs_multi_at(
+        data = bigrams,
+        word = "word",
+        multi = "yyyy",
+        color_value = colors_te
+      )
     viz_bigram_freqs_multi
     testthat::expect_true(ggplot2::is.ggplot(viz_bigram_freqs_multi))
   })
 
 
 
-testhat::test_that(
+testthat::test_that(
   "corrs",
   {
     num_top_ngrams <- 50
@@ -211,7 +216,7 @@ testhat::test_that(
   })
 
 
-testhat::test_that(
+testthat::test_that(
   "tfidf",
   {
     unigrams_tfidf <-
@@ -233,7 +238,7 @@ testhat::test_that(
   })
 
 
-testhat::test_that(
+testthat::test_that(
   "change",
   {
     unigrams_bytime <-

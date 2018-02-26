@@ -10,8 +10,24 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
 Imports:
-    rlang,dplyr,utils,stringr,tidytext,tidyr,temisc,forcats,ggplot2,ggalt,stats,wordcloud,purrr,broom,igraph,lubridate,widyr,
+    rlang,
+    dplyr,
+    utils,
+    stringr,
+    tidytext,
+    tidyr,
+    temisc,
+    forcats,
+    ggplot2,
+    stats,
+    wordcloud,
+    purrr,
+    broom,
+    ggraph,
+    igraph,
+    lubridate,
+    widyr,
     ggrepel,
     scales,
     gridExtra
-Suggests: ggraph,testthat, covr
+Suggests: testthat,covr

@@ -96,7 +96,7 @@ visualize_tfidf_at <-
 
     viz <-
       data_viz %>%
-      ggplot2::ggplot(ggplot2::aes_string(x = word, y = tf_idf, fill = color)) +
+      ggplot2::ggplot(ggplot2::aes_string(x = word, y = "tf_idf", fill = color)) +
       ggplot2::geom_col() +
       ggplot2::scale_fill_manual(values = color_value) +
       ggplot2::facet_wrap(stats::as.formula(paste0("~ ", multi)), scales = "free") +

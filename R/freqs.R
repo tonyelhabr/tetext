@@ -109,10 +109,10 @@ visualize_bigram_freqs_multi_at <-
 
     data_proc <- wrangle_multi_col(data_proc, multi)
 
-    freq <- word <- NULL
-
     word_quo <- rlang::sym(word)
     multi_quo <- rlang::sym(multi)
+
+    rank <- freq <- NULL
 
     data_viz <-
       data_proc %>%

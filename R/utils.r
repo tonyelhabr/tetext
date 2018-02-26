@@ -1,4 +1,9 @@
 
+require_ns <- function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    stop(sprintf('Package "%s" needed for this function to work. Please install it.', pkg), call. = FALSE)
+  }
+}
 
 # NOTE: Need this because NULLs cannot be used with lists, which would break visualize_time_batch_at().
 is_nothing <- function(x) {

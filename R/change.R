@@ -139,7 +139,7 @@ visualize_change_at <-
       dplyr::inner_join(data_models_top, by = c("word")) %>%
       dplyr::mutate(pct = n / time_total) %>%
       dplyr::mutate(label = dplyr::if_else(time_floor == max(time_floor), word, NA_character_)) %>%
-      ggplot2::ggplot(ggplot2::aes(x = time_floor, y = pct, color_value = word)) +
+      ggplot2::ggplot(ggplot2::aes(x = time_floor, y = pct, color = word)) +
       ggplot2::scale_color_manual(values = color_value) +
       ggplot2::geom_line(size = 1.5) +
       ggrepel::geom_label_repel(ggplot2::aes(label = label), nudge_x = 1, na.rm = TRUE) +
