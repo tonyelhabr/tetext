@@ -27,13 +27,12 @@ Does not need to be specified.
 Included in \code{colnames} if specified.}
 
 \item{trim}{logical. Indicates whether or not to select only certain columns
-(and drop the others). Default is provided.}
+(and drop the others).}
 
 \item{colnames}{character (vector). Name(s) of column(s) in \code{data} to keep.
-Only relevant if \code{trim = TRUE}. Default is provided.}
+Only relevant if \code{trim = TRUE}.}
 
-\item{timezone}{character. Passed directly to \code{lubridate::with_tz()} as \code{tzone} parameter.
-Default is provided.}
+\item{timezone}{character. Passed directly to \code{lubridate::with_tz()} as \code{tzone} parameter.}
 }
 \value{
 data.frame

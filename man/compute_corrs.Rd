@@ -17,16 +17,16 @@ compute_corrs(data = NULL, word = "word", feature = NULL,
 \item{data}{data.frame.}
 
 \item{word}{character. Name of column in \code{data} to use as \code{item}
-in \code{widyr::pairwise_cor()}. Default is provided.}
+in \code{widyr::pairwise_cor()}.}
 
 \item{feature}{character. Name of column in \code{data} to use as \code{feature}
 in \code{widyr::pairwise_cor()}. No default is provided}
 
 \item{num_top_ngrams}{numeric. Useful primarily to prevent \code{widyr::pairwise_cor()}
-from hanging up. Default is provided.}
+from hanging up. If between 0 and 1, then interpreted as a percentage.}
 
 \item{num_top_corrs}{numeric. Useful primarily to limit input to a network visualation.
-does not hang up. Default is provided.}
+does not hang up. If between 0 and 1, then interpreted as a percentage.}
 
 \item{return_corrs}{logical. Whether to return just the correlations and word pairs,
 but not the word counts. This is the default option.}

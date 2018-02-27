@@ -4,7 +4,6 @@ context("functions")
 require("bindrcpp")
 require("dplyr")
 require("ggplot2")
-require("temisc")
 
 dir <- file.path("tests")
 filename_data <- "data-tony-cleaned.rds"
@@ -33,9 +32,10 @@ data <- readRDS(file = filepath_data)
 unigrams <- readRDS(file = filepath_unigrams)
 bigrams <- readRDS(file = filepath_bigrams)
 
-color_main <- "firebrick"
-colors_main <- temisc::get_rpal_colors(color_main)
-colors_te <- temisc::colors_te
+
+colors_te <- c("red", "green", "blue", "orange", "purple", "yellow", "pink", "cyan")
+color_main <- colors_te[1]
+colors_main <- paste0(color_main, c("", as.character(seq(1, 4, 1))))
 
 message("Tests are in order of likely usage in script.")
 
@@ -114,7 +114,7 @@ testthat::test_that(
         data = data,
         arrange = TRUE
       )
-    # gridExtra::grid.arrange(viz_time_list)
+    gridExtra::grid.arrange(viz_time_list)
     testthat::expect_true(!ggplot2::is.ggplot(viz_time_list))
 
   })
@@ -157,7 +157,7 @@ testthat::test_that(
         color_value = colors_main,
         num_top = 50,
         multi = "yyyy",
-        value_multi = 2011
+        value_multi = 2016
       )
     # viz_cnts_wordcloud_multi
   })
@@ -190,6 +190,7 @@ testthat::test_that(
   {
     num_top_ngrams <- 50
     num_top_corrs <- 50
+
     unigrams_corrs <-
       compute_corrs_at(
         data = unigrams,
@@ -204,6 +205,24 @@ testthat::test_that(
     expect <- c("vba", "ut", "sql")
     testthat::expect_equal(actual, expect)
 
+    num_top_ngrams <- 0.1
+    num_top_corrs <- 0.1
+    unigrams_corrs <-
+      compute_corrs_at(
+        data = unigrams,
+        num_top_ngrams = num_top_ngrams,
+        num_top_corrs = num_top_corrs,
+        feature = "timestamp"
+      )
+    actual <- unigrams_corrs$item1[1]
+    expect <- c("candlewood")
+    testthat::expect_equal(actual, expect)
+    actual <- unigrams_corrs$item2[1]
+    expect <- c("suites")
+    testthat::expect_equal(actual, expect)
+
+    num_top_ngrams <- 50
+    num_top_corrs <- 50
     viz_corrs_network <-
       visualize_corrs_network_at(
         data = unigrams,
@@ -220,15 +239,27 @@ testthat::test_that(
   "tfidf",
   {
     unigrams_tfidf <-
-      compute_tfidf_at(data = unigrams,
-                    doc = "yyyy")
+      compute_tfidf_at(
+        data = unigrams,
+        doc = "yyyy"
+      )
     actual <- unigrams_tfidf$word[1]
     expect <- c("resistivity")
     testthat::expect_equal(actual, expect)
 
+    unigrams_tfidf <-
+      unigrams %>%
+      dplyr::filter(yyyy == 2017) %>%
+      dplyr:: mutate(hh4 = ceiling((hh + 1) / 4)) %>%
+      compute_tfidf_at(
+        doc = "hh4"
+      )
+    actual <- unigrams_tfidf$word[1]
+    expect <- c("displaying")
+    testthat::expect_equal(actual, expect)
+
     viz_unigrams_tfidf_multi <-
       visualize_tfidf_at(
-        data = unigrams,
         doc = "yyyy",
         color_value = colors_te,
         lab_subtitle = "By Year"
@@ -241,24 +272,33 @@ testthat::test_that(
 testthat::test_that(
   "change",
   {
-    unigrams_bytime <-
-      compute_change_at(data = unigrams,
-                     timebin = "timestamp",
-                     timefloor = "year")
-
+    unigrams_change <-
+      compute_change_at(
+        data = unigrams,
+        timebin = "timestamp",
+        timefloor = "year"
+      )
     expect <- c("excel", "nutrition", "vba")
-    actual <- unigrams_bytime$word[1:3]
+    actual <- unigrams_change$word[1:3]
     testthat::expect_equal(actual, expect)
 
-    viz_unigrams_bytime <-
+    unigrams_change <-
+      compute_change_at(
+        data = unigrams,
+        timebin = "yyyy",
+        bin = FALSE
+      )
+    testthat::expect_equal(actual, expect)
+
+    viz_unigrams_change <-
       visualize_change_at(
         data = unigrams,
         timebin = "timestamp",
         timefloor = "year",
         color_value = colors_te
       )
-    viz_unigrams_bytime
-    testthat::expect_true(ggplot2::is.ggplot(viz_unigrams_bytime))
+    viz_unigrams_change
+    testthat::expect_true(ggplot2::is.ggplot(viz_unigrams_change))
   })
 
 

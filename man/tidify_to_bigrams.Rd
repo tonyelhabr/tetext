@@ -14,7 +14,7 @@ tidify_to_bigrams(data = NULL, text = "text", rgx_pattern, rgx_replacement,
 \arguments{
 \item{data}{data.frame.}
 
-\item{text}{character. Name of column in \code{data} to parse. Default is provided.}
+\item{text}{character. Name of column in \code{data} to parse.}
 
 \item{rgx_pattern}{character. Regular expression to substitute.}
 

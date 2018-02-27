@@ -10,7 +10,7 @@ get_sents(lexicon = NULL, normalize = TRUE)
 \item{lexicon}{character. Specifies lexicon to use. Must be a lexicon available in the \code{tidytext::package}.}
 
 \item{normalize}{logical. Only releveant if \code{lexicon = 'afinn'}. Renormalizes
-'afinn' scores to -1 to 1 range. Default is provided.}
+'afinn' scores to -1 to 1 range.}
 }
 \value{
 data.frame

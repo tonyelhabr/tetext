@@ -1,4 +1,42 @@
 
+invert_pct <- function(num) {
+  if(num < 0.5) {
+    num <- 1 - num
+  }
+  num
+}
+
+
+filter_num_top_at <- function(data = NULL, col = NULL, num_top = NULL) {
+  if (is.null(data))
+    stop("`data` cannot be NULL.", call. = FALSE)
+  if (is.null(col))
+    stop("`col` cannot be NULL.", call. = FALSE)
+  if (is.null(num_top))
+    stop("`num_top` cannot be NULL.", call. = FALSE)
+  if(num_top <= 0)
+    stop("`num_top` must be greater than 0.", call. = FALSE)
+
+  rank <- NULL
+  col_quo <- rlang::sym(col)
+
+  if(num_top >= 1) {
+    out <-
+      data %>%
+      dplyr::mutate(rank = dplyr::row_number(dplyr::desc(!!col_quo))) %>%
+      dplyr::filter(rank <= num_top)
+  } else if((num_top > 0) & (num_top < 1)) {
+    num_top <- invert_pct(num_top)
+    out <-
+      data %>%
+      dplyr::arrange(dplyr::desc(!!col_quo)) %>%
+      dplyr::filter(!!col_quo >= stats::quantile(!!col_quo, num_top, na.rm = TRUE))
+  }
+  out
+}
+
+filter_num_top <- filter_num_top_at
+
 require_ns <- function(pkg) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
     stop(sprintf('Package "%s" needed for this function to work. Please install it.', pkg), call. = FALSE)
@@ -18,7 +56,7 @@ coerce_col_to_factor <- function(data, colname) {
   if (class_i != "factor") {
     data <-
       data %>% dplyr::mutate_at(dplyr::vars(dplyr::contains(nm_i)), dplyr::funs(factor))
-    message(sprintf("Coercing %s to a factor.", nm_i))
+    # message(sprintf("Coercing %s to a factor.", nm_i))
   }
   data
 }

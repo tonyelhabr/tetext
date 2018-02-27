@@ -89,13 +89,13 @@ visualize_bigram_freqs_multi_at <-
            word = "word",
            multi = NULL,
            color = multi,
-           color_value = "grey80",
+           color_value = "grey50",
            num_top = 3,
            lab_title = "Most Frequently Used Pairs of Words",
            lab_subtitle = paste0("By ", stringr::str_to_title(multi)),
            lab_x = NULL,
            lab_y = NULL,
-           theme_base = temisc::theme_te_a()) {
+           theme_base = theme_tetext()) {
 
     if(is.null(data)) stop("`data` cannot be NULL.", call. = FALSE)
     if(is.null(multi)) stop("`multi` cannot be NULL.", call. = FALSE)
@@ -112,13 +112,10 @@ visualize_bigram_freqs_multi_at <-
     word_quo <- rlang::sym(word)
     multi_quo <- rlang::sym(multi)
 
-    rank <- freq <- NULL
-
     data_viz <-
       data_proc %>%
       dplyr::group_by(!!multi_quo) %>%
-      dplyr::mutate(rank = dplyr::row_number(dplyr::desc(freq))) %>%
-      dplyr::filter(rank <= num_top) %>%
+      filter_num_top("freq", num_top) %>%
       dplyr::ungroup() %>%
       dplyr::arrange(!!multi_quo) %>%
       dplyr::mutate(!!word_quo := stringr::str_replace_all(!!word_quo, " ", "\n")) %>%
@@ -126,8 +123,8 @@ visualize_bigram_freqs_multi_at <-
 
 
     if (is.null(color)) {
-      data_viz$color_value <- "dummy"
-      color <- "color_value"
+      data_viz <- data_viz %>% dplyr::mutate(`.dummy` = "dummy")
+      color <- ".dummy"
 
     }
     data_viz <- wrangle_color_col(data_viz, color)
@@ -138,7 +135,7 @@ visualize_bigram_freqs_multi_at <-
         ggplot2::aes_string(
           x = multi,
           y = word,
-          color_value = color,
+          color = color,
           size = "freq")
       ) +
       ggplot2::geom_point() +

@@ -13,10 +13,10 @@ compute_tfidf(data = NULL, word = "word", doc = "document")
 \item{data}{data.frame.}
 
 \item{word}{character. Name of column in \code{data} to use
-as \code{term} in \code{tidytext::bind_tf_idf()}. Default is provided.}
+as \code{term} in \code{tidytext::bind_tf_idf()}.}
 
 \item{doc}{character. Name of column in \code{data} to use
-as \code{document} in \code{tidytext::bind_tf_idf()}. Default is provided.}
+as \code{document} in \code{tidytext::bind_tf_idf()}.}
 }
 \value{
 data.frame.

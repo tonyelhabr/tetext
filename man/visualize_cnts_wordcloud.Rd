@@ -8,10 +8,10 @@
 \title{Visualize counts}
 \usage{
 visualize_cnts_wordcloud_at(data = NULL, word = "word",
-  color_value = "grey80", num_top = 50, random_order = FALSE)
+  color_value = "grey50", num_top = 50, random_order = FALSE)
 
 visualize_cnts_wordcloud(data = NULL, word = "word",
-  color_value = "grey80", num_top = 50, random_order = FALSE)
+  color_value = "grey50", num_top = 50, random_order = FALSE)
 
 visualize_cnts_wordcloud_multi_at(data = NULL, ..., multi = NULL,
   value_multi = NULL)
@@ -22,10 +22,10 @@ visualize_cnts_wordcloud_multi(data = NULL, ..., multi = NULL,
 \arguments{
 \item{data}{data.frame.}
 
-\item{word}{character. Name of column in \code{data} to use for words. Default is provided.}
+\item{word}{character. Name of column in \code{data} to use for words.}
 
 \item{color_value}{character (vector). Hex value(s) of color. May be a vector.
-Should not be a function. Default is provided.}
+Should not be a function.}
 
 \item{num_top}{numeric. Number of words to show.}
 

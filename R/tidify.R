@@ -9,7 +9,7 @@
 #' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
 #' @param data data.frame. Not in 'tidy' format.
-#' @param text character. Name of column in \code{data} to parse. Default is provided.
+#' @param text character. Name of column in \code{data} to parse.
 #' @param rgx_pattern character. Regular expression to substitute.
 #' @param rgx_replacement character. Regular expression used as replacement.
 #' @param rgx_unnest character. Regular expression to use in \code{tidytext::unnest_tokens()}.

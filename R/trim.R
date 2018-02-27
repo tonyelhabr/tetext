@@ -117,8 +117,8 @@ compute_timefilter_at <-
            multi) {
     if(missing(multi)) {
       add_dummy <- TRUE
-      data$multi <- "dummy"
-      multi <- "multi"
+      data <- data %>% dplyr::mutate(`.multi` = "dummy")
+      multi <- ".multi"
     } else {
       add_dummy <- FALSE
     }

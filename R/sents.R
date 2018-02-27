@@ -8,7 +8,7 @@
 #' This function is essentially a customized version of  \code{tidytext::get_sentiments()}.
 #' @param lexicon character. Specifies lexicon to use. Must be a lexicon available in the \code{tidytext::package}.
 #' @param normalize logical. Only releveant if \code{lexicon = 'afinn'}. Renormalizes
-#' 'afinn' scores to -1 to 1 range. Default is provided.
+#' 'afinn' scores to -1 to 1 range.
 #' @return data.frame
 #' @rdname get_sents
 #' @export
@@ -109,8 +109,8 @@ compute_sent_summary_at <-
            ...) {
     if (missing(multi)) {
       add_dummy <- TRUE
-      data$multi <- "dummy"
-      multi <- "multi"
+      data <- data %>% dplyr::mutate(`.multi` = "dummy")
+      multi <- ".multi"
     } else {
       add_dummy <- FALSE
     }

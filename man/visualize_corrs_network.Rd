@@ -6,13 +6,13 @@
 \title{Visualize correlations}
 \usage{
 visualize_corrs_network_at(..., resize_points = TRUE, size_point = "n",
-  add_point_labels = TRUE, color_point = "grey80", shape_point = 21,
+  add_point_labels = TRUE, color_point = "grey50", shape_point = 21,
   seed = 42, lab_title = "Network of Pairwise Correlations",
   lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
   theme_base = ggplot2::theme_void())
 
 visualize_corrs_network(..., resize_points = TRUE, size_point = "n",
-  add_point_labels = TRUE, color_point = "grey80", shape_point = 21,
+  add_point_labels = TRUE, color_point = "grey50", shape_point = 21,
   seed = 42, lab_title = "Network of Pairwise Correlations",
   lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
   theme_base = ggplot2::theme_void())
@@ -27,23 +27,22 @@ correspond to count of words.}
 
 \item{add_point_labels}{logical. Indicates whether or not to add labels to points.}
 
-\item{color_point}{character. Hex value of color_value for points. Default is provided.}
+\item{color_point}{character. Hex value of color_value for points.}
 
-\item{shape_point}{numeric. Default is provided.}
+\item{shape_point}{numeric.}
 
-\item{seed}{numeric. Used to by \code{ggraph::ggraph}. Default is provided.}
+\item{seed}{numeric. Used to by \code{ggraph::ggraph}.}
 
-\item{lab_title}{character. Default is provided.}
+\item{lab_title}{character.}
 
 \item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
 
-\item{lab_x}{character. Default is provided.}
+\item{lab_x}{character.}
 
-\item{lab_y}{character. Default is provided.}
+\item{lab_y}{character.}
 
-\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.
-Default is provided.}
+\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.}
 }
 \value{
 gg.

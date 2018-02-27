@@ -8,13 +8,13 @@
 #' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
 #' @param word character. Name of column in \code{data} to use as \code{item}
-#' in \code{widyr::pairwise_cor()}. Default is provided.
+#' in \code{widyr::pairwise_cor()}.
 #' @param feature character. Name of column in \code{data} to use as \code{feature}
 #' in \code{widyr::pairwise_cor()}. No default is provided
 #' @param num_top_ngrams numeric. Useful primarily to prevent \code{widyr::pairwise_cor()}
-#' from hanging up. Default is provided.
+#' from hanging up. If between 0 and 1, then interpreted as a percentage.
 #' @param num_top_corrs numeric. Useful primarily to limit input to a network visualation.
-#' does not hang up. Default is provided.
+#' does not hang up. If between 0 and 1, then interpreted as a percentage.
 #' @param return_corrs logical. Whether to return just the correlations and word pairs,
 #' but not the word counts. This is the default option.
 #' @param return_words logical. Whether to return the counts used to compute
@@ -47,23 +47,24 @@ compute_corrs_at <-
     word <- feature <- correlation <- n <- NULL
 
     data_cnt_top <-
-      dplyr::count(data, !!word_quo, sort = TRUE) %>%
-      dplyr::mutate(rank = dplyr::row_number(dplyr::desc(n))) %>%
-      dplyr::filter(rank <= num_top_ngrams)
+      data %>%
+      dplyr::count(!!word_quo, sort = TRUE) %>%
+      filter_num_top("n", num_top_ngrams)
 
     data_joined <-
-      dplyr::semi_join(data, data_cnt_top, by = word)
+      data %>%
+      dplyr::semi_join(data_cnt_top, by = word)
 
     data_joined_renamed <-
+      data_joined %>%
       dplyr::rename(
-        data_joined,
         word = !!word_quo,
         feature = !!feature_quo
       )
 
     data_corrs <-
+      data_joined_renamed %>%
       widyr::pairwise_cor(
-        data_joined_renamed,
         word,
         feature,
         sort = TRUE,
@@ -72,8 +73,8 @@ compute_corrs_at <-
 
     data_corrs_top <-
       data_corrs %>%
-      dplyr::mutate(rank = dplyr::row_number(dplyr::desc(correlation))) %>%
-      dplyr::filter(rank <= num_top_corrs)
+      filter_num_top("correlation", num_top_corrs)
+
 
     if(return_both | (return_words & return_corrs)) {
       out <- list(words = data_cnt_top, corrs = data_corrs_top)
@@ -99,9 +100,9 @@ compute_corrs <- compute_corrs_at
 #' correspond to count of words.
 #' @param size_point character. Name of column in \code{data} to use for point sizing.
 #' @param add_point_labels logical. Indicates whether or not to add labels to points.
-#' @param color_point character. Hex value of color_value for points. Default is provided.
-#' @param shape_point numeric. Default is provided.
-#' @param seed numeric. Used to by \code{ggraph::ggraph}. Default is provided.
+#' @param color_point character. Hex value of color_value for points.
+#' @param shape_point numeric.
+#' @param seed numeric. Used to by \code{ggraph::ggraph}.
 #' @inheritParams visualize_time
 #' @return gg.
 #' @rdname visualize_corrs_network
@@ -113,7 +114,7 @@ visualize_corrs_network_at <-
            resize_points = TRUE,
            size_point = "n",
            add_point_labels = TRUE,
-           color_point = "grey80",
+           color_point = "grey50",
            shape_point = 21,
            seed = 42,
            lab_title = "Network of Pairwise Correlations",

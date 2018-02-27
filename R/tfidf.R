@@ -9,9 +9,9 @@
 #' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
 #' @param word character. Name of column in \code{data} to use
-#' as \code{term} in \code{tidytext::bind_tf_idf()}. Default is provided.
+#' as \code{term} in \code{tidytext::bind_tf_idf()}.
 #' @param doc character. Name of column in \code{data} to use
-#' as \code{document} in \code{tidytext::bind_tf_idf()}. Default is provided.
+#' as \code{document} in \code{tidytext::bind_tf_idf()}.
 #' @return data.frame.
 #' @rdname compute_tfidf
 #' @export
@@ -60,10 +60,10 @@ visualize_tfidf_at <-
            multi = doc,
            num_top = 10,
            color = multi,
-           color_value = "grey80",
+           color_value = "grey50",
            lab_title = "Highest TF-IDF Words",
            lab_subtitle = paste0("By ", stringr::str_to_title(multi)),
-           theme_base = temisc::theme_te_a_facet()) {
+           theme_base = theme_tetext_facet()) {
     data_proc <-
       compute_tfidf_at(
         data = data,
@@ -75,21 +75,20 @@ visualize_tfidf_at <-
     # tfidf_quo <- rlang::sym(tfidf)
     multi_quo <- rlang::sym(multi)
 
-    tf_idf <- NULL
+    tf_idf <- rank <- NULL
 
     data_viz <-
       data_proc %>%
       dplyr::group_by(!!multi_quo) %>%
-      dplyr::top_n(num_top, tf_idf) %>%
+      filter_num_top("tf_idf", num_top) %>%
       dplyr::ungroup() %>%
-      # dplyr::mutate(!!multi_quo := factor(!!multi_quo)) %>%
       dplyr::mutate(
         !!word_quo := reorder_within(!!word_quo, tf_idf, !!multi_quo)
       )
 
     if (is.null(color)) {
-      data_viz$color_value <- "dummy"
-      color <- "color_value"
+      data_viz <- data_viz %>% dplyr::mutate(`.dummy` = "dummy")
+      color <- ".dummy"
 
     }
     data_viz <- wrangle_color_col(data_viz, color)

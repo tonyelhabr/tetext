@@ -8,50 +8,49 @@
 \title{Visualize counts}
 \usage{
 visualize_cnts_at(data = NULL, word = "word", num_top = 10,
-  color = NULL, color_value = "grey80", lab_title = "Count of Words",
+  color = NULL, color_value = "grey50", lab_title = "Count of Words",
   lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = temisc::theme_te_a())
+  theme_base = theme_tetext())
 
 visualize_cnts(data = NULL, word = "word", num_top = 10, color = NULL,
-  color_value = "grey80", lab_title = "Count of Words",
+  color_value = "grey50", lab_title = "Count of Words",
   lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = temisc::theme_te_a())
+  theme_base = theme_tetext())
 
 visualize_cnts_multi_at(data = NULL, word = "word", num_top = 10,
-  color = NULL, color_value = "grey80", lab_title = "Count of Words",
+  color = NULL, color_value = "grey50", lab_title = "Count of Words",
   lab_subtitle = paste0("By ", stringr::str_to_title(multi)), lab_x = NULL,
-  lab_y = NULL, theme_base = temisc::theme_te_a_facet(), multi)
+  lab_y = NULL, theme_base = theme_tetext_facet(), multi)
 
 visualize_cnts_multi(data = NULL, word = "word", num_top = 10,
-  color = NULL, color_value = "grey80", lab_title = "Count of Words",
+  color = NULL, color_value = "grey50", lab_title = "Count of Words",
   lab_subtitle = paste0("By ", stringr::str_to_title(multi)), lab_x = NULL,
-  lab_y = NULL, theme_base = temisc::theme_te_a_facet(), multi)
+  lab_y = NULL, theme_base = theme_tetext_facet(), multi)
 }
 \arguments{
 \item{data}{data.frame.}
 
 \item{word}{character. Name of column in \code{data} to use for words.
-Probably something like 'word' or 'bigram'. Default is provided.}
+Probably something like 'word' or 'bigram'.}
 
-\item{num_top}{numeric. Number of words to show. Default is provided.}
+\item{num_top}{numeric. Number of words to show. If between 0 and 1, then assumed to be a percentage.}
 
 \item{color}{character. Name of column in \code{data} to use for color basis.
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
 
 \item{color_value}{character (vector). Hex value(s) of color. May be a vector.
-Should not be a function. Default is provided.}
+Should not be a function.}
 
-\item{lab_title}{character. Default is provided.}
+\item{lab_title}{character.}
 
 \item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
 
-\item{lab_x}{character. Default is provided.}
+\item{lab_x}{character.}
 
-\item{lab_y}{character. Default is provided.}
+\item{lab_y}{character.}
 
-\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.
-Default is provided.}
+\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.}
 
 \item{multi}{character. Name of column to use as 'facetting' variable. Not used
 if not specified.}

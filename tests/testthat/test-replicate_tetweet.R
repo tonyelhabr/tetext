@@ -4,7 +4,6 @@ context("funcs-tetweet")
 require("bindrcpp")
 require("dplyr")
 require("ggplot2")
-require("temisc")
 
 dir <- file.path("tests")
 filename_data_multi <- "tweets-search-nba-augmented.rds"
@@ -17,7 +16,7 @@ filepath_data_multi <-
   system.file(dir, filename_data_multi, package = "tetext", mustWork = TRUE)
 
 data <- readRDS(file = filepath_data_multi)
-colors_te <- temisc::colors_te
+colors_tms <- c("blue", "red", "cadetblue", "purple", "black")
 
 tms <- c("DAL", "HOU", "MEM", "NOP", "SAS")
 
@@ -63,7 +62,7 @@ testhat::test_that(
         timebin = "timestamp",
         geom = "hist",
         color = "name",
-        color_value = colors_te,
+        color_value = colors_tms,
         multi = "name",
         ncol = 1,
         scales = "fixed"
@@ -86,7 +85,7 @@ testhat::test_that(
         timebin = "hh4",
         geom = "bar",
         color = "name",
-        color_value = colors_te,
+        color_value = colors_tms,
         multi = "name",
         ncol = length(tms),
         scales = "fixed"
@@ -98,7 +97,7 @@ testhat::test_that(
         data = data_multi_trim %>% mutate(hh = (lubridate::hour(timestamp))),
         timebin = "hh",
         color = "name",
-        color_value = colors_te,
+        color_value = colors_tms,
         multi = "name"
       )
     viz_hh_multi_hh
@@ -126,8 +125,80 @@ testhat::test_that(
         rgx_replacement = "",
         rgx_ignore_custom = rgx_tidiers$rgx_ignore_custom
       )
+    actual <- nrow(unigrams)
+    expect <- 78458
+    testthat::expect_equal(actual, expect)
 
-
+    bigrams <-
+      data_multi_trim_kind %>%
+      mutate(text = rtweet::plain_tweets(text)) %>%
+      tidify_to_bigrams_at(
+        text = "text",
+        rgx_pattern = rgx_tidiers$rgx_pattern,
+        rgx_replacement = "",
+        rgx_ignore_custom = rgx_tidiers$rgx_ignore_custom
+      )
+    actual <- nrow(bigrams)
+    expect <- 35447
+    testthat::expect_equal(actual, expect)
   }
 )
+
+testhat::test_that(
+  "cnts",
+  {
+    viz_cnts_multi <-
+      unigrams %>%
+      visualize_cnts_multi_at(
+        num_top = 5,
+        color = "name",
+        color_value = colors_tms,
+        lab_subtitle = "By Team",
+        multi = "name"
+      )
+    viz_cnts_multi
+    testthat::expect_true(ggplot2::is.ggplot(viz_cnts_multi))
+
+    viz_cnts_wordcloud_multi <-
+      unigrams %>%
+      visualize_cnts_wordcloud_multi_at(
+        word = "word",
+        color_value = colors_tms,
+        num_top = 50,
+        multi = "name",
+        value_multi = "SAS"
+      )
+    # viz_cnts_wordcloud_multi
+
+    par(mfrow = c(1, 2))
+    purrr::map2(
+      c("DAL", "HOU"),
+      colors_tms[1:2],
+      ~visualize_cnts_wordcloud_multi_at(
+        data = unigrams,
+        word = "word",
+        color_value = .y,
+        num_top = 50,
+        multi = "name",
+        value_multi = .x
+      )
+    )
+    par(mfrow = c(1, 1))
+  }
+)
+
+testhat::test_that(
+  "freqs",
+  {
+    viz_bigram_freqs_multi <-
+      bigrams %>%
+      visualize_bigram_freqs_multi_at(
+        num_top = 2,
+        color = "name",
+        color_value = colors_tms,
+        lab_subtitle = "By Team",
+        multi = "name"
+      )
+    viz_bigram_freqs_multi
+  }
 

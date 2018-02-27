@@ -6,8 +6,8 @@
 #' with \code{dplyr::count()}.
 #' @inheritParams visualize_time
 #' @param word character. Name of column in \code{data} to use for words.
-#' Probably something like 'word' or 'bigram'. Default is provided.
-#' @param num_top numeric. Number of words to show. Default is provided.
+#' Probably something like 'word' or 'bigram'.
+#' @param num_top numeric. Number of words to show. If between 0 and 1, then assumed to be a percentage.
 #' @return gg.
 #' @rdname visualize_cnts
 #' @export
@@ -16,29 +16,29 @@ visualize_cnts_at <- function(data = NULL,
                            word = "word",
                            num_top = 10,
                            color = NULL,
-                           color_value = "grey80",
+                           color_value = "grey50",
                            lab_title = "Count of Words",
                            lab_subtitle = NULL,
                            lab_x = NULL,
                            lab_y = NULL,
-                           theme_base = temisc::theme_te_a()) {
+                           theme_base = theme_tetext()) {
   if (is.null(data))
     stop("`data` cannot be NULL.", call. = FALSE)
 
   word_quo <- rlang::sym(word)
 
-  n <- NULL
+  n <- rank <- NULL
 
   data_viz <-
     data %>%
     dplyr::count(!!word_quo) %>%
-    dplyr::filter(dplyr::row_number(dplyr::desc(n)) <= num_top) %>%
+    filter_num_top("n", num_top) %>%
     dplyr::mutate(!!word_quo := stats::reorder(!!word_quo, n))
 
 
   if (is.null(color)) {
-    data_viz$color_value <- "dummy"
-    color <- "color_value"
+    data_viz <- data_viz %>% dplyr::mutate(`.dummy` = "dummy")
+    color <- ".dummy"
   }
   data_viz <- wrangle_color_col(data_viz, color)
 
@@ -87,12 +87,12 @@ visualize_cnts_multi_at <- function(data = NULL,
                                  word = "word",
                                  num_top = 10,
                                  color = NULL,
-                                 color_value = "grey80",
+                                 color_value = "grey50",
                                  lab_title = "Count of Words",
                                  lab_subtitle = paste0("By ", stringr::str_to_title(multi)),
                                  lab_x = NULL,
                                  lab_y = NULL,
-                                 theme_base = temisc::theme_te_a_facet(),
+                                 theme_base = theme_tetext_facet(),
                                  multi) {
   if (is.null(data))
     stop("`data` cannot be NULL.", call. = FALSE)
@@ -107,17 +107,15 @@ visualize_cnts_multi_at <- function(data = NULL,
     data %>%
     dplyr::count(!!multi_quo, !!word_quo) %>%
     dplyr::group_by(!!multi_quo) %>%
-    # dplyr::arrange(rank = dplyr::row_number(dplyr::desc(n))) %>%
-    # dplyr::filter(rank <= num_top) %>%
-    dplyr::top_n(num_top, n) %>%
+    filter_num_top("n", num_top) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(
       !!word_quo := reorder_within(!!word_quo, n, !!multi_quo)
     )
 
   if (is.null(color)) {
-    data_viz$color_value <- "dummy"
-    color <- "color_value"
+    data_viz <- data_viz %>% dplyr::mutate(`.dummy` = "dummy")
+    color <- ".dummy"
   }
   data_viz <- wrangle_color_col(data_viz, color)
 
@@ -165,7 +163,7 @@ visualize_cnts_multi <- visualize_cnts_multi_at
 #' Fairly original function.
 #' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
-#' @param word character. Name of column in \code{data} to use for words. Default is provided.
+#' @param word character. Name of column in \code{data} to use for words.
 #' @param num_top numeric. Number of words to show.
 #' @param random_order logical. Passed directly to \code{random.order} parameter
 #' in \code{wordcloud::wordcloud()}
@@ -176,7 +174,7 @@ visualize_cnts_multi <- visualize_cnts_multi_at
 visualize_cnts_wordcloud_at <-
   function(data = NULL,
            word = "word",
-           color_value = "grey80",
+           color_value = "grey50",
            num_top = 50,
            random_order = FALSE) {
     if (is.null(data))
@@ -185,13 +183,19 @@ visualize_cnts_wordcloud_at <-
     data_viz <- data %>% dplyr::count(!!word_quo)
 
     n <- NULL
-    words <- dplyr::pull(data_viz, !!word_quo)
-    freqs <- dplyr::pull(data_viz, n)
+
+    if(num_top < 1) {
+      num_top <- nrow(data) * (1 - invert_pct(num_top))
+    }
+
+    words <- data_viz %>% dplyr::pull(!!word_quo)
+    freqs <- data_viz %>% dplyr::pull(n)
+    # browser()
     viz <-
       wordcloud::wordcloud(
         word = words,
         freq = freqs,
-        color_values = color_value,
+        colors = color_value,
         max.words = num_top,
         random.order = random_order
       )

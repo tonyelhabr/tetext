@@ -6,37 +6,38 @@
 \title{Visualize change}
 \usage{
 visualize_change_at(..., num_top = 5, color = NULL,
-  color_value = rep("grey80", num_top),
+  color_value = rep("grey50", num_top), add_labels = TRUE,
   lab_title = "Largest Changes in Word Frequency", lab_subtitle = NULL,
-  lab_x = NULL, lab_y = NULL, theme_base = temisc::theme_te_a())
+  lab_x = NULL, lab_y = NULL, theme_base = theme_tetext())
 
 visualize_change(..., num_top = 5, color = NULL,
-  color_value = rep("grey80", num_top),
+  color_value = rep("grey50", num_top), add_labels = TRUE,
   lab_title = "Largest Changes in Word Frequency", lab_subtitle = NULL,
-  lab_x = NULL, lab_y = NULL, theme_base = temisc::theme_te_a())
+  lab_x = NULL, lab_y = NULL, theme_base = theme_tetext())
 }
 \arguments{
 \item{...}{dots. Parameters passed to \code{compute_change_at()}.}
 
-\item{num_top}{numeric. Number of words to show. Default is provided.}
+\item{num_top}{numeric. Number of words to show. If between 0 and 1, then assumed to be a percentage.}
 
 \item{color}{character. Name of column in \code{data} to use for color basis.
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
 
 \item{color_value}{character (vector). Hex value(s) of color. May be a vector.
-Should not be a function. Default is provided.}
+Should not be a function.}
 
-\item{lab_title}{character. Default is provided.}
+\item{add_labels}{logical. Whether or not to add labels to the lines.}
+
+\item{lab_title}{character.}
 
 \item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
 
-\item{lab_x}{character. Default is provided.}
+\item{lab_x}{character.}
 
-\item{lab_y}{character. Default is provided.}
+\item{lab_y}{character.}
 
-\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.
-Default is provided.}
+\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.}
 }
 \value{
 gg.

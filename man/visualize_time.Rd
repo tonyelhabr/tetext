@@ -9,23 +9,21 @@
 \usage{
 visualize_time_at(data = NULL, timebin = NULL, geom = c("bar", "hist"),
   add_alpha = FALSE, alpha_range = c(0.25, 1), color = NULL,
-  color_value = "grey80", lab_title = "Count Over Time",
+  color_value = "grey50", lab_title = "Count Over Time",
   lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = temisc::theme_te_a())
+  theme_base = theme_tetext())
 
 visualize_time(data = NULL, timebin = NULL, geom = c("bar", "hist"),
   add_alpha = FALSE, alpha_range = c(0.25, 1), color = NULL,
-  color_value = "grey80", lab_title = "Count Over Time",
+  color_value = "grey50", lab_title = "Count Over Time",
   lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = temisc::theme_te_a())
+  theme_base = theme_tetext())
 
-visualize_time_multi_at(data = data, ...,
-  theme_base = temisc::theme_te_a_facet(), multi = NULL, ncol = 3,
-  nrow = NULL, scales = "free")
+visualize_time_multi_at(data = data, ..., theme_base = theme_tetext_facet(),
+  multi = NULL, ncol = 3, nrow = NULL, scales = "free")
 
-visualize_time_multi(data = data, ...,
-  theme_base = temisc::theme_te_a_facet(), multi = NULL, ncol = 3,
-  nrow = NULL, scales = "free")
+visualize_time_multi(data = data, ..., theme_base = theme_tetext_facet(),
+  multi = NULL, ncol = 3, nrow = NULL, scales = "free")
 }
 \arguments{
 \item{data}{data.frame.}
@@ -38,33 +36,32 @@ Probably something like 'yyyy', 'mm', etc.}
 \item{add_alpha}{logical. Whether or not to use \code{ggplot2::scale_alpha()} based on count.}
 
 \item{alpha_range}{numeric (vector). Direct parameter passed to \code{range} parameter
-of \code{ggplot2::scale_alpha()}. Default is provided.}
+of \code{ggplot2::scale_alpha()}.}
 
 \item{color}{character. Name of column in \code{data} to use for color basis.
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
 
 \item{color_value}{character (vector). Hex value(s) of color. May be a vector.
-Should not be a function. Default is provided.}
+Should not be a function.}
 
-\item{lab_title}{character. Default is provided.}
+\item{lab_title}{character.}
 
 \item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
 
-\item{lab_x}{character. Default is provided.}
+\item{lab_x}{character.}
 
-\item{lab_y}{character. Default is provided.}
+\item{lab_y}{character.}
 
-\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.
-Default is provided.}
+\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.}
 
 \item{...}{dots. Parameters to pass directly to \code{visualize_time_at()}.}
 
 \item{multi}{character. Name of column in \code{data} to use for facetting.}
 
-\item{ncol, nrow}{numeric. Direct parameters to \code{ggplot2::facet_wrap()}. Default is provided.}
+\item{ncol, nrow}{numeric. Direct parameters to \code{ggplot2::facet_wrap()}.}
 
-\item{scales}{character. Direct parameter to \code{ggplot2::facet_wrap()}. Default is provided.}
+\item{scales}{character. Direct parameter to \code{ggplot2::facet_wrap()}.}
 }
 \value{
 gg

@@ -10,18 +10,18 @@
 #' @param geom character. 'bar' or 'hist'. 'bar' is probably best for everything except Date objects.
 #' @param add_alpha logical. Whether or not to use \code{ggplot2::scale_alpha()} based on count.
 #' @param alpha_range numeric (vector). Direct parameter passed to \code{range} parameter
-#' of \code{ggplot2::scale_alpha()}. Default is provided.
+#' of \code{ggplot2::scale_alpha()}.
 #' @param color character. Name of column in \code{data} to use for color basis.
 #' Set to \code{NULL} by default although not actually required in order to simplify internal code.
 #' @param color_value character (vector). Hex value(s) of color. May be a vector.
-#' Should not be a function. Default is provided.
-#' @param lab_title character. Default is provided.
+#' Should not be a function.
+#' @param lab_title character.
 #' @param lab_subtitle character. Probably something like 'By Year', 'By Month', etc.
 #' Set to \code{NULL} by default although not actually required in order to simplify internal code.
-#' @param lab_x character. Default is provided.
-#' @param lab_y character. Default is provided.
+#' @param lab_x character.
+#' @param lab_y character.
 #' @param theme_base \code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.
-#' Default is provided.
+#'
 #' @return gg
 #' @rdname visualize_time
 #' @export
@@ -33,12 +33,12 @@ visualize_time_at <-
            add_alpha = FALSE,
            alpha_range = c(0.25, 1),
            color = NULL,
-           color_value = "grey80",
+           color_value = "grey50",
            lab_title = "Count Over Time",
            lab_subtitle = NULL,
            lab_x = NULL,
            lab_y = NULL,
-           theme_base = temisc::theme_te_a()) {
+           theme_base = theme_tetext()) {
     if (is.null(data))
       stop("`data` must not be NULL.", call. = FALSE)
     if (is_nothing(timebin))
@@ -47,12 +47,18 @@ visualize_time_at <-
     geom <- match.arg(geom)
 
     if (is_nothing(color)) {
-      data$color_value <- "dummy"
-      color <- "color_value"
-
+      data <- data %>% dplyr::mutate(`.dummy` = "dummy")
+      color <- ".dummy"
     }
-    # data <- wrangle_color_col(data, color)
 
+    # if(length(color_value) > 1) {
+    #   color_value <- color_value[1]
+    #   message("Only using the first color in the specified `color_value`.")
+    # }
+
+    data <- wrangle_color_col(data, color)
+
+    # browser()
     viz <-
       ggplot2::ggplot(data = data, ggplot2::aes_string(x = timebin))
 
@@ -60,7 +66,12 @@ visualize_time_at <-
       if (!add_alpha) {
         viz <-
           viz +
-          ggplot2::geom_bar(ggplot2::aes_string(y = "..count..", fill = color))
+          ggplot2::geom_bar(
+            ggplot2::aes_string(
+              y = "..count..",
+              fill = color
+            )
+          )
       } else {
         viz <-
           viz +
@@ -68,14 +79,20 @@ visualize_time_at <-
             y = "..count..",
             alpha = "..count..",
             fill = color
-          )) +
+          )
+          ) +
           ggplot2::scale_alpha(range = alpha_range)
       }
     } else if (geom == "hist") {
       viz <-
         viz +
-        ggplot2::geom_histogram(ggplot2::aes_string(y = "..count..", fill = color),
-                                bins = 30)
+        ggplot2::geom_histogram(
+          ggplot2::aes_string(
+            y = "..count..",
+            fill = color
+          ),
+          bins = 30
+        )
     }
     viz <-
       viz +
@@ -108,14 +125,14 @@ visualize_time <- visualize_time_at
 #' @inheritParams visualize_cnts
 #' @param ... dots. Parameters to pass directly to \code{visualize_time_at()}.
 #' @param multi character. Name of column in \code{data} to use for facetting.
-#' @param ncol,nrow numeric. Direct parameters to \code{ggplot2::facet_wrap()}. Default is provided.
-#' @param scales character. Direct parameter to \code{ggplot2::facet_wrap()}. Default is provided.
+#' @param ncol,nrow numeric. Direct parameters to \code{ggplot2::facet_wrap()}.
+#' @param scales character. Direct parameter to \code{ggplot2::facet_wrap()}.
 #' @rdname visualize_time
 #' @export
 visualize_time_multi_at <-
   function(data = data,
            ...,
-           theme_base = temisc::theme_te_a_facet(),
+           theme_base = theme_tetext_facet(),
            multi = NULL,
            ncol = 3,
            nrow = NULL,
@@ -169,12 +186,12 @@ visualize_time_batch_at <-
            add_alphas = c(FALSE, rep(TRUE, length(colnames_timebin) - 1)),
            # alpha_ranges = rep(c(0.25, 1), length(colnames_timebin)),
            colnames_color = rep(NA, length(colnames_timebin)),
-           color_values = rep("grey80", length(colnames_timebin)),
+           color_values = rep("grey50", length(colnames_timebin)),
            labs_title = rep("Count Over Time", length(colnames_timebin)),
            labs_subtitle = c("", "By Year", "By Month", "By Day of Week", "By Hour"),
            labs_x = rep("", length(colnames_timebin)),
            labs_y = rep("", length(colnames_timebin)),
-           # themes_base = rep(temisc::theme_te_a(), length(colnames_timebin)),
+           # themes_base = rep(theme_tetext(), length(colnames_timebin)),
            arrange = FALSE,
            show = FALSE) {
     if (is.null(data))
@@ -266,12 +283,12 @@ visualize_hh_multi_at <-
            timebin = NULL,
            multi = NULL,
            color = multi,
-           color_value = "grey80",
+           color_value = "grey50",
            lab_title = "Count Over Time",
            lab_subtitle = "By Time of Day",
            lab_x = NULL,
            lab_y = NULL,
-           theme_base = temisc::theme_te_a()) {
+           theme_base = theme_tetext()) {
     if (is.null(data))
       stop("`data` must not be NULL.", call. = FALSE)
     if (is_nothing(timebin))
@@ -280,8 +297,8 @@ visualize_hh_multi_at <-
       stop("`multi` cannot be NULL.", call. = FALSE)
 
     if (is_nothing(color)) {
-      data$color_value <- "dummy"
-      color <- "color_value"
+      data <- data %>% dplyr::mutate(`.dummy` = "dummy")
+      color <- ".dummy"
 
     }
     # data <- wrangle_color_col(data, color)
@@ -297,7 +314,7 @@ visualize_hh_multi_at <-
       ggplot2::scale_fill_manual(values = color_value) +
       ggplot2::geom_violin(size = 0) +
       ggplot2::geom_hline(yintercept = seq(3, 24, by = 3),
-                          color = "grey80",
+                          color = "grey50",
                           size = 0.1) +
       ggplot2::coord_flip()
 

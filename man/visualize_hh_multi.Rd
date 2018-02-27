@@ -6,14 +6,14 @@
 \title{Visualize hourly data}
 \usage{
 visualize_hh_multi_at(data = NULL, timebin = NULL, multi = NULL,
-  color = multi, color_value = "grey80", lab_title = "Count Over Time",
+  color = multi, color_value = "grey50", lab_title = "Count Over Time",
   lab_subtitle = "By Time of Day", lab_x = NULL, lab_y = NULL,
-  theme_base = temisc::theme_te_a())
+  theme_base = theme_tetext())
 
 visualize_hh_multi(data = NULL, timebin = NULL, multi = NULL,
-  color = multi, color_value = "grey80", lab_title = "Count Over Time",
+  color = multi, color_value = "grey50", lab_title = "Count Over Time",
   lab_subtitle = "By Time of Day", lab_x = NULL, lab_y = NULL,
-  theme_base = temisc::theme_te_a())
+  theme_base = theme_tetext())
 }
 \arguments{
 \item{data}{data.frame.}
@@ -26,19 +26,18 @@ visualize_hh_multi(data = NULL, timebin = NULL, multi = NULL,
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
 
 \item{color_value}{character (vector). Hex value(s) of color. May be a vector.
-Should not be a function. Default is provided.}
+Should not be a function.}
 
-\item{lab_title}{character. Default is provided.}
+\item{lab_title}{character.}
 
 \item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
 
-\item{lab_x}{character. Default is provided.}
+\item{lab_x}{character.}
 
-\item{lab_y}{character. Default is provided.}
+\item{lab_y}{character.}
 
-\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.
-Default is provided.}
+\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.}
 }
 \description{
 Visualize time-based data aggregated over hours.

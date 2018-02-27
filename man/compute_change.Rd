@@ -21,18 +21,20 @@ to use to compute change.}
 
 \item{word}{character. Name of column in \code{data} corresponding to n-gram.}
 
-\item{timefloor}{character. Passed directly to \code{lubridate::floor_date()} as\code{unit} parameter.}
+\item{timefloor}{character. Name of column passed directly to \code{lubridate::floor_date()} as \code{unit} parameter
+if the specified column name is not already in \code{data}.}
 
-\item{top_pct}{numeric. Number between 0 and 1. Default is provided.}
+\item{top_pct}{numeric. Number between 0 and 1. Useful primarily to limit the number of models
+that need to be computed.}
 
 \item{return_models}{logical. Whether to return just the models. This is probably the preferred
-option when calling \code{compute_change_at()} directly. Default is provided.}
+option when calling \code{compute_change_at()} directly.}
 
 \item{return_data}{logical. Whether to 'bytime' data which is used as
-the \code{data} parameter in \code{stats::glm()} for creating models. Default is provided.
+the \code{data} parameter in \code{stats::glm()} for creating models.
 Needed when using \code{visualize_change_at()}.}
 
-\item{return_both}{logical. Set to \code{TRUE} when \code{visualize_change_at()}. Default is provided.}
+\item{return_both}{logical. Set to \code{TRUE} when \code{visualize_change_at()}.}
 }
 \value{
 data.frame.

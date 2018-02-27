@@ -6,22 +6,22 @@
 \title{Visualize bigrams}
 \usage{
 visualize_bigram_freqs_multi_at(data = NULL, word = "word", multi = NULL,
-  color = multi, color_value = "grey80", num_top = 3,
+  color = multi, color_value = "grey50", num_top = 3,
   lab_title = "Most Frequently Used Pairs of Words",
   lab_subtitle = paste0("By ", stringr::str_to_title(multi)), lab_x = NULL,
-  lab_y = NULL, theme_base = temisc::theme_te_a())
+  lab_y = NULL, theme_base = theme_tetext())
 
 visualize_bigram_freqs_multi(data = NULL, word = "word", multi = NULL,
-  color = multi, color_value = "grey80", num_top = 3,
+  color = multi, color_value = "grey50", num_top = 3,
   lab_title = "Most Frequently Used Pairs of Words",
   lab_subtitle = paste0("By ", stringr::str_to_title(multi)), lab_x = NULL,
-  lab_y = NULL, theme_base = temisc::theme_te_a())
+  lab_y = NULL, theme_base = theme_tetext())
 }
 \arguments{
 \item{data}{data.frame.}
 
 \item{word}{character. Name of column in \code{data} to use for words.
-Probably something like 'word' or 'bigram'. Default is provided.}
+Probably something like 'word' or 'bigram'.}
 
 \item{multi}{character. Name of column in \code{data} to use for facetting.}
 
@@ -29,21 +29,20 @@ Probably something like 'word' or 'bigram'. Default is provided.}
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
 
 \item{color_value}{character (vector). Hex value(s) of color. May be a vector.
-Should not be a function. Default is provided.}
+Should not be a function.}
 
-\item{num_top}{numeric. Number of words to show. Default is provided.}
+\item{num_top}{numeric. Number of words to show. If between 0 and 1, then assumed to be a percentage.}
 
-\item{lab_title}{character. Default is provided.}
+\item{lab_title}{character.}
 
 \item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
 Set to \code{NULL} by default although not actually required in order to simplify internal code.}
 
-\item{lab_x}{character. Default is provided.}
+\item{lab_x}{character.}
 
-\item{lab_y}{character. Default is provided.}
+\item{lab_y}{character.}
 
-\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.
-Default is provided.}
+\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.}
 }
 \value{
 gg.

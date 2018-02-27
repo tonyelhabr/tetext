@@ -13,11 +13,11 @@
 #' Does not need to be specified.
 #' Included in \code{colnames} if specified.
 #' @param trim logical. Indicates whether or not to select only certain columns
-#' (and drop the others). Default is provided.
+#' (and drop the others).
 #' @param colnames character (vector). Name(s) of column(s) in \code{data} to keep.
-#' Only relevant if \code{trim = TRUE}. Default is provided.
+#' Only relevant if \code{trim = TRUE}.
 #' @param timezone character. Passed directly to \code{lubridate::with_tz()} as \code{tzone} parameter.
-#' Default is provided.
+#'
 #' @return data.frame
 #' @rdname clean_tweets
 #' @export
