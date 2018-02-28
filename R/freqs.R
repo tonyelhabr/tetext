@@ -10,7 +10,6 @@
 #' @return data.frame.
 #' @rdname compute_freqs
 #' @export
-
 compute_freqs_at <- function(data = NULL, word = "word") {
 
     if(is.null(data)) stop("`data` cannot be NULL.", call. = FALSE)
@@ -18,6 +17,7 @@ compute_freqs_at <- function(data = NULL, word = "word") {
     freq <- n <- NULL
 
     word_quo <- rlang::sym(word)
+
 
     out <-
       data %>%

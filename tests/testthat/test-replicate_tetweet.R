@@ -22,7 +22,7 @@ tms <- c("DAL", "HOU", "MEM", "NOP", "SAS")
 
 message("Tests are in order of likely usage in script.")
 
-testhat::test_that(
+testthat::test_that(
   "trim",
   {
     data_multi <-
@@ -38,6 +38,8 @@ testhat::test_that(
       data_multi %>%
       compute_timefilter_multi_at(timebin = "timestamp", multi = "name")
 
+    testthat::expect_true(is.list(data_multi_timefilter))
+
     data_multi_trim <-
       data_multi %>%
       trim_bytime_at(
@@ -46,19 +48,28 @@ testhat::test_that(
         end = data_multi_timefilter$date_end
       )
 
-    data_multi %>%
+    actual <- nrow(data_multi_trim)
+    expected <- 8636
+    testthat::expect_equal(actual, expected)
+
+    data_multi_trim_2 <-
+      data_multi %>%
       trim_bytime_at(
         timebin = "timestamp",
         multi = "name"
       )
+    actual <- data_multi_trim_2
+    expected <- data_multi_trim
+    testthat::expect_equal(actual, expected)
+
   }
 
-testhat::test_that(
+testthat::test_that(
   "time",
   {
     viz_time_multi_all <-
+      data_multi_trim %>%
       visualize_time_multi_at(
-        data = data_multi_trim,
         timebin = "timestamp",
         geom = "hist",
         color = "name",
@@ -70,18 +81,10 @@ testhat::test_that(
     viz_time_multi_all
     testthat::expect_true(ggplot2::is.ggplot(viz_time_multi_all))
 
-    data_multi_trim %>%
-      mutate(
-        hh = lubridate::hour(timestamp),
-        hh4 = floor((lubridate::hour(timestamp)) / 6) + 1
-      ) %>%
-      arrange(desc(hh4)) %>%
-      select(time, hh, hh4) %>%
-      filter(hh4 <= 4)
-
     viz_time_multi_hh <-
+      data_multi_trim %>%
+      mutate(hh4 = floor((lubridate::hour(timestamp)) / 6) + 1) %>%
       visualize_time_multi_at(
-        data = data_multi_trim %>% mutate(hh4 = floor((lubridate::hour(timestamp)) / 6) + 1),
         timebin = "hh4",
         geom = "bar",
         color = "name",
@@ -91,24 +94,31 @@ testhat::test_that(
         scales = "fixed"
       )
     viz_time_multi_hh
+    testthat::expect_true(ggplot2::is.ggplot(viz_time_multi_hh))
 
-    viz_hh_multi_hh <-
+    viz_time_multi_hh <-
+      data_multi_trim %>%
+      mutate(hh = (lubridate::hour(timestamp))) %>%
       visualize_hh_multi_at(
-        data = data_multi_trim %>% mutate(hh = (lubridate::hour(timestamp))),
         timebin = "hh",
         color = "name",
         color_value = colors_tms,
         multi = "name"
       )
-    viz_hh_multi_hh
+    viz_time_multi_hh
+    testthat::expect_true(ggplot2::is.ggplot(viz_time_multi_hh))
   })
 
-testhat::test_that(
+testthat::test_that(
   "twitter",
   {
     data_multi_trim_kind <-
       data_multi_trim %>%
       add_tweet_kind_cols()
+
+    actual <- setdiff(names(data_multi_trim_kind), names(data_multi_trim))
+    expected <- c("hashtag", "link", "rt", "quote", "reply", "type")
+    testthat::expect_equal(actual, expected)
 
     # TODO: Add visualize_tweet_kind_at()
 
@@ -144,7 +154,7 @@ testhat::test_that(
   }
 )
 
-testhat::test_that(
+testthat::test_that(
   "cnts",
   {
     viz_cnts_multi <-
@@ -163,7 +173,7 @@ testhat::test_that(
       unigrams %>%
       visualize_cnts_wordcloud_multi_at(
         word = "word",
-        color_value = colors_tms,
+        color_value = colors_tms[5],
         num_top = 50,
         multi = "name",
         value_multi = "SAS"
@@ -187,7 +197,7 @@ testhat::test_that(
   }
 )
 
-testhat::test_that(
+testthat::test_that(
   "freqs",
   {
     viz_bigram_freqs_multi <-
@@ -201,4 +211,34 @@ testhat::test_that(
       )
     viz_bigram_freqs_multi
   }
+)
+
+testthat::test_that(
+  "xy",
+  {
+    xy_grid <- create_xy_grid(tms)
+    xy_nms <- xy_grid %>% dplyr::pull(xy)
+
+    unigrams_freqs_multi <-
+      unigrams %>%
+      compute_freqs_multi_at(
+        multi = "name"
+      )
+
+    unigrams_freqs_multi_by2 <-
+      unigrams %>%
+      compute_freqs_multi_by2_at(
+        xy_grid = xy_grid,
+        xy_nms = xy_nms,
+        multi = "name"
+      )
+    unigrams_freqs_multi_by2
+
+    testthat::expect_true(nrow(unigrams_freqs_multi) != nrow(unigrams_freqs_multi_by2))
+    testthat::expect_true(ncol(unigrams_freqs_multi) != ncol(unigrams_freqs_multi_by2))
+
+  }
+)
+
+
 

@@ -130,7 +130,7 @@ visualize_time <- visualize_time_at
 #' @rdname visualize_time
 #' @export
 visualize_time_multi_at <-
-  function(data = data,
+  function(data = NULL,
            ...,
            theme_base = theme_tetext_facet(),
            multi = NULL,
