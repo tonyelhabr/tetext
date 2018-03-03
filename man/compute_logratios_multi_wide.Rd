@@ -34,5 +34,6 @@ to consider a \code{num_top} or \code{top_pct} parameter that might be used if
 does not seem to handle \code{NULL} in \code{...}.
 }
 \seealso{
-\url{https://www.tidytextmining.com/twitter.html#changes-in-word-use}
+\url{https://www.tidytextmining.com/twitter.html#comparing-word-usage}.
+\url{http://varianceexplained.org/r/trump-tweets/}.
 }

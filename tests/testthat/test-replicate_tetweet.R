@@ -186,15 +186,15 @@ testthat::test_that(
       )
     # viz_cnts_wordcloud_multi
 
-    par(mfrow = c(1, 2))
+    par(mfrow = c(2, 3))
     purrr::map2(
-      c("DAL", "HOU"),
-      colors_tms[1:2],
+      tms,
+      colors_tms,
       ~visualize_cnts_wordcloud_multi_at(
         data = unigrams,
         word = "word",
         color_value = .y,
-        num_top = 50,
+        num_top = 15,
         multi = "name",
         value_multi = .x
       )
@@ -231,6 +231,27 @@ testthat::test_that(
         multi = "name"
       )
     unigrams_sent_summ
+
+    actual <- nrow(unigrams_sent_summ)
+    expect <- 10
+    testthat::expect_equal(actual, expect)
+
+    unigrams_sentratios <-
+      unigrams %>%
+      compute_sentratios_multi_by2_at(
+        word = "word",
+        multi = "name"
+      )
+    unigrams_sentratios
+
+    actual <- nrow(unigrams_sentratios)
+    expect <- 962
+    testthat::expect_equal(actual, expect)
+
+    unigrams_sentratios %>%
+      dplyr::group_by(name_xy, sentiment) %>%
+      dplyr::do(head(., 2))
+
   }
 )
 
@@ -285,12 +306,27 @@ testthat::test_that(
         word = "word",
         multi = "name",
         filter_multi = TRUE,
-        # x_include = "SAS"
         multi_main = "SAS",
         num_top = 3,
         color_value = c(colors_tms[5], "grey50")
       )
     viz_logratios_multi_by2
+    testthat::expect_true(ggplot2::is.ggplot(viz_logratios_multi_byy2)
+
+    viz_sentratios_multi_by2 <-
+      unigrams %>%
+      visualize_sentratios_multi_by2_at(
+        word = "word",
+        multi = "name",
+        filter_multi = TRUE,
+        multi_main = "SAS",
+        sent_main = "positive",
+        num_top = 3,
+        flip_axes = TRUE,
+        color_value = c(colors_tms[5], "grey50")
+      )
+    viz_sentratios_multi_by2
+    testthat::expect_true(ggplot2::is.ggplot(viz_sentratios_multi_byy2)
   }
 )
 

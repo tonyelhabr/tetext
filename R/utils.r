@@ -170,5 +170,88 @@ filter_data_multi_at <-
     data
   }
 
+# validate_multi_main <-
+#   function(data = NULL,
+#            filter_multi = NULL,
+#            multi = NULL,
+#            multis = NULL,
+#            multi_main = NULL) {
+#     if (is.null(data))
+#       stop("`data` cannot be NULL.", call. = FALSE)
+#     if (is.null(filter_multi))
+#       stop("`filter_multi` cannot be NULL.", call. = FALSE)
+#
+#     if (filter_multi) {
+#       if (is.null(multi))
+#         stop("`multi` cannot be NULL.", call. = FALSE)
+#       if (is.null(multis))
+#         stop("`multis` cannot be NULL.", call. = FALSE)
+#       if (is.null(multi_main))
+#         return(stop(
+#           "`multi_main` must not be NULL if `filter_multi = TRUE`.",
+#           call. = FALSE
+#         ))
+#       if (!(multi_main %in% multis))
+#         return(stop(sprintf(
+#           "`multi_main` is not in %s.", paste(multis, collapse = ",")
+#         ), call. = FALSE))
+#       if (length(multi_main) > 1)
+#         return(stop("`multi_main` should be a singular value.", call. = FALSE))
+#     }
+#     invisible(data)
+#   }
+#
+# validate_sent_main <-
+#   function(data = NULL,
+#            filter_sent = NULL,
+#            sent = "sentiment",
+#            sent_main = NULL) {
+#     if (is.null(data))
+#       stop("`data` cannot be NULL.", call. = FALSE)
+#     if (is.null(filter_sent))
+#       stop("`filter_sent` cannot be NULL.", call. = FALSE)
+#     if (filter_sent) {
+#       if (is.null(sent))
+#         stop("`sent` cannot be NULL.", call. = FALSE)
+#       if (is.null(sent_main))
+#         return(stop(
+#           "`sent_main` must not be NULL if `filter_sent = TRUE`.",
+#           call. = FALSE
+#         ))
+#       if (length(sent_main) > 1)
+#         return(stop("`sent_main` should be a singular value.", call. = FALSE))
+#     }
+#     invisible(data)
+#   }
 
+validate_x_main <-
+  function(data = NULL,
+           filter_x = NULL,
+           x = NULL,
+           xs = NULL,
+           x_main = NULL) {
+    if (is.null(data))
+      stop("`data` cannot be NULL.", call. = FALSE)
+    if (is.null(filter_x))
+      stop("`filter_x` cannot be NULL.", call. = FALSE)
+
+    if (filter_x) {
+      if (is.null(x))
+        stop("`x` cannot be NULL.", call. = FALSE)
+      if (is.null(xs))
+        stop("`xs` cannot be NULL.", call. = FALSE)
+      if (is.null(x_main))
+        return(stop(
+          "`x_main` must not be NULL if `filter_x = TRUE`.",
+          call. = FALSE
+        ))
+      if (!(x_main %in% xs))
+        return(stop(sprintf(
+          "`x_main` is not in %s.", paste(xs, collapse = ",")
+        ), call. = FALSE))
+      if (length(x_main) > 1)
+        return(stop("`x_main` should be a singular value.", call. = FALSE))
+    }
+    data
+  }
 

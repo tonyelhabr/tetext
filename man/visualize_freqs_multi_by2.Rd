@@ -5,8 +5,8 @@
 \alias{visualize_freqs_multi_by2}
 \title{Visualize n-gram frequencies in pairs}
 \usage{
-visualize_freqs_multi_by2_at(data = NULL, word = "word", xy_nms = NULL,
-  xy_grid = NULL, multi = NULL, filter_multi = FALSE, multi_main = NULL,
+visualize_freqs_multi_by2_at(data = NULL, word = "word", multi = NULL,
+  xy_nms, xy_grid, filter_multi = FALSE, multi_main = NULL,
   x_include = NULL, y_include = NULL, x_exclude = NULL,
   y_exclude = NULL, color = NULL, color_value = "grey50",
   add_labels = TRUE, lab_title = "Relative Word Frequency",
@@ -14,8 +14,8 @@ visualize_freqs_multi_by2_at(data = NULL, word = "word", xy_nms = NULL,
   lab_y = NULL, theme_base = theme_tetext_facet(), facet_scales = "free",
   facet_ncol = 3, facet_nrow = NULL, facet_strip_position = "top")
 
-visualize_freqs_multi_by2(data = NULL, word = "word", xy_nms = NULL,
-  xy_grid = NULL, multi = NULL, filter_multi = FALSE, multi_main = NULL,
+visualize_freqs_multi_by2(data = NULL, word = "word", multi = NULL,
+  xy_nms, xy_grid, filter_multi = FALSE, multi_main = NULL,
   x_include = NULL, y_include = NULL, x_exclude = NULL,
   y_exclude = NULL, color = NULL, color_value = "grey50",
   add_labels = TRUE, lab_title = "Relative Word Frequency",
@@ -28,18 +28,17 @@ visualize_freqs_multi_by2(data = NULL, word = "word", xy_nms = NULL,
 
 \item{word}{character. Name of column in \code{data} to use for count. Default is provided}
 
+\item{multi}{character. Name of column in \code{data} to use for facetting.}
+
 \item{xy_nms}{character (vector). Values to use to create a 'grid' of all
 combinations of values.}
 
 \item{xy_grid}{data.frame. Output from \code{create_xy_grid()}.}
 
-\item{multi}{character. Name of column in \code{data} to use for facetting.}
-
 \item{filter_multi}{logical. Whether or not to filter the \code{multi} values.}
 
-\item{multi_main}{character. Name of single \code{multi} value to use as
-basis.
-Essentially equivalent to how \code{x_include} should be used. Not used if \code{filter_multi = FALSE}.}
+\item{multi_main}{character. Name of single \code{multi} value to use as basis.
+Not used if \code{filter_multi = FALSE}.}
 
 \item{x_include, y_include, x_exclude, y_exclude}{character (vector).
 \code{multi} values to include and exclude. Not used if \code{filter_multi = FALSE}.}

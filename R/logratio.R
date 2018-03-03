@@ -11,7 +11,8 @@
 #' @return data.frame.
 #' @rdname compute_logratios_multi_wide
 #' @export
-#' @seealso \url{https://www.tidytextmining.com/twitter.html#changes-in-word-use}
+#' @seealso \url{https://www.tidytextmining.com/twitter.html#comparing-word-usage}.
+#' \url{http://varianceexplained.org/r/trump-tweets/}.
 compute_logratios_multi_wide_at <-
   function(data = NULL,
            word = "word",
@@ -124,33 +125,41 @@ compute_logratios_multi_by2 <- compute_logratios_multi_by2_at
 
 #' Visualize n-gram log ratios in pairs
 #'
-#' @description Visualize n-grams log ratios across pairs of \code{multi} values.
+#' @description Visualize n-gram log ratios across pairs of \code{multi} values.
 #' @details \code{compute_logratios_multi_by2_at()} should NOT be called beforehand.
 #' @inheritParams compute_freqs_multi_by2_at
 #' @inheritParams visualize_freqs_multi_by2_at
 #' @inheritParams compute_logratios_multi_by2_at
-#' @param ... Additional parameters to pass to \code{compute_logratios_multi_by2_at()}.
+#' @param ... dots. Additional parameters to pass to \code{compute_logratios_multi_by2_at()}.
 #' @param num_top numeric. Number of n-grams to show for each \code{multi} pair.
+#' @param flip_axes logical. Whether or not to call \code{ggplot2::coord_flip()}.
+#' @param lab_other character. Name to give to 'opposing' factor of \code{multi_main}.
+#' @param color_value character (vector). Should be a vector of length two (for dual colors)
+#' if \code{filter_multi = TRUE} and \code{!is.null(multi_main) & length(multi_main) == 1}.
 #' @return gg.
 #' @rdname visualize_logratios_multi_by2
 #' @export
+#' @seealso \url{https://www.tidytextmining.com/twitter.html#comparing-word-usage}.
+#' \url{http://varianceexplained.org/r/trump-tweets/}.
 visualize_logratios_multi_by2_at <-
   function(data = NULL,
            word = "word",
-           xy_nms = NULL,
-           xy_grid = NULL,
            multi = NULL,
+           xy_nms,
+           xy_grid,
            # cnt_min,
            ...,
            filter_multi = TRUE,
+           multi_main = NULL,
            x_include = NULL,
            y_include = NULL,
            x_exclude = NULL,
            y_exclude = NULL,
-           multi_main = NULL,
            color = NULL,
            color_value = c("grey50", "grey80"),
            num_top = 3,
+           flip_axes = FALSE,
+           lab_other = "other",
            lab_title = "Most Unique Words",
            lab_subtitle = paste0("By ", stringr::str_to_title(multi)),
            lab_x = NULL,
@@ -159,9 +168,11 @@ visualize_logratios_multi_by2_at <-
            facet_scales = "free",
            facet_ncol = 3,
            facet_nrow = NULL,
-           facet_strip_position = "top") {
+           facet_strip_position = "right") {
 
-    if(is.null(xy_grid) | is.null(xy_nms)) {
+    # NOTE: Checks for NULL are made in other function(s).
+
+    if(missing(xy_grid) | missing(xy_nms)) {
       multis <-
         data %>%
         pull_distinctly_at(multi)
@@ -181,34 +192,35 @@ visualize_logratios_multi_by2_at <-
         ...
       )
 
-    if((!is.null(multi_main)) & (length(multi_main) > 1))
-      return(stop("`multi_main` should be a singular value.", call. = FALSE))
+    data_proc <-
+      data_proc %>%
+      validate_x_main(
+        filter_x = filter_multi,
+        x = multi,
+        xs = data %>% pull_distinctly_at(multi),
+        x_main = multi_main
+      )
 
     data_proc <-
       data_proc %>%
       filter_data_multi_at(
         filter_multi = filter_multi,
+        multi_main = multi_main,
         x_include = x_include,
         y_include = y_include,
         x_exclude = x_exclude,
-        y_exclude = y_exclude,
-        multi_main = multi_main
+        y_exclude = y_exclude
       )
 
-    logratio_dir <- logratio <- NULL
-    name_xy <- name_x <- name_y <- NULL
+    logratio_dir <- logratio <- name_xy <- name_x <- name_y <- NULL
 
-    word_quo <- rlang::sym(word)
-
-    multi_other <- "other"
     data_proc <-
       data_proc %>%
       dplyr::mutate(logratio_dir = dplyr::if_else(logratio < 0, TRUE, FALSE)) %>%
       dplyr::group_by(name_xy, logratio_dir) %>%
       dplyr::arrange(name_xy, dplyr::desc(abs(logratio))) %>%
-      dplyr::slice(1:num_top) %>%
+      filter_num_top_at("logratio", num_top) %>%
       dplyr::ungroup()
-
 
     data_proc <-
       data_proc %>%
@@ -222,22 +234,33 @@ visualize_logratios_multi_by2_at <-
     }
     # data_proc <- wrangle_color_col(data_proc, color)
 
+    word_quo <- rlang::sym(word)
     color_quo <- rlang::sym(color)
     multi_quo <- rlang::sym(multi)
+    multi_other <- lab_other
 
     data_proc <-
       data_proc %>%
       dplyr::mutate(!!color_quo := dplyr::if_else(logratio_dir, name_x, multi_other)) %>%
       dplyr::mutate(!!color_quo := factor(!!color_quo, levels = c(multi_main, multi_other))) %>%
-      # dplyr::mutate(!!word_quo := reorder_within(!!word_quo, dplyr::desc(logratio), name_xy))
-      dplyr::mutate(!!word_quo := stats::reorder(!!word_quo, dplyr::desc(logratio)))
+      dplyr::mutate(!!word_quo := reorder_within(!!word_quo, dplyr::desc(logratio), name_xy))
+      # dplyr::mutate(!!word_quo := stats::reorder(!!word_quo, dplyr::desc(logratio)))
 
     viz <-
       data_proc %>%
       ggplot2::ggplot(ggplot2::aes_string(x = word, y = "logratio", fill = color)) +
+      # ggplot2::geom_bar(stat = "identity") +
       ggplot2::geom_col() +
-      ggplot2::facet_wrap(~ name_xy, scales = "free") +
-      ggplot2::scale_fill_manual(values = color_value)
+      scale_x_reordered() +
+      ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) +
+      ggplot2::scale_fill_manual(values = color_value) +
+      ggplot2::facet_wrap(
+        ~ name_xy,
+        scales = facet_scales,
+        ncol = facet_ncol,
+        nrow = facet_nrow,
+        strip.position = facet_strip_position
+      )
 
     viz_labs <-
       ggplot2::labs(
@@ -251,15 +274,37 @@ visualize_logratios_multi_by2_at <-
       ggplot2::theme(
         legend.position = "bottom",
         legend.title = ggplot2::element_blank(),
-        panel.grid.major.y = ggplot2::element_blank()
+        axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+        panel.grid.major.x = ggplot2::element_blank()
       )
+
+    if(flip_axes) {
+      viz_theme <-
+        viz_theme +
+        ggplot2::theme(
+          axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
+          panel.grid.major.y = ggplot2::element_blank()
+        )
+    } else {
+      viz_theme <-
+        viz_theme +
+        ggplot2::theme(
+          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+          panel.grid.major.x = ggplot2::element_blank()
+        )
+    }
 
     viz <-
       viz +
       viz_labs +
       viz_theme
-    viz
 
+    if(flip_axes) {
+      viz <-
+        viz +
+        ggplot2::coord_flip()
+    }
+    viz
   }
 
 #' @rdname visualize_logratios_multi_by2

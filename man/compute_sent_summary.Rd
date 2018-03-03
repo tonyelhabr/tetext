@@ -8,10 +8,10 @@
 \title{Compute sentiment scores.}
 \usage{
 compute_sent_summary_multi_at(data = NULL, word = "word", multi = NULL,
-  feature = NULL, ...)
+  feature = NULL, lexicon = "bing", ...)
 
 compute_sent_summary_multi(data = NULL, word = "word", multi = NULL,
-  feature = NULL, ...)
+  feature = NULL, lexicon = "bing", ...)
 
 compute_sent_summary_at(data = NULL, word, multi, feature, ...)
 
@@ -28,6 +28,8 @@ that there are more than one entitiy.}
 \item{feature}{character. Name of column in \code{data} whose values serve as
 entity across which 'word' values are scored. Probably something like 'sentence',
 or, in the case of Twitter data, 'status_id'.}
+
+\item{lexicon}{character. Specifies lexicon to use. Must be a lexicon available in the \code{tidytext::package}.}
 
 \item{...}{dots. Parameters to pass to \code{get_sents()} internally.}
 }

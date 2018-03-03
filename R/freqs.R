@@ -268,21 +268,19 @@ compute_freqs_multi_by2 <- compute_freqs_multi_by2_at
 #' @inheritParams compute_freqs_multi_by2_at
 #' @param add_labels logical. Whether or not to add text labels (of the n-grams).
 #' @param filter_multi logical. Whether or not to filter the \code{multi} values.
+#' @param multi_main character. Name of single \code{multi} value to use as basis.
+#' Not used if \code{filter_multi = FALSE}.
 #' @param x_include,y_include,x_exclude,y_exclude character (vector).
 #' \code{multi} values to include and exclude. Not used if \code{filter_multi = FALSE}.
-#' @param multi_main character. Name of single \code{multi} value to use as
-#' basis.
-#' Essentially equivalent to how \code{x_include} should be used. Not used if \code{filter_multi = FALSE}.
-#'
 #' @return gg.
 #' @rdname visualize_freqs_multi_by2
 #' @export
 visualize_freqs_multi_by2_at <-
   function(data = NULL,
            word = "word",
-           xy_nms = NULL,
-           xy_grid = NULL,
            multi = NULL,
+           xy_nms,
+           xy_grid,
            filter_multi = FALSE,
            multi_main = NULL,
            x_include = NULL,
@@ -303,7 +301,7 @@ visualize_freqs_multi_by2_at <-
            facet_nrow = NULL,
            facet_strip_position = "top") {
 
-    if(is.null(xy_grid) | is.null(xy_nms)) {
+    if(missing(xy_grid) | missing(xy_nms)) {
       multis <-
         data %>%
         pull_distinctly_at(multi)
@@ -322,18 +320,24 @@ visualize_freqs_multi_by2_at <-
         multi = multi
       )
 
-    if((!is.null(multi_main)) & (length(multi_main) > 1))
-      return(stop("`multi_main` should be a singular value.", call. = FALSE))
+    data_proc <-
+      data_proc %>%
+      validate_x_main(
+        filter_x = filter_multi,
+        x = multi,
+        xs = data %>% pull_distinctly_at(multi),
+        x_main = multi_main
+      )
 
     data_proc <-
       data_proc %>%
       filter_data_multi_at(
         filter_multi = filter_multi,
+        multi_main = multi_main,
         x_include = x_include,
         y_include = y_include,
         x_exclude = x_exclude,
-        y_exclude = y_exclude,
-        multi_main = multi_main
+        y_exclude = y_exclude
       )
 
     name_xy <- name_x <- name_y <- NULL

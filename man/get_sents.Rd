@@ -4,7 +4,7 @@
 \alias{get_sents}
 \title{Get sentiment dictionary}
 \usage{
-get_sents(lexicon = "bing", normalize = TRUE)
+get_sents(lexicon = c("bing", "afinn", "nrc", "loughran"), normalize = TRUE)
 }
 \arguments{
 \item{lexicon}{character. Specifies lexicon to use. Must be a lexicon available in the \code{tidytext::package}.}
@@ -21,4 +21,7 @@ Get words associated with a lexicon for subsequent sentiment analysis.
 \details{
 Called by \code{compute_sent_multi_summary()}.
 This function is essentially a customized version of  \code{tidytext::get_sentiments()}.
+}
+\seealso{
+\url{https://github.com/juliasilge/tidytext/blob/master/R/sentiments.R}.
 }
