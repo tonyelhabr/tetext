@@ -19,11 +19,13 @@ visualize_time(data = NULL, timebin = NULL, geom = c("bar", "hist"),
   lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
   theme_base = theme_tetext())
 
-visualize_time_multi_at(data = data, ..., theme_base = theme_tetext_facet(),
-  multi = NULL, ncol = 3, nrow = NULL, scales = "free")
+visualize_time_multi_at(data = NULL, ..., theme_base = theme_tetext_facet(),
+  multi = NULL, facet_scales = "free", facet_ncol = 3,
+  facet_nrow = NULL, facet_strip_position = "top")
 
-visualize_time_multi(data = data, ..., theme_base = theme_tetext_facet(),
-  multi = NULL, ncol = 3, nrow = NULL, scales = "free")
+visualize_time_multi(data = NULL, ..., theme_base = theme_tetext_facet(),
+  multi = NULL, facet_scales = "free", facet_ncol = 3,
+  facet_nrow = NULL, facet_strip_position = "top")
 }
 \arguments{
 \item{data}{data.frame.}
@@ -59,9 +61,9 @@ Set to \code{NULL} by default although not actually required in order to simplif
 
 \item{multi}{character. Name of column in \code{data} to use for facetting.}
 
-\item{ncol, nrow}{numeric. Direct parameters to \code{ggplot2::facet_wrap()}.}
+\item{facet_scales, facet_strip_position}{character. Direct parameters to analogous \code{ggplot2::facet_wrap()} parameters.}
 
-\item{scales}{character. Direct parameter to \code{ggplot2::facet_wrap()}.}
+\item{facet_ncol, facet_nrow}{numeric. Direct parameters to analogous \code{ggplot2::facet_wrap()} parameters.}
 }
 \value{
 gg

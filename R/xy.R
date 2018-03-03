@@ -16,6 +16,9 @@
 create_xy_grid <- function(xy_nms) {
   if (is.null(xy_nms))
     stop("`xy_nms` cannot be NULL.", call. = FALSE)
+
+  x <- y <- xy <- i <- NULL
+
   xy_grid <-
     dplyr::bind_cols(x = xy_nms, y = xy_nms) %>%
     tidyr::complete(x, y)
@@ -50,6 +53,9 @@ get_xy_info <-
       stop("`xy_nms` cannot be NULL.", call. = FALSE)
     if (is.null(i))
       stop("`i` cannot be NULL.", call. = FALSE)
+
+    x <- y <- xy <- NULL
+
     xy_i <- xy_nms[i]
     xy_i_row <- xy_grid %>% dplyr::filter(xy == xy_i)
     x_i <- xy_i_row %>%  dplyr::pull(x)
@@ -69,6 +75,7 @@ preprocess_xy_data <- function(data = NULL, xy_info = NULL) {
     stop("`data` cannot be NULL.", call. = FALSE)
   if (is.null(xy_info))
     stop("`xy_info` cannot be NULL.", call. = FALSE)
+  name <- NULL
   data %>%
     dplyr::filter(name %in% c(xy_info$x, xy_info$y))
 }
@@ -87,6 +94,8 @@ postprocess_xy_data <- function(data = NULL, xy_info = NULL) {
     stop("`data` cannot be NULL.", call. = FALSE)
   if (is.null(xy_info))
     stop("`xy_info` cannot be NULL.", call. = FALSE)
+
+  x <- y <- name_x <- name_y <- name_xy <- NULL
   out <-
     data %>%
     dplyr::mutate(name_x = xy_info$x, name_y = xy_info$y) %>%
@@ -95,8 +104,8 @@ postprocess_xy_data <- function(data = NULL, xy_info = NULL) {
   if (length(setdiff(c(xy_info$x, xy_info$y), names(data))) == 0) {
     out <-
       out %>%
-      dplyr:rename(x = !!rlang::sym(xy_info$x),
-                   y = !!rlang::sym(xy_info$y)) %>%
+      dplyr::rename(x = !!rlang::sym(xy_info$x),
+                    y = !!rlang::sym(xy_info$y)) %>%
       dplyr::select(name_x, name_y, name_xy, x, y, dplyr::everything())
   } else {
     out <-
@@ -108,11 +117,13 @@ postprocess_xy_data <- function(data = NULL, xy_info = NULL) {
 #' 'Engine' for '_by2' functions
 #'
 #' @description Apply a function to \code{data} in pairs (over a \code{multi} column).
-#' @details Should be replaced by a \code{purrr} function in the future
+#' @details Should be replaced by a \code{purrr} function in the future.
+#' Must be careful not to pass \code{NULL} in \code{...}.
 #' @inheritParams create_xy_grid
 #' @inheritParams get_xy_info
 #' @param data data.frame. Data to apply a function over.
-#' @param func function.
+#' @param func function. Wrapped by \code{do.call()}.
+#' @param ... dots. Additional parameters to pass to \code{func}.
 #' @return data.frame.
 wrapper_func <-
   function(data = NULL,
@@ -145,38 +156,39 @@ wrapper_func <-
     out
   }
 
-#' Compute n-gram frequencies in pairs
+#' Post-process data in \code{wrapper_func()}
 #'
-#' @description Apply \code{compute_freqs_multi_at} to \code{data} in pairs (over values of the \code{multi} column).
-#' @details Should be replaced by a \code{purrr} function in the future.
-#' @inheritParams create_xy_grid
-#' @inheritParams get_xy_info
-#' @param data data.frame. Data to apply a function over.
-#' @param func function.
+#' @description Add dummy columns to \code{data}, if necessary.
+#' @details To be used exclusively by \code{wrapper_func()}.
+#' @inheritParams preprocess_xy_data
+#' @param data data.frame.
+#' @param num_cols_expect numeric.
+#' @param add logical. whether or not to try to add a dummy column. Only
+#' applied if the difference between the expected and actual number of columns is 1
+#' (where the expected is greater than the actual).
 #' @return data.frame.
-#' @rdname compute_freqs_multi_by2
-#' @export
-compute_freqs_multi_by2_at <-
-  function(data = NULL,
-           func = compute_freqs_multi_at,
-           xy_grid = NULL,
-           xy_nms = NULL,
-           multi = NULL) {
-    if (is.null(multi))
-      stop("`multi` cannot be NULL.", call. = FALSE)
+append_dummy_cols <- function(data = NULL, num_cols_expect = NULL, add = TRUE) {
+  if (is.null(data))
+    stop("`data` cannot be NULL.", call. = FALSE)
+  if (is.null(num_cols_expect))
+    stop("`num_cols_expect` cannot be NULL.", call. = FALSE)
 
-    out <-
-      wrapper_func(
-        data = data,
-        func = func,
-        xy_grid = xy_grid,
-        xy_nms = xy_nms,
-        multi = "name"
-      )
-    out
+  if(ncol(data) < num_cols_expect) {
+    warning(sprintf("Expected %.0f columns but see only %.0f.", num_cols_expect, ncol(data)))
+    num_cols_diff <- num_cols_expect - ncol(data)
+    if(num_cols_diff == 1) {
+      if(add) {
+        name_last <- names(data)[ncol(data)]
+        out <- dplyr::bind_cols(data, data[, ncol(data)])
+        names(out)[ncol(out)] <- paste0(name_last, "2")
+        warning(sprintf("Added %.0f dummy column(s).", num_cols_diff))
+      }
+    } else {
+      stop("Don't know how to add dummy columns.")
+    }
   }
+  out
+}
 
-#' @rdname compute_freqs_multi_by2
-#' @export
-compute_freqs_multi_by2 <- compute_freqs_multi_by2_at
+
 

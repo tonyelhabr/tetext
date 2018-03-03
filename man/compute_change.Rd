@@ -5,24 +5,26 @@
 \alias{compute_change}
 \title{Compute change}
 \usage{
-compute_change_at(data = NULL, timebin = NULL, word = "word",
-  timefloor = NULL, top_pct = 0.05, return_models = TRUE,
+compute_change_at(data = NULL, word = "word", timebin = NULL,
+  bin = TRUE, timefloor = NULL, top_pct = 0.05, return_models = TRUE,
   return_data = FALSE, return_both = FALSE)
 
-compute_change(data = NULL, timebin = NULL, word = "word",
+compute_change(data = NULL, word = "word", timebin = NULL, bin = TRUE,
   timefloor = NULL, top_pct = 0.05, return_models = TRUE,
   return_data = FALSE, return_both = FALSE)
 }
 \arguments{
 \item{data}{data.frame.}
 
+\item{word}{character. Name of column in \code{data} corresponding to n-gram.}
+
 \item{timebin}{character. Name of column in \code{data} specifying temporal period
 to use to compute change.}
 
-\item{word}{character. Name of column in \code{data} corresponding to n-gram.}
+\item{bin}{logical. Whether or not to call \code{lubridate::floor_date()} to truncate \code{timebin}.}
 
-\item{timefloor}{character. Name of column passed directly to \code{lubridate::floor_date()} as \code{unit} parameter
-if the specified column name is not already in \code{data}.}
+\item{timefloor}{character. Name of column passed directly to \code{unit} parameter of
+\code{lubridate::floor_date()} if \code{bin = FALSE}.}
 
 \item{top_pct}{numeric. Number between 0 and 1. Useful primarily to limit the number of models
 that need to be computed.}
@@ -40,7 +42,7 @@ Needed when using \code{visualize_change_at()}.}
 data.frame.
 }
 \description{
-Compute change in word usage over time.
+Compute change in n-gram usage over time.
 }
 \details{
 None.

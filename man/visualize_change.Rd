@@ -6,12 +6,12 @@
 \title{Visualize change}
 \usage{
 visualize_change_at(..., num_top = 5, color = NULL,
-  color_value = rep("grey50", num_top), add_labels = TRUE,
+  color_value = rep("grey50", num_top), add_labels = FALSE,
   lab_title = "Largest Changes in Word Frequency", lab_subtitle = NULL,
   lab_x = NULL, lab_y = NULL, theme_base = theme_tetext())
 
 visualize_change(..., num_top = 5, color = NULL,
-  color_value = rep("grey50", num_top), add_labels = TRUE,
+  color_value = rep("grey50", num_top), add_labels = FALSE,
   lab_title = "Largest Changes in Word Frequency", lab_subtitle = NULL,
   lab_x = NULL, lab_y = NULL, theme_base = theme_tetext())
 }

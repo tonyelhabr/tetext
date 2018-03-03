@@ -1,7 +1,7 @@
 
 #' Compute change
 #'
-#' @description Compute change in word usage over time.
+#' @description Compute change in n-gram usage over time.
 #' @details None.
 #' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
@@ -70,7 +70,7 @@ compute_change_at <-
       dplyr::group_by(!!word_quo) %>%
       dplyr::mutate(word_total = sum(n)) %>%
       dplyr::ungroup() %>%
-      filter_num_top("word_total", top_pct) %>%
+      filter_num_top_at("word_total", top_pct) %>%
       # dplyr::filter(word_total >= stats::quantile(word_total, top_pct)) %>%
       dplyr::arrange(dplyr::desc(word_total))
 
@@ -140,9 +140,9 @@ visualize_change_at <-
     data_models_top <-
       data_models %>%
       dplyr::mutate(temp = 1 - adjusted_p_value) %>%
-      filter_num_top("temp", num_top) %>%
+      filter_num_top_at("temp", num_top) %>%
       dplyr::select(-temp)
-      # filter_num_top("adjusted_p_value", num_top)
+      # filter_num_top_at("adjusted_p_value", num_top)
 
     if (is.null(color)) {
       data_models_top <- data_models_top %>% dplyr::mutate(`.dummy` = "dummy")

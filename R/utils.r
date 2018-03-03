@@ -21,6 +21,17 @@ filter_num_top_at <- function(data = NULL, col = NULL, num_top = NULL) {
   col_quo <- rlang::sym(col)
 
   if(num_top >= 1) {
+    if(num_top > nrow(data))
+      return(
+        stop(
+          sprintf(
+            "`num_top` (%.0f) must not be greater than `nrow(data)` (%.0f).",
+            num_top,
+            nrow(data)
+          ),
+          call. = FALSE
+        )
+      )
     out <-
       data %>%
       dplyr::mutate(rank = dplyr::row_number(dplyr::desc(!!col_quo))) %>%
@@ -35,8 +46,6 @@ filter_num_top_at <- function(data = NULL, col = NULL, num_top = NULL) {
   out
 }
 
-filter_num_top <- filter_num_top_at
-
 require_ns <- function(pkg) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
     stop(sprintf('Package "%s" needed for this function to work. Please install it.', pkg), call. = FALSE)
@@ -47,7 +56,6 @@ require_ns <- function(pkg) {
 is_nothing <- function(x) {
   any(is.null(x)) || any(is.na(x)) || any(is.nan(x))
 }
-
 
 coerce_col_to_factor <- function(data, colname) {
   classes <- sapply(names(data), class)
@@ -89,3 +97,78 @@ wrangle_multi_col <-
   function(data, colname) {
     coerce_col_to_factor(data, colname)
   }
+
+filter_if_not_null_at <- function(data = NULL, col = NULL, value = NULL, invert = FALSE) {
+  if (is.null(data))
+    stop("`data` cannot be NULL.", call. = FALSE)
+
+  if(is.null(col))
+    return(data)
+
+  if(is.null(value))
+    return(data)
+
+  if(!(col %in% names(data)))
+    return(stop("`col` must be in `data`.", call. = FALSE))
+
+  col_quo <- rlang::sym(col)
+  if(!invert) {
+    out <-
+      data %>%
+      dplyr::filter(!!col_quo %in% value)
+  } else {
+    out <-
+      data %>%
+      dplyr::filter(!(!!col_quo %in% value))
+  }
+  out
+}
+
+pull_distinctly_at <- function(data = NULL, col = NULL) {
+  if (is.null(data))
+    stop("`data` cannot be NULL.", call. = FALSE)
+
+  if(!(col %in% names(data)))
+    return(stop("`col` must be in `data`.", call. = FALSE))
+
+  col_quo <- rlang::sym(col)
+  data %>%
+    dplyr::distinct(!!col_quo) %>%
+    dplyr::arrange(!!col_quo) %>%
+    dplyr::pull(!!col_quo)
+}
+
+
+filter_data_multi_at <-
+  function(data = NULL,
+           filter_multi = NULL,
+           x_include = NULL,
+           y_include = NULL,
+           x_exclude = NULL,
+           y_exclude = NULL,
+           multi_main = NULL) {
+    if (is.null(data))
+      stop("`data` cannot be NULL.", call. = FALSE)
+    if (is.null(filter_multi))
+      stop("`filter_multi` cannot be NULL.", call. = FALSE)
+
+    if (filter_multi) {
+      data <-
+        data %>% filter_if_not_null_at("name_x", multi_main, invert = FALSE)
+      data <-
+        data %>% filter_if_not_null_at("name_x", x_include, invert = FALSE)
+      data <-
+        data %>% filter_if_not_null_at("name_y", y_include, invert = FALSE)
+      data <-
+        data %>% filter_if_not_null_at("name_x", x_exclude, invert = TRUE)
+      data <-
+        data %>% filter_if_not_null_at("name_y", y_exclude, invert = TRUE)
+
+    } else {
+      message("It's recommended to set `filter_multi = TRUE`.")
+    }
+    data
+  }
+
+
+

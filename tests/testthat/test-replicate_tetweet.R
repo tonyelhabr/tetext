@@ -22,31 +22,33 @@ tms <- c("DAL", "HOU", "MEM", "NOP", "SAS")
 
 message("Tests are in order of likely usage in script.")
 
+data_multi <-
+  data %>%
+  filter(name %in% tms) %>%
+  clean_tweets_at(multi = "name")
+
+data_multi_timefilter <-
+  data_multi %>%
+  compute_timefilter_multi_at(timebin = "timestamp", multi = "name")
+
+data_multi_trim <-
+  data_multi %>%
+  trim_bytime_at(
+    timebin = "timestamp",
+    start = data_multi_timefilter$date_start,
+    end = data_multi_timefilter$date_end
+  )
+
 testthat::test_that(
   "trim",
   {
-    data_multi <-
-      data %>%
-      filter(name %in% tms) %>%
-      clean_tweets_at(multi = "name")
 
+    stopifnot(exists("data_multi"))
     actual <- data_multi %>% distinct(name) %>% arrange(name) %>% pull(name)
     expected <- tms
     testthat::expect_equal(actual, expected)
 
-    data_multi_timefilter <-
-      data_multi %>%
-      compute_timefilter_multi_at(timebin = "timestamp", multi = "name")
-
     testthat::expect_true(is.list(data_multi_timefilter))
-
-    data_multi_trim <-
-      data_multi %>%
-      trim_bytime_at(
-        timebin = "timestamp",
-        start = data_multi_timefilter$date_start,
-        end = data_multi_timefilter$date_end
-      )
 
     actual <- nrow(data_multi_trim)
     expected <- 8636
@@ -63,6 +65,7 @@ testthat::test_that(
     testthat::expect_equal(actual, expected)
 
   }
+)
 
 testthat::test_that(
   "time",
@@ -75,8 +78,8 @@ testthat::test_that(
         color = "name",
         color_value = colors_tms,
         multi = "name",
-        ncol = 1,
-        scales = "fixed"
+        facet_ncol = 1,
+        facet_scales = "fixed"
       )
     viz_time_multi_all
     testthat::expect_true(ggplot2::is.ggplot(viz_time_multi_all))
@@ -90,8 +93,8 @@ testthat::test_that(
         color = "name",
         color_value = colors_tms,
         multi = "name",
-        ncol = length(tms),
-        scales = "fixed"
+        facet_ncol = length(tms),
+        facet_scales = "fixed"
       )
     viz_time_multi_hh
     testthat::expect_true(ggplot2::is.ggplot(viz_time_multi_hh))
@@ -107,47 +110,50 @@ testthat::test_that(
       )
     viz_time_multi_hh
     testthat::expect_true(ggplot2::is.ggplot(viz_time_multi_hh))
-  })
+  }
+)
+
+data_multi_trim_kind <-
+  data_multi_trim %>%
+  add_tweet_kind_cols()
+
+rgx_tidiers <-
+  get_tweet_rgx_tidiers()
+
+unigrams <-
+  data_multi_trim_kind %>%
+  mutate(text = rtweet::plain_tweets(text)) %>%
+  tidify_to_unigrams_at(
+    text = "text",
+    rgx_unnest = rgx_tidiers$rgx_unnest,
+    rgx_pattern = rgx_tidiers$rgx_pattern,
+    rgx_replacement = "",
+    rgx_ignore_custom = rgx_tidiers$rgx_ignore_custom
+  )
+
+bigrams <-
+  data_multi_trim_kind %>%
+  mutate(text = rtweet::plain_tweets(text)) %>%
+  tidify_to_bigrams_at(
+    text = "text",
+    rgx_pattern = rgx_tidiers$rgx_pattern,
+    rgx_replacement = "",
+    rgx_ignore_custom = rgx_tidiers$rgx_ignore_custom
+  )
 
 testthat::test_that(
   "twitter",
   {
-    data_multi_trim_kind <-
-      data_multi_trim %>%
-      add_tweet_kind_cols()
-
     actual <- setdiff(names(data_multi_trim_kind), names(data_multi_trim))
     expected <- c("hashtag", "link", "rt", "quote", "reply", "type")
     testthat::expect_equal(actual, expected)
 
     # TODO: Add visualize_tweet_kind_at()
 
-    rgx_tidiers <-
-      get_tweet_rgx_tidiers()
-
-    unigrams <-
-      data_multi_trim_kind %>%
-      mutate(text = rtweet::plain_tweets(text)) %>%
-      tidify_to_unigrams_at(
-        text = "text",
-        rgx_unnest = rgx_tidiers$rgx_unnest,
-        rgx_pattern = rgx_tidiers$rgx_pattern,
-        rgx_replacement = "",
-        rgx_ignore_custom = rgx_tidiers$rgx_ignore_custom
-      )
     actual <- nrow(unigrams)
     expect <- 78458
     testthat::expect_equal(actual, expect)
 
-    bigrams <-
-      data_multi_trim_kind %>%
-      mutate(text = rtweet::plain_tweets(text)) %>%
-      tidify_to_bigrams_at(
-        text = "text",
-        rgx_pattern = rgx_tidiers$rgx_pattern,
-        rgx_replacement = "",
-        rgx_ignore_custom = rgx_tidiers$rgx_ignore_custom
-      )
     actual <- nrow(bigrams)
     expect <- 35447
     testthat::expect_equal(actual, expect)
@@ -210,26 +216,41 @@ testthat::test_that(
         multi = "name"
       )
     viz_bigram_freqs_multi
+    testthat::expect_true(ggplot2::is.ggplot(viz_bigram_freqs_multi))
+  }
+)
+
+testthat::test_that(
+  "sents",
+  {
+    unigrams_sent_summ <-
+      unigrams %>%
+      compute_sent_summary_multi_at(
+        word = "word",
+        feature = "status_id",
+        multi = "name"
+      )
+    unigrams_sent_summ
   }
 )
 
 testthat::test_that(
   "xy",
   {
-    xy_grid <- create_xy_grid(tms)
-    xy_nms <- xy_grid %>% dplyr::pull(xy)
+    # xy_grid <- create_xy_grid(tms)
+    # xy_nms <- xy_grid %>% dplyr::pull(xy)
 
     unigrams_freqs_multi <-
       unigrams %>%
       compute_freqs_multi_at(
+        word = "word",
         multi = "name"
       )
 
     unigrams_freqs_multi_by2 <-
       unigrams %>%
       compute_freqs_multi_by2_at(
-        xy_grid = xy_grid,
-        xy_nms = xy_nms,
+        word = "word",
         multi = "name"
       )
     unigrams_freqs_multi_by2
@@ -237,6 +258,39 @@ testthat::test_that(
     testthat::expect_true(nrow(unigrams_freqs_multi) != nrow(unigrams_freqs_multi_by2))
     testthat::expect_true(ncol(unigrams_freqs_multi) != ncol(unigrams_freqs_multi_by2))
 
+    viz_freqs_multi_by2 <-
+      unigrams %>%
+      visualize_freqs_multi_by2_at(
+        word = "word",
+        multi = "name",
+        filter_multi = TRUE,
+        # x_include = "SAS"
+        multi_main = "SAS"
+      )
+    viz_freqs_multi_by2
+    testthat::expect_true(ggplot2::is.ggplot(viz_freqs_multi_by2))
+
+    unigrams_logratios_multi_by2 <-
+      unigrams %>%
+      compute_logratios_multi_by2_at(
+        word = "word",
+        multi = "name",
+        cnt_min = 50
+      )
+    unigrams_logratios_multi_by2
+
+    viz_logratios_multi_by2 <-
+      unigrams %>%
+      visualize_logratios_multi_by2_at(
+        word = "word",
+        multi = "name",
+        filter_multi = TRUE,
+        # x_include = "SAS"
+        multi_main = "SAS",
+        num_top = 3,
+        color_value = c(colors_tms[5], "grey50")
+      )
+    viz_logratios_multi_by2
   }
 )
 

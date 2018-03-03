@@ -1,6 +1,4 @@
 
-
-
 #' Get sentiment dictionary
 #'
 #' @description Get words associated with a lexicon for subsequent sentiment analysis.
@@ -12,7 +10,7 @@
 #' @return data.frame
 #' @rdname get_sents
 #' @export
-get_sents <- function(lexicon = NULL,
+get_sents <- function(lexicon = "bing",
                       normalize = TRUE) {
   if (is.null(lexicon))
     stop("`lexicon` cannot be NULL.", call. = FALSE)
@@ -43,7 +41,7 @@ compute_sent_summary_multi_at <-
            word = "word",
            multi = NULL,
            feature = NULL,
-           lexicon = "bing",
+           # lexicon = "bing",
            ...) {
     if (is.null(data))
       stop("`data` cannot be NULL.", call. = FALSE)
@@ -56,25 +54,27 @@ compute_sent_summary_multi_at <-
     multi_quo <- rlang::sym(multi)
     feature_quo <- rlang::sym(feature)
 
-    total_words <- sentiment <- n <- NULL
+    total_words <- sentiment <- n <- word <- words <- sentiment_pct <- NULL
 
     data_multi_cnt <-
       data %>%
-      dplyr::group_by(!!multi) %>%
+      dplyr::group_by(!!multi_quo) %>%
       dplyr::mutate(total_words = n()) %>%
       dplyr::ungroup() %>%
-      dplyr::distinct(!!feature, !!multi, total_words)
+      dplyr::distinct(!!multi_quo, !!feature_quo, total_words)
 
     sents <- get_sents(...)
 
     out <-
-      data_multi_cnt %>%
+      data %>%
+      dplyr::rename(word = !!word_quo) %>%
       dplyr::inner_join(sents, by = "word") %>%
-      dplyr::count(!!feature, sentiment) %>%
-      tidyr::complete(sentiment, !!feature, fill = list(n = 0)) %>%
-      dplyr::inner_join(data, by = c(feature)) %>%
-      dplyr::group_by(!!multi, sentiment, total_words) %>%
+      dplyr::count(!!feature_quo, sentiment) %>%
+      tidyr::complete(sentiment, !!feature_quo, fill = list(n = 0)) %>%
+      dplyr::inner_join(data_multi_cnt, by = c(feature)) %>%
+      dplyr::group_by(!!multi_quo, sentiment, total_words) %>%
       dplyr::summarize(words = sum(n)) %>%
+      # dplyr::mutate(sentiment_pct = words / total_words) %>%
       dplyr::ungroup()
     out
   }
@@ -95,7 +95,6 @@ compute_sent_summary_multi <- compute_sent_summary_multi_at
 #' @param feature character. Name of column in \code{data} whose values serve as
 #' entity across which 'word' values are scored. Probably something like 'sentence',
 #' or, in the case of Twitter data, 'status_id'.
-#' @param lexicon character. Name of lexicon available in \code{tidytext} package to use.
 #' @param ... dots. Parameters to pass to \code{get_sents()} internally.
 #' @return data.frame.
 #' @rdname compute_sent_summary

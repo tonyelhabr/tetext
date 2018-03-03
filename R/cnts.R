@@ -32,7 +32,7 @@ visualize_cnts_at <- function(data = NULL,
   data_viz <-
     data %>%
     dplyr::count(!!word_quo) %>%
-    filter_num_top("n", num_top) %>%
+    filter_num_top_at("n", num_top) %>%
     dplyr::mutate(!!word_quo := stats::reorder(!!word_quo, n))
 
 
@@ -107,7 +107,7 @@ visualize_cnts_multi_at <- function(data = NULL,
     data %>%
     dplyr::count(!!multi_quo, !!word_quo) %>%
     dplyr::group_by(!!multi_quo) %>%
-    filter_num_top("n", num_top) %>%
+    filter_num_top_at("n", num_top) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(
       !!word_quo := reorder_within(!!word_quo, n, !!multi_quo)
@@ -212,25 +212,54 @@ visualize_cnts_wordcloud <- visualize_cnts_wordcloud_at
 #' @param ... dots. Parameters to pass to \code{visualize_cnts_wordcloud_at()}.
 #' @param multi character. Name of column in \code{data} to use to create
 #' a separate wordcloud.
+#' @param all logical. Whether or not to create a wordcloud for each value of \code{multi}.
 #' @param value_multi charater or numeric. Value by which to filter the column
-#' specified by \code{multi}.
+#' specified by \code{multi}. Ignored if \code{all = TRUE}.
+#' @param num_par_row,num_par_col numeric. Values to pass to \code{mfrow} in \code{par}.
+#' Defaults are provided internally based on value of \code{all} and number of \code{multi} values.
 #' @return plots.
 #' @rdname visualize_cnts_wordcloud
 #' @export
 visualize_cnts_wordcloud_multi_at <-
-  function(data = NULL, ..., multi = NULL, value_multi = NULL) {
+  function(data = NULL, ..., multi = NULL, all = FALSE, value_multi = NULL, num_par_row, num_par_col) {
     if (is.null(data))
       stop("`data` must not be NULL.", call. = FALSE)
-
     if (is.null(multi))
       stop("`multi` must not be NULL.", call. = FALSE)
-    if (is.null(value_multi))
-      stop("`value_multi` must not be NULL.", call. = FALSE)
 
     multi_quo <- rlang::sym(multi)
-    data_proc <- dplyr::filter(data, !!multi_quo == value_multi)
-    viz <- visualize_cnts_wordcloud_at(data = data_proc, ...)
-    viz
+    if(!all) {
+      if (is.null(value_multi))
+        stop("`value_multi` must not be NULL.", call. = FALSE)
+
+      data_proc <- data %>% dplyr::filter(!!multi_quo == value_multi)
+      # if(missing(num_par_row)) {
+      #   num_par_row <- 1
+      # }
+      # if(missing(num_par_col)) {
+      #   num_par_col <- 1
+      # }
+      # graphics::par(mfrow = c(num_par_row, num_par_col))
+      visualize_cnts_wordcloud_at(data = data_proc, ...)
+    } else {
+      message("`all = TRUE` is not currently implemented.")
+      # multis <- data %>% pull_distinctly_at(multi)
+      #
+      # if(missing(num_par_row)) {
+      #   num_par_row <- ceiling(length(multis) / 3)
+      # }
+      # if(missing(num_par_col)) {
+      #   num_par_col <- min(length(multis), 3)
+      # }
+      # graphics::par(mfrow = c(num_par_row, num_par_col))
+      # purrr::map(
+      #   ~visualize_cnts_wordcloud_multi_at(
+      #     data = unigrams,
+      #     ...
+      #   )
+      # )
+    }
+    # graphics::par(mfrow = c(1, 1))
   }
 
 #' @rdname visualize_cnts_wordcloud

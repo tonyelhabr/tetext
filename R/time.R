@@ -125,8 +125,8 @@ visualize_time <- visualize_time_at
 #' @inheritParams visualize_cnts
 #' @param ... dots. Parameters to pass directly to \code{visualize_time_at()}.
 #' @param multi character. Name of column in \code{data} to use for facetting.
-#' @param ncol,nrow numeric. Direct parameters to \code{ggplot2::facet_wrap()}.
-#' @param scales character. Direct parameter to \code{ggplot2::facet_wrap()}.
+#' @param facet_ncol,facet_nrow numeric. Direct parameters to analogous \code{ggplot2::facet_wrap()} parameters.
+#' @param facet_scales,facet_strip_position character. Direct parameters to analogous \code{ggplot2::facet_wrap()} parameters.
 #' @rdname visualize_time
 #' @export
 visualize_time_multi_at <-
@@ -134,9 +134,10 @@ visualize_time_multi_at <-
            ...,
            theme_base = theme_tetext_facet(),
            multi = NULL,
-           ncol = 3,
-           nrow = NULL,
-           scales = "free") {
+           facet_scales = "free",
+           facet_ncol = 3,
+           facet_nrow = NULL,
+           facet_strip_position = "top") {
     if (is.null(multi))
       stop("`multi` cannot be NULL.", call. = FALSE)
     # data <- wrangle_multi_col(data, multi)
@@ -147,9 +148,10 @@ visualize_time_multi_at <-
       viz +
       ggplot2::facet_wrap(
         stats::as.formula(paste0("~ ", multi)),
-        ncol = ncol,
-        nrow = nrow,
-        scales = scales
+        scales = facet_scales,
+        ncol = facet_ncol,
+        nrow = facet_nrow,
+        strip.position = facet_strip_position
       )
     viz
   }

@@ -49,7 +49,7 @@ compute_corrs_at <-
     data_cnt_top <-
       data %>%
       dplyr::count(!!word_quo, sort = TRUE) %>%
-      filter_num_top("n", num_top_ngrams)
+      filter_num_top_at("n", num_top_ngrams)
 
     data_joined <-
       data %>%
@@ -73,7 +73,7 @@ compute_corrs_at <-
 
     data_corrs_top <-
       data_corrs %>%
-      filter_num_top("correlation", num_top_corrs)
+      filter_num_top_at("correlation", num_top_corrs)
 
 
     if(return_both | (return_words & return_corrs)) {

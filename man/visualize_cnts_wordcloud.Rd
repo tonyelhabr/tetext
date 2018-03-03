@@ -14,10 +14,10 @@ visualize_cnts_wordcloud(data = NULL, word = "word",
   color_value = "grey50", num_top = 50, random_order = FALSE)
 
 visualize_cnts_wordcloud_multi_at(data = NULL, ..., multi = NULL,
-  value_multi = NULL)
+  all = FALSE, value_multi = NULL, num_par_row, num_par_col)
 
 visualize_cnts_wordcloud_multi(data = NULL, ..., multi = NULL,
-  value_multi = NULL)
+  all = FALSE, value_multi = NULL, num_par_row, num_par_col)
 }
 \arguments{
 \item{data}{data.frame.}
@@ -37,8 +37,13 @@ in \code{wordcloud::wordcloud()}}
 \item{multi}{character. Name of column in \code{data} to use to create
 a separate wordcloud.}
 
+\item{all}{logical. Whether or not to create a wordcloud for each value of \code{multi}.}
+
 \item{value_multi}{charater or numeric. Value by which to filter the column
-specified by \code{multi}.}
+specified by \code{multi}. Ignored if \code{all = TRUE}.}
+
+\item{num_par_row, num_par_col}{numeric. Values to pass to \code{mfrow} in \code{par}.
+Defaults are provided internally based on value of \code{all} and number of \code{multi} values.}
 }
 \value{
 plot.

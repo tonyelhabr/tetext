@@ -5,6 +5,7 @@
 \alias{compute_freqs}
 \alias{compute_freqs_multi_at}
 \alias{compute_freqs_multi}
+\alias{compute_freqs_multi_wide_at}
 \title{Compute n-gram frequency}
 \usage{
 compute_freqs_at(data = NULL, word = "word")
@@ -14,6 +15,8 @@ compute_freqs(data = NULL, word = "word")
 compute_freqs_multi_at(data = NULL, word = "word", multi = NULL)
 
 compute_freqs_multi(data = NULL, word = "word", multi = NULL)
+
+compute_freqs_multi_wide_at(data = NULL, word = "word", multi = NULL)
 }
 \arguments{
 \item{data}{data.frame.}
@@ -30,7 +33,12 @@ data.frame.
 }
 \description{
 Compute the frequency of n-grams.
+
+Manipulates output from \code{compute_freqs_multi_at()}
+for \code{compute_freqs_mult_by2} function.
 }
 \details{
 Inspired by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
+
+To be used by \code{_by2} function only.
 }

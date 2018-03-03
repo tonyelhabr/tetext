@@ -80,7 +80,7 @@ visualize_tfidf_at <-
     data_viz <-
       data_proc %>%
       dplyr::group_by(!!multi_quo) %>%
-      filter_num_top("tf_idf", num_top) %>%
+      filter_num_top_at("tf_idf", num_top) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(
         !!word_quo := reorder_within(!!word_quo, tf_idf, !!multi_quo)
