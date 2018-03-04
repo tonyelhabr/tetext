@@ -126,7 +126,8 @@ visualize_bigram_freqs_multi_at <-
            color_value = "grey50",
            num_top = 3,
            lab_title = "Most Frequently Used Pairs of Words",
-           lab_subtitle = paste0("By ", stringr::str_to_title(multi)),
+           lab_subtitle = NULL,
+           lab_caption = NULL,
            lab_x = NULL,
            lab_y = NULL,
            theme_base = theme_tetext()) {
@@ -185,7 +186,8 @@ visualize_bigram_freqs_multi_at <-
         x = lab_x,
         y = lab_y,
         title = lab_title,
-        subtitle = lab_subtitle
+        subtitle = lab_subtitle,
+        caption = lab_caption
       )
 
     viz_theme <-
@@ -292,7 +294,8 @@ visualize_freqs_multi_by2_at <-
            # num_top = 3,
            add_labels = TRUE,
            lab_title = "Relative Word Frequency",
-           lab_subtitle = paste0("By ", stringr::str_to_title(multi)),
+           lab_subtitle = NULL,
+           lab_caption = NULL,
            lab_x = NULL,
            lab_y = NULL,
            theme_base = theme_tetext_facet(),
@@ -396,7 +399,8 @@ visualize_freqs_multi_by2_at <-
         x = lab_x,
         y = lab_y,
         title = lab_title,
-        subtitle = lab_subtitle
+        subtitle = lab_subtitle,
+        caption = lab_caption
       )
 
     viz_theme <-

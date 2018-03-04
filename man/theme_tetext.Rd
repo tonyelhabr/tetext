@@ -8,7 +8,7 @@
 \title{Custom theme}
 \usage{
 theme_tetext(base_family = "", base_size = 11, plot_title_size = 16,
-  subtitle_size = 12, ...)
+  subtitle_size = 12, void = FALSE, ...)
 
 theme_tetext_dx(...)
 
@@ -21,13 +21,15 @@ theme_tetext_facet_dx(...)
 
 \item{base_size, plot_title_size, subtitle_size}{numeric.}
 
+\item{void}{logical. Whether or not to modifly theme to mimic \code{ggplot2::theme_void()}/}
+
 \item{...}{dots. Additional parameters passed to \code{ggplot2::theme()}.}
 }
 \description{
-A custom \code{ggplot2} theme.
+A custom \code{ggplot2} theme (that is similar to \code{ggplot2::theme_minimal()}.
 }
 \details{
-Copy-paste of theme from \code{teplot} package.
+This theme is 'copy-pasted' of theme from \code{teplot} package.
 }
 \seealso{
 \url{https://github.com/hrbrmstr/hrbrthemes/blob/master/R/theme-ipsum.r}

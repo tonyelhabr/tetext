@@ -29,7 +29,10 @@ data_multi <-
 
 data_multi_timefilter <-
   data_multi %>%
-  compute_timefilter_multi_at(timebin = "timestamp", multi = "name")
+  compute_timefilter_multi_at(
+    timebin = "timestamp",
+    multi = "name"
+  )
 
 data_multi_trim <-
   data_multi %>%

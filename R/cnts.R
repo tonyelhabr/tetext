@@ -19,6 +19,7 @@ visualize_cnts_at <- function(data = NULL,
                            color_value = "grey50",
                            lab_title = "Count of Words",
                            lab_subtitle = NULL,
+                           lab_caption = NULL,
                            lab_x = NULL,
                            lab_y = NULL,
                            theme_base = theme_tetext()) {
@@ -55,7 +56,8 @@ visualize_cnts_at <- function(data = NULL,
       x = lab_x,
       y = lab_y,
       title = lab_title,
-      subtitle = lab_subtitle
+      subtitle = lab_subtitle,
+      caption = lab_caption
     )
   viz_theme <-
     theme_base +
@@ -89,7 +91,8 @@ visualize_cnts_multi_at <- function(data = NULL,
                                  color = NULL,
                                  color_value = "grey50",
                                  lab_title = "Count of Words",
-                                 lab_subtitle = paste0("By ", stringr::str_to_title(multi)),
+                                 lab_subtitle = NULL,
+                                 lab_caption = NULL,
                                  lab_x = NULL,
                                  lab_y = NULL,
                                  theme_base = theme_tetext_facet(),
@@ -103,7 +106,7 @@ visualize_cnts_multi_at <- function(data = NULL,
 
   n <- rank <- NULL
 
-  data_viz <-
+  data_proc <-
     data %>%
     dplyr::count(!!multi_quo, !!word_quo) %>%
     dplyr::group_by(!!multi_quo) %>%
@@ -114,15 +117,14 @@ visualize_cnts_multi_at <- function(data = NULL,
     )
 
   if (is.null(color)) {
-    data_viz <- data_viz %>% dplyr::mutate(`.dummy` = "dummy")
+    data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
     color <- ".dummy"
   }
-  data_viz <- wrangle_color_col(data_viz, color)
+  data_proc <- wrangle_color_col(data_proc, color)
 
   viz <-
-    ggplot2::ggplot(
-      data = data_viz,
-      ggplot2::aes_string(x = word, y = "n", fill = color)) +
+    data_proc %>%
+    ggplot2::ggplot(ggplot2::aes_string(x = word, y = "n", fill = color)) +
     ggplot2::geom_col() +
     scale_x_reordered() +
     ggplot2::scale_fill_manual(values = color_value) +
@@ -134,7 +136,8 @@ visualize_cnts_multi_at <- function(data = NULL,
       x = lab_x,
       y = lab_y,
       title = lab_title,
-      subtitle = lab_subtitle
+      subtitle = lab_subtitle,
+      caption = lab_caption
     )
   viz_theme <-
     theme_base +
@@ -180,7 +183,7 @@ visualize_cnts_wordcloud_at <-
     if (is.null(data))
       stop("`data` must not be NULL.", call. = FALSE)
     word_quo <- rlang::sym(word)
-    data_viz <- data %>% dplyr::count(!!word_quo)
+    data_proc <- data %>% dplyr::count(!!word_quo)
 
     n <- NULL
 
@@ -188,9 +191,9 @@ visualize_cnts_wordcloud_at <-
       num_top <- nrow(data) * (1 - invert_pct(num_top))
     }
 
-    words <- data_viz %>% dplyr::pull(!!word_quo)
-    freqs <- data_viz %>% dplyr::pull(n)
-    # browser()
+    words <- data_proc %>% dplyr::pull(!!word_quo)
+    freqs <- data_proc %>% dplyr::pull(n)
+
     viz <-
       wordcloud::wordcloud(
         word = words,

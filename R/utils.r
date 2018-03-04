@@ -6,45 +6,47 @@ invert_pct <- function(num) {
   num
 }
 
-
-filter_num_top_at <- function(data = NULL, col = NULL, num_top = NULL) {
-  if (is.null(data))
-    stop("`data` cannot be NULL.", call. = FALSE)
-  if (is.null(col))
-    stop("`col` cannot be NULL.", call. = FALSE)
-  if (is.null(num_top))
-    stop("`num_top` cannot be NULL.", call. = FALSE)
-  if(num_top <= 0)
-    stop("`num_top` must be greater than 0.", call. = FALSE)
-
-  rank <- NULL
-  col_quo <- rlang::sym(col)
-
-  if(num_top >= 1) {
-    if(num_top > nrow(data))
-      return(
-        stop(
-          sprintf(
-            "`num_top` (%.0f) must not be greater than `nrow(data)` (%.0f).",
-            num_top,
-            nrow(data)
-          ),
-          call. = FALSE
-        )
-      )
-    out <-
-      data %>%
-      dplyr::mutate(rank = dplyr::row_number(dplyr::desc(!!col_quo))) %>%
-      dplyr::filter(rank <= num_top)
-  } else if((num_top > 0) & (num_top < 1)) {
-    num_top <- invert_pct(num_top)
-    out <-
-      data %>%
-      dplyr::arrange(dplyr::desc(!!col_quo)) %>%
-      dplyr::filter(!!col_quo >= stats::quantile(!!col_quo, num_top, na.rm = TRUE))
+validate_range <- function(x, max = 1, min = 0) {
+  if(x > max) {
+    stop("`x` must not be greater than ", max, ".", call. = FALSE)
   }
-  out
+  if(x < min) {
+    stop("`x` must not be less than ", min, ".", call. = FALSE)
+  }
+  x
 }
+
+filter_num_top_at <-
+  function(data = NULL,
+           col = NULL,
+           num_top = NULL,
+           max = nrow(data),
+           min = 0) {
+    if (is.null(data))
+      stop("`data` cannot be NULL.", call. = FALSE)
+    if (is.null(col))
+      stop("`col` cannot be NULL.", call. = FALSE)
+    if (is.null(num_top))
+      stop("`num_top` cannot be NULL.", call. = FALSE)
+    num_top <- validate_range(x = num_top, max = max, min = min)
+
+    rank <- NULL
+    col_quo <- rlang::sym(col)
+
+    if (num_top >= 1) {
+      out <-
+        data %>%
+        dplyr::mutate(rank = dplyr::row_number(dplyr::desc(!!col_quo))) %>%
+        dplyr::filter(rank <= num_top)
+    } else {
+      # num_top <- invert_pct(num_top)
+      out <-
+        data %>%
+        dplyr::arrange(dplyr::desc(!!col_quo)) %>%
+        dplyr::filter(!!col_quo >= stats::quantile(!!col_quo, num_top, na.rm = TRUE))
+    }
+    out
+  }
 
 require_ns <- function(pkg) {
   if (!requireNamespace(pkg, quietly = TRUE)) {

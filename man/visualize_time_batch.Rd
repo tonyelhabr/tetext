@@ -5,46 +5,44 @@
 \alias{visualize_time_batch}
 \title{Visualize over multiple time periods}
 \usage{
-visualize_time_batch_at(data = NULL, colnames_timebin = c("timestamp",
-  "yyyy", "mm", "wd", "hh"), geoms = c("hist", "bar", "bar", "bar", "bar"),
-  add_alphas = c(FALSE, rep(TRUE, length(colnames_timebin) - 1)),
-  colnames_color = rep(NA, length(colnames_timebin)),
-  color_values = rep("grey50", length(colnames_timebin)),
-  labs_title = rep("Count Over Time", length(colnames_timebin)),
+visualize_time_batch_at(data = NULL, timebins = c("timestamp", "yyyy", "mm",
+  "wd", "hh"), geoms = c("hist", "bar", "bar", "bar", "bar"),
+  add_alphas = c(FALSE, rep(TRUE, length(timebins) - 1)), colors = rep(NA,
+  length(timebins)), color_values = rep("grey50", length(timebins)),
+  labs_x = rep("", length(timebins)), labs_y = rep("", length(timebins)),
+  labs_title = rep("Count Over Time", length(timebins)),
   labs_subtitle = c("", "By Year", "By Month", "By Day of Week", "By Hour"),
-  labs_x = rep("", length(colnames_timebin)), labs_y = rep("",
-  length(colnames_timebin)), arrange = FALSE, show = FALSE)
+  arrange = FALSE, show = FALSE)
 
-visualize_time_batch(data = NULL, colnames_timebin = c("timestamp", "yyyy",
-  "mm", "wd", "hh"), geoms = c("hist", "bar", "bar", "bar", "bar"),
-  add_alphas = c(FALSE, rep(TRUE, length(colnames_timebin) - 1)),
-  colnames_color = rep(NA, length(colnames_timebin)),
-  color_values = rep("grey50", length(colnames_timebin)),
-  labs_title = rep("Count Over Time", length(colnames_timebin)),
+visualize_time_batch(data = NULL, timebins = c("timestamp", "yyyy", "mm",
+  "wd", "hh"), geoms = c("hist", "bar", "bar", "bar", "bar"),
+  add_alphas = c(FALSE, rep(TRUE, length(timebins) - 1)), colors = rep(NA,
+  length(timebins)), color_values = rep("grey50", length(timebins)),
+  labs_x = rep("", length(timebins)), labs_y = rep("", length(timebins)),
+  labs_title = rep("Count Over Time", length(timebins)),
   labs_subtitle = c("", "By Year", "By Month", "By Day of Week", "By Hour"),
-  labs_x = rep("", length(colnames_timebin)), labs_y = rep("",
-  length(colnames_timebin)), arrange = FALSE, show = FALSE)
+  arrange = FALSE, show = FALSE)
 }
 \arguments{
 \item{data}{data.frame (single).}
 
-\item{colnames_timebin}{character (vector).}
+\item{timebins}{character (vector).}
 
 \item{geoms}{character (vector).}
 
 \item{add_alphas}{logical (vector).}
 
-\item{colnames_color}{character (vector).}
+\item{colors}{character (vector).}
 
 \item{color_values}{character (vector).}
-
-\item{labs_title}{character (vector).}
-
-\item{labs_subtitle}{character (vector).}
 
 \item{labs_x}{character (vector).}
 
 \item{labs_y}{character (vector).}
+
+\item{labs_title}{character (vector).}
+
+\item{labs_subtitle}{character (vector).}
 
 \item{arrange}{logical. Whether or not to plot in an arranged format.}
 

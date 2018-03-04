@@ -11,13 +11,12 @@ visualize_sentratios_multi_by2_at(data = NULL, word = "word",
   multi_main = NULL, x_include = NULL, y_include = NULL,
   x_exclude = NULL, y_exclude = NULL, color = NULL,
   color_value = c("grey50", "grey80"), num_top = 3, flip_axes = FALSE,
-  lab_other = paste0("Other"),
+  lab_other = "other",
   lab_title = "Most Significant Words Contributing to Sentiment Differences",
-  lab_subtitle = ifelse(!is.null(sent_main),
-  paste0(stringr::str_to_title(sent_main), " Sentiments"), paste0("By ",
-  stringr::str_to_title(multi))), lab_x = NULL, lab_y = "Log Odds Ratio",
-  theme_base = theme_tetext_facet(), facet_scales = "free",
-  facet_ncol = 3, facet_nrow = NULL, facet_strip_position = "right")
+  lab_subtitle = NULL, lab_caption = NULL, lab_x = NULL,
+  lab_y = "Log Odds Ratio", theme_base = theme_tetext_facet(),
+  facet_scales = "free", facet_ncol = 3, facet_nrow = NULL,
+  facet_strip_position = "right")
 
 visualize_sentratios_multi_by2(data = NULL, word = "word", multi = NULL,
   xy_nms, xy_grid, cnt_min = 10, lexicon = "bing", ...,
@@ -25,13 +24,12 @@ visualize_sentratios_multi_by2(data = NULL, word = "word", multi = NULL,
   multi_main = NULL, x_include = NULL, y_include = NULL,
   x_exclude = NULL, y_exclude = NULL, color = NULL,
   color_value = c("grey50", "grey80"), num_top = 3, flip_axes = FALSE,
-  lab_other = paste0("Other"),
+  lab_other = "other",
   lab_title = "Most Significant Words Contributing to Sentiment Differences",
-  lab_subtitle = ifelse(!is.null(sent_main),
-  paste0(stringr::str_to_title(sent_main), " Sentiments"), paste0("By ",
-  stringr::str_to_title(multi))), lab_x = NULL, lab_y = "Log Odds Ratio",
-  theme_base = theme_tetext_facet(), facet_scales = "free",
-  facet_ncol = 3, facet_nrow = NULL, facet_strip_position = "right")
+  lab_subtitle = NULL, lab_caption = NULL, lab_x = NULL,
+  lab_y = "Log Odds Ratio", theme_base = theme_tetext_facet(),
+  facet_scales = "free", facet_ncol = 3, facet_nrow = NULL,
+  facet_strip_position = "right")
 }
 \arguments{
 \item{data}{data.frame. Data to apply a function over.}
@@ -86,16 +84,38 @@ if \code{filter_multi = TRUE} and \code{!is.null(multi_main) & length(multi_main
 
 \item{lab_other}{character. Name to give to 'opposing' factor of \code{multi_main}.}
 
-\item{lab_title}{character.}
+\item{lab_title}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
-Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+\item{lab_subtitle}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{lab_x}{character.}
+\item{lab_caption}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{lab_y}{character.}
+\item{lab_x}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.}
+\item{lab_y}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
+
+\item{theme_base}{\code{ggplot2} theme (e.g. as \code{ggplot2::theme_minimal()}.)
+A custom \code{tetext} thems is supplied as a default.}
 
 \item{facet_scales}{character. Direct parameters to analogous \code{ggplot2::facet_wrap()} parameters.}
 

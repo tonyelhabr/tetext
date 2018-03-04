@@ -49,6 +49,26 @@ This package containts functions that I often use.
 
 ## Notes
 
+### Inspiration
+
+This package is heavily influenced by the blogs of
+[David Robinson](http://varianceexplained.org/posts/) and 
+[Julia Silge](juliasilge.com/blog/), as well as their co-authored book
+[_Text Mining with R_](https://www.tidytextmining.com/).
+Most of the functions in this package implement snippets of code that they have
+shared.
+
+### Syntax
+
+This package follows the `dplyr` convention of suffixing standard evaluation (SE)
+function with `_at`. These functions expect characters (as inputs) to indicate
+column names. 
+
+There are non-suffixed versions of all major functions that serve as aliases to the `_at` SE functions. 
+In the future, if non-standard evaluation (NSE) is implemented,
+the non-suffixed versions will be altered to refer to the NSE versions.
+(This would comply with the `dplyr` convetion for NSE functions)
+
 Here is a list of all functions in the package.
 
 ```{r echo = FALSE}
@@ -83,29 +103,29 @@ Compute and visualize change in n-gram usage across documents.
 + __sents:__ `compute_sent_summary_at()`, `compute_sent_summary_multi_at()`
 Compute sentiment scores for n-grams.
 + __xy:__ `compute_freqs_multi_by2_at()`, `visualize_freqs_multi_by2_at()`, 
-`compute_logratios_multi_by2_at()`, `visualize_logratios_multi_by2_at()`:
+`compute_logratios_multi_by2_at()`, `visualize_logratios_multi_by2_at()`,
+`compute_sentratios_multi_by2_at()`, `visualize_sentratios_multi_by2_at()`,
 Compute metrics across multiple `multi` entities. Uses a handful of internal
 function that are not intended to be called directly (although they can be).
 These internal functions include  the following:
 `create_xy_grid()`, `filter_xy_grid()`, `preprocess_xy_data()`, `postprocess_xy_data()`, 
 `wrapper_func()`, `add_dummy_cols()`.
 Also, there are more specific internal functions, such as:
-`compute_freqs_multi_wide_at()`, `compute_logratios_multi_wide_at()`
+`compute_freqs_multi_wide_at()`, `compute_logratios_multi_wide_at()`, `compute_sentratios_multi_wide_at()`
 
-### To Add?
+### Notes To Self
+
+#### TODO
 
 Add `lab_caption` for visualization functions.
 
-#### Low Priority
-
-+ `create_sents_ratios_wide()`, `visualize_sents_ratios()`: See the functions with the same names in my `tetweets` project.
-
-#### Unlikely
-
-+ `model_lda()`, `visualize_lda_betas()`, `visualize_lda_gammas()`
-+ ~~`compute_sentdiff_poisson()`, `prepare_sents_diffs_poisson()`, `visualize_sents_diffs_poission()`~~
++ ~~__model:__~~ `model_lda()`, `visualize_lda_betas()`, `visualize_lda_gammas()`
++ ~~__poisson:__~~
+`compute_sentdiff_poisson()`, `prepare_sents_diffs_poisson()`, `visualize_sents_diffs_poission()`
 
 ## Examples
+
+For now, see the tests.
 
 ```{r echo = FALSE}
 # library("tetext")

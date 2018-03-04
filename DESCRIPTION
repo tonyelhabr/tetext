@@ -30,4 +30,7 @@ Imports:
     ggrepel,
     scales,
     gridExtra
-Suggests: testthat,covr
+Suggests: testthat,covr,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

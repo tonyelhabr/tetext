@@ -8,14 +8,14 @@
 visualize_corrs_network_at(..., resize_points = TRUE, size_point = "n",
   add_point_labels = TRUE, color_point = "grey50", shape_point = 21,
   seed = 42, lab_title = "Network of Pairwise Correlations",
-  lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = ggplot2::theme_void())
+  lab_subtitle = NULL, lab_caption = NULL, lab_x = NULL, lab_y = NULL,
+  theme_base = theme_tetext(void = TRUE))
 
 visualize_corrs_network(..., resize_points = TRUE, size_point = "n",
   add_point_labels = TRUE, color_point = "grey50", shape_point = 21,
   seed = 42, lab_title = "Network of Pairwise Correlations",
-  lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = ggplot2::theme_void())
+  lab_subtitle = NULL, lab_caption = NULL, lab_x = NULL, lab_y = NULL,
+  theme_base = theme_tetext(void = TRUE))
 }
 \arguments{
 \item{...}{dots. Parameters passed directly to \code{compute_corrs_at()}.}
@@ -33,16 +33,38 @@ correspond to count of words.}
 
 \item{seed}{numeric. Used to by \code{ggraph::ggraph}.}
 
-\item{lab_title}{character.}
+\item{lab_title}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
-Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+\item{lab_subtitle}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{lab_x}{character.}
+\item{lab_caption}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{lab_y}{character.}
+\item{lab_x}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.}
+\item{lab_y}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
+
+\item{theme_base}{\code{ggplot2} theme (e.g. as \code{ggplot2::theme_minimal()}.)
+A custom \code{tetext} thems is supplied as a default.}
 }
 \value{
 gg.

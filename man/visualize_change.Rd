@@ -7,13 +7,19 @@
 \usage{
 visualize_change_at(..., num_top = 5, color = NULL,
   color_value = rep("grey50", num_top), add_labels = FALSE,
-  lab_title = "Largest Changes in Word Frequency", lab_subtitle = NULL,
-  lab_x = NULL, lab_y = NULL, theme_base = theme_tetext())
+  lab_title = "Words with Most Statistically Significant Change in Frequency",
+  lab_subtitle = NULL,
+  lab_caption = paste0("Statistical Significance is determined by a logistical model\\n",
+  "estimating word appearance in a given time period."), lab_x = NULL,
+  lab_y = NULL, theme_base = theme_tetext())
 
 visualize_change(..., num_top = 5, color = NULL,
   color_value = rep("grey50", num_top), add_labels = FALSE,
-  lab_title = "Largest Changes in Word Frequency", lab_subtitle = NULL,
-  lab_x = NULL, lab_y = NULL, theme_base = theme_tetext())
+  lab_title = "Words with Most Statistically Significant Change in Frequency",
+  lab_subtitle = NULL,
+  lab_caption = paste0("Statistical Significance is determined by a logistical model\\n",
+  "estimating word appearance in a given time period."), lab_x = NULL,
+  lab_y = NULL, theme_base = theme_tetext())
 }
 \arguments{
 \item{...}{dots. Parameters passed to \code{compute_change_at()}.}
@@ -28,16 +34,38 @@ Should not be a function.}
 
 \item{add_labels}{logical. Whether or not to add labels to the lines.}
 
-\item{lab_title}{character.}
+\item{lab_title}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
-Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+\item{lab_subtitle}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{lab_x}{character.}
+\item{lab_caption}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{lab_y}{character.}
+\item{lab_x}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.}
+\item{lab_y}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
+
+\item{theme_base}{\code{ggplot2} theme (e.g. as \code{ggplot2::theme_minimal()}.)
+A custom \code{tetext} thems is supplied as a default.}
 }
 \value{
 gg.

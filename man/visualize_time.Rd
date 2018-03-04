@@ -9,14 +9,14 @@
 \usage{
 visualize_time_at(data = NULL, timebin = NULL, geom = c("bar", "hist"),
   add_alpha = FALSE, alpha_range = c(0.25, 1), color = NULL,
-  color_value = "grey50", lab_title = "Count Over Time",
-  lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
+  color_value = "grey50", lab_x = NULL, lab_y = NULL,
+  lab_title = "Count Over Time", lab_subtitle = NULL, lab_caption = NULL,
   theme_base = theme_tetext())
 
 visualize_time(data = NULL, timebin = NULL, geom = c("bar", "hist"),
   add_alpha = FALSE, alpha_range = c(0.25, 1), color = NULL,
-  color_value = "grey50", lab_title = "Count Over Time",
-  lab_subtitle = NULL, lab_x = NULL, lab_y = NULL,
+  color_value = "grey50", lab_x = NULL, lab_y = NULL,
+  lab_title = "Count Over Time", lab_subtitle = NULL, lab_caption = NULL,
   theme_base = theme_tetext())
 
 visualize_time_multi_at(data = NULL, ..., theme_base = theme_tetext_facet(),
@@ -46,16 +46,14 @@ Set to \code{NULL} by default although not actually required in order to simplif
 \item{color_value}{character (vector). Hex value(s) of color. May be a vector.
 Should not be a function.}
 
-\item{lab_title}{character.}
+\item{lab_title, lab_subtitle, lab_caption, lab_x, lab_y}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
-Set to \code{NULL} by default although not actually required in order to simplify internal code.}
-
-\item{lab_x}{character.}
-
-\item{lab_y}{character.}
-
-\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.}
+\item{theme_base}{\code{ggplot2} theme (e.g. as \code{ggplot2::theme_minimal()}.)
+A custom \code{tetext} thems is supplied as a default.}
 
 \item{...}{dots. Parameters to pass directly to \code{visualize_time_at()}.}
 

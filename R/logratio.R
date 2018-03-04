@@ -161,7 +161,8 @@ visualize_logratios_multi_by2_at <-
            flip_axes = FALSE,
            lab_other = "other",
            lab_title = "Most Unique Words",
-           lab_subtitle = paste0("By ", stringr::str_to_title(multi)),
+           lab_subtitle = NULL,
+           lab_caption = NULL,
            lab_x = NULL,
            lab_y = "Log Odds Ratio",
            theme_base = theme_tetext_facet(),
@@ -267,7 +268,8 @@ visualize_logratios_multi_by2_at <-
         x = lab_x,
         y = lab_y,
         title = lab_title,
-        subtitle = lab_subtitle
+        subtitle = lab_subtitle,
+        caption = lab_caption
       )
     viz_theme <-
       theme_base +

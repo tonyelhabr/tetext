@@ -11,10 +11,10 @@
 #' @param data data.frame (created using \code{rtweet} package).
 #' @param multi character. Name of column in \code{data} used for facetting.
 #' Does not need to be specified.
-#' Included in \code{colnames} if specified.
+#' Included in \code{cols} if specified.
 #' @param trim logical. Indicates whether or not to select only certain columns
 #' (and drop the others).
-#' @param colnames character (vector). Name(s) of column(s) in \code{data} to keep.
+#' @param cols character (vector). Name(s) of column(s) in \code{data} to keep.
 #' Only relevant if \code{trim = TRUE}.
 #' @param timezone character. Passed directly to \code{lubridate::with_tz()} as \code{tzone} parameter.
 #'
@@ -27,7 +27,7 @@ clean_tweets_at <-
   function(data = NULL,
            multi,
            trim = TRUE,
-           colnames =
+           cols =
              c(
                "status_id",
                "created_at",
@@ -55,11 +55,11 @@ clean_tweets_at <-
       if (!missing(multi)) {
         data <-
           data %>%
-          dplyr::select(dplyr::one_of(c(multi, colnames)))
+          dplyr::select(dplyr::one_of(c(multi, cols)))
       } else {
         data <-
           data %>%
-          dplyr::select(dplyr::one_of(c(colnames)))
+          dplyr::select(dplyr::one_of(c(cols)))
       }
     }
 

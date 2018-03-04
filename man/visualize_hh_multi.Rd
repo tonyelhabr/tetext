@@ -6,14 +6,14 @@
 \title{Visualize hourly data}
 \usage{
 visualize_hh_multi_at(data = NULL, timebin = NULL, multi = NULL,
-  color = multi, color_value = "grey50", lab_title = "Count Over Time",
-  lab_subtitle = "By Time of Day", lab_x = NULL, lab_y = NULL,
-  theme_base = theme_tetext())
+  color = multi, color_value = "grey50", lab_x = NULL, lab_y = NULL,
+  lab_title = "Count Over Time", lab_subtitle = "By Time of Day",
+  lab_caption = NULL, theme_base = theme_tetext())
 
 visualize_hh_multi(data = NULL, timebin = NULL, multi = NULL,
-  color = multi, color_value = "grey50", lab_title = "Count Over Time",
-  lab_subtitle = "By Time of Day", lab_x = NULL, lab_y = NULL,
-  theme_base = theme_tetext())
+  color = multi, color_value = "grey50", lab_x = NULL, lab_y = NULL,
+  lab_title = "Count Over Time", lab_subtitle = "By Time of Day",
+  lab_caption = NULL, theme_base = theme_tetext())
 }
 \arguments{
 \item{data}{data.frame.}
@@ -28,16 +28,38 @@ Set to \code{NULL} by default although not actually required in order to simplif
 \item{color_value}{character (vector). Hex value(s) of color. May be a vector.
 Should not be a function.}
 
-\item{lab_title}{character.}
+\item{lab_x}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{lab_subtitle}{character. Probably something like 'By Year', 'By Month', etc.
-Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+\item{lab_y}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{lab_x}{character.}
+\item{lab_title}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{lab_y}{character.}
+\item{lab_subtitle}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
 
-\item{theme_base}{\code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.}
+\item{lab_caption}{character. It is recommended NOT
+to use these parameters directly. (Instead, it is recommended that they are modified
+'after' the function is called.) Noneheless, they are provided as inputs and assigned
+reasonable defaults (e.g. 'Count Over Time')
+where appropriate. (Otherwise, they are given the value of NULL.)}
+
+\item{theme_base}{\code{ggplot2} theme (e.g. as \code{ggplot2::theme_minimal()}.)
+A custom \code{tetext} thems is supplied as a default.}
 }
 \description{
 Visualize time-based data aggregated over hours.

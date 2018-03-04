@@ -61,8 +61,11 @@ visualize_tfidf_at <-
            num_top = 10,
            color = multi,
            color_value = "grey50",
+           lab_x = NULL,
+           lab_y = NULL,
            lab_title = "Highest TF-IDF Words",
-           lab_subtitle = paste0("By ", stringr::str_to_title(multi)),
+           lab_subtitle = NULL,
+           lab_caption = NULL,
            theme_base = theme_tetext_facet()) {
     data_proc <-
       compute_tfidf_at(
@@ -105,10 +108,11 @@ visualize_tfidf_at <-
 
     viz_labs <-
       ggplot2::labs(
-        x = NULL,
-        y = NULL,
+        x = lab_x,
+        y = lab_y,
         title = lab_title,
-        subtitle = lab_subtitle
+        subtitle = lab_subtitle,
+        caption = lab_caption
       )
     viz_theme <-
       theme_base +

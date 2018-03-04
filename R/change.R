@@ -12,7 +12,10 @@
 #' @param timefloor character. Name of column passed directly to \code{unit} parameter of
 #' \code{lubridate::floor_date()} if \code{bin = FALSE}.
 #' @param top_pct numeric. Number between 0 and 1. Useful primarily to limit the number of models
-#' that need to be computed.
+#' that need to be computed and to reduce 'nose' regarding what is deemed significant.
+#' @param only_signif logical. Whether or not to return rows with a significant p-value.
+#' @param signif_cutoff numeric. Number between 0 and 1. Value to use as 'maximum' threshhld for significance.
+#' Only used if \code{only_signif = TRUE}.
 #' @param return_models logical. Whether to return just the models. This is probably the preferred
 #' option when calling \code{compute_change_at()} directly.
 #' @param return_data logical. Whether to 'bytime' data which is used as
@@ -29,7 +32,9 @@ compute_change_at <-
            timebin = NULL,
            bin = TRUE,
            timefloor = NULL,
-           top_pct = 0.05,
+           top_pct = 0.25,
+           only_signif = FALSE,
+           signif_cutoff = 0.1,
            return_models = TRUE,
            return_data = FALSE,
            return_both = FALSE) {
@@ -70,10 +75,12 @@ compute_change_at <-
       dplyr::group_by(!!word_quo) %>%
       dplyr::mutate(word_total = sum(n)) %>%
       dplyr::ungroup() %>%
-      filter_num_top_at("word_total", top_pct) %>%
+      filter_num_top_at("word_total", top_pct, 1, 0) %>%
       # dplyr::filter(word_total >= stats::quantile(word_total, top_pct)) %>%
       dplyr::arrange(dplyr::desc(word_total))
 
+    # NOTE: This supplies a formula to `stats::sglm()` in an atypical fashion:
+    # "... as a two-column matrix with the columns giving the numbers of successes and failures".
     data_bytime_models <-
       data_bytime %>%
       tidyr::nest(-!!word_quo) %>%
@@ -88,6 +95,13 @@ compute_change_at <-
       dplyr::filter(term == "time_floor") %>%
       dplyr::mutate(adjusted_p_value = stats::p.adjust(p.value)) %>%
       dplyr::arrange(adjusted_p_value)
+
+    if(only_signif) {
+      signif_cutoff <- validate_range(x = signif_cutoff, max = 1, min = 0)
+      data_bytime_models <-
+        data_bytime_models %>%
+        dplyr::filter(adjusted_p_value <= signif_cutoff)
+    }
 
     if(return_both | (return_data & return_models)) {
       out <- list(data = data_bytime, models = data_bytime_models)
@@ -121,8 +135,10 @@ visualize_change_at <-
            color = NULL,
            color_value = rep("grey50", num_top),
            add_labels = FALSE,
-           lab_title = "Largest Changes in Word Frequency",
+           lab_title = "Words with Most Statistically Significant Change in Frequency",
            lab_subtitle = NULL,
+           lab_caption = paste0("Statistical Significance is determined by a logistical model\n",
+                                "estimating word appearance in a given time period."),
            lab_x = NULL,
            lab_y = NULL,
            theme_base = theme_tetext()) {
@@ -152,11 +168,15 @@ visualize_change_at <-
 
     time_total <- time_floor <- word <- pct <- label <- n <- NULL
 
-    viz <-
+    # Create label column even if `add_labels = FALSE`.
+    data_proc <-
       data %>%
       dplyr::inner_join(data_models_top, by = c("word")) %>%
       dplyr::mutate(pct = n / time_total) %>%
-      dplyr::mutate(label = dplyr::if_else(time_floor == max(time_floor), word, NA_character_)) %>%
+      dplyr::mutate(label = dplyr::if_else(time_floor == max(time_floor), word, NA_character_))
+
+    viz <-
+      data_proc %>%
       ggplot2::ggplot(ggplot2::aes(x = time_floor, y = pct, color = word)) +
       ggplot2::scale_color_manual(values = color_value) +
       ggplot2::geom_line(size = 1.5) +
@@ -174,7 +194,8 @@ visualize_change_at <-
         x = lab_x,
         y = lab_y,
         title = lab_title,
-        subtitle = lab_subtitle
+        subtitle = lab_subtitle,
+        caption = lab_caption
       )
     viz_theme <-
       theme_base +

@@ -6,12 +6,14 @@
 \title{Compute change}
 \usage{
 compute_change_at(data = NULL, word = "word", timebin = NULL,
-  bin = TRUE, timefloor = NULL, top_pct = 0.05, return_models = TRUE,
-  return_data = FALSE, return_both = FALSE)
+  bin = TRUE, timefloor = NULL, top_pct = 0.25, only_signif = FALSE,
+  signif_cutoff = 0.1, return_models = TRUE, return_data = FALSE,
+  return_both = FALSE)
 
 compute_change(data = NULL, word = "word", timebin = NULL, bin = TRUE,
-  timefloor = NULL, top_pct = 0.05, return_models = TRUE,
-  return_data = FALSE, return_both = FALSE)
+  timefloor = NULL, top_pct = 0.25, only_signif = FALSE,
+  signif_cutoff = 0.1, return_models = TRUE, return_data = FALSE,
+  return_both = FALSE)
 }
 \arguments{
 \item{data}{data.frame.}
@@ -27,7 +29,12 @@ to use to compute change.}
 \code{lubridate::floor_date()} if \code{bin = FALSE}.}
 
 \item{top_pct}{numeric. Number between 0 and 1. Useful primarily to limit the number of models
-that need to be computed.}
+that need to be computed and to reduce 'nose' regarding what is deemed significant.}
+
+\item{only_signif}{logical. Whether or not to return rows with a significant p-value.}
+
+\item{signif_cutoff}{numeric. Number between 0 and 1. Value to use as 'maximum' threshhld for significance.
+Only used if \code{only_signif = TRUE}.}
 
 \item{return_models}{logical. Whether to return just the models. This is probably the preferred
 option when calling \code{compute_change_at()} directly.}

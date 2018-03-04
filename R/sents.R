@@ -263,11 +263,10 @@ visualize_sentratios_multi_by2_at <-
            color_value = c("grey50", "grey80"),
            num_top = 3,
            flip_axes = FALSE,
-           lab_other = paste0("Other"),
+           lab_other = "other",
            lab_title = "Most Significant Words Contributing to Sentiment Differences",
-           lab_subtitle = ifelse(!is.null(sent_main),
-                                 paste0(stringr::str_to_title(sent_main), " Sentiments"),
-                                         paste0("By ", stringr::str_to_title(multi))),
+           lab_subtitle = NULL,
+           lab_caption = NULL,
            lab_x = NULL,
            lab_y = "Log Odds Ratio",
            theme_base = theme_tetext_facet(),
@@ -403,7 +402,8 @@ visualize_sentratios_multi_by2_at <-
         x = lab_x,
         y = lab_y,
         title = lab_title,
-        subtitle = lab_subtitle
+        subtitle = lab_subtitle,
+        caption = lab_caption
       )
 
     viz_theme <-

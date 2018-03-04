@@ -15,13 +15,13 @@
 #' Set to \code{NULL} by default although not actually required in order to simplify internal code.
 #' @param color_value character (vector). Hex value(s) of color. May be a vector.
 #' Should not be a function.
-#' @param lab_title character.
-#' @param lab_subtitle character. Probably something like 'By Year', 'By Month', etc.
-#' Set to \code{NULL} by default although not actually required in order to simplify internal code.
-#' @param lab_x character.
-#' @param lab_y character.
-#' @param theme_base \code{ggplot2} theme, such as \code{ggplot2::theme_minimal()}.
-#'
+#' @param lab_title,lab_subtitle,lab_caption,lab_x,lab_y character. It is recommended NOT
+#' to use these parameters directly. (Instead, it is recommended that they are modified
+#' 'after' the function is called.) Noneheless, they are provided as inputs and assigned
+#' reasonable defaults (e.g. 'Count Over Time')
+#' where appropriate. (Otherwise, they are given the value of NULL.)
+#' @param theme_base \code{ggplot2} theme (e.g. as \code{ggplot2::theme_minimal()}.)
+#' A custom \code{tetext} thems is supplied as a default.
 #' @return gg
 #' @rdname visualize_time
 #' @export
@@ -34,10 +34,11 @@ visualize_time_at <-
            alpha_range = c(0.25, 1),
            color = NULL,
            color_value = "grey50",
-           lab_title = "Count Over Time",
-           lab_subtitle = NULL,
            lab_x = NULL,
            lab_y = NULL,
+           lab_title = "Count Over Time",
+           lab_subtitle = NULL,
+           lab_caption = NULL,
            theme_base = theme_tetext()) {
     if (is.null(data))
       stop("`data` must not be NULL.", call. = FALSE)
@@ -45,6 +46,10 @@ visualize_time_at <-
       stop("`timebin` must not be NULL.", call. = FALSE)
 
     geom <- match.arg(geom)
+
+    if((class(data$timebin) %in% c("Date", "POSIXct")) & (geom != "hist")) {
+      message("It is recommended to set `geom = hist` for Date-time objects.")
+    }
 
     if (is_nothing(color)) {
       data <- data %>% dplyr::mutate(`.dummy` = "dummy")
@@ -103,7 +108,8 @@ visualize_time_at <-
         x = lab_x,
         y = lab_y,
         title = lab_title,
-        subtitle = lab_subtitle
+        subtitle = lab_subtitle,
+        caption = lab_caption
       )
     viz_theme <-
       theme_base +
@@ -167,10 +173,10 @@ visualize_time_multi <- visualize_time_multi_at
 #' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
 #' @param data data.frame (single).
-#' @param colnames_timebin character (vector).
+#' @param timebins character (vector).
 #' @param geoms character (vector).
 #' @param add_alphas logical (vector).
-#' @param colnames_color character (vector).
+#' @param colors character (vector).
 #' @param color_values character (vector).
 #' @param labs_title character (vector).
 #' @param labs_subtitle character (vector).
@@ -183,43 +189,44 @@ visualize_time_multi <- visualize_time_multi_at
 #' @export
 visualize_time_batch_at <-
   function(data = NULL,
-           colnames_timebin = c("timestamp", "yyyy", "mm", "wd", "hh"),
+           timebins = c("timestamp", "yyyy", "mm", "wd", "hh"),
            geoms = c("hist", "bar", "bar", "bar", "bar"),
-           add_alphas = c(FALSE, rep(TRUE, length(colnames_timebin) - 1)),
-           # alpha_ranges = rep(c(0.25, 1), length(colnames_timebin)),
-           colnames_color = rep(NA, length(colnames_timebin)),
-           color_values = rep("grey50", length(colnames_timebin)),
-           labs_title = rep("Count Over Time", length(colnames_timebin)),
+           add_alphas = c(FALSE, rep(TRUE, length(timebins) - 1)),
+           # alpha_ranges = rep(c(0.25, 1), length(timebins)),
+           colors = rep(NA, length(timebins)),
+           color_values = rep("grey50", length(timebins)),
+           labs_x = rep("", length(timebins)),
+           labs_y = rep("", length(timebins)),
+           labs_title = rep("Count Over Time", length(timebins)),
            labs_subtitle = c("", "By Year", "By Month", "By Day of Week", "By Hour"),
-           labs_x = rep("", length(colnames_timebin)),
-           labs_y = rep("", length(colnames_timebin)),
-           # themes_base = rep(theme_tetext(), length(colnames_timebin)),
+           # lab_caption = rep("", length(timebins)),
+           # themes_base = rep(theme_tetext(), length(timebins)),
            arrange = FALSE,
            show = FALSE) {
     if (is.null(data))
       stop("`data` must not be NULL.", call. = FALSE)
 
-    num_colnames_timebin <- length(colnames_timebin)
+    num_timebins <- length(timebins)
     if (!(
-      num_colnames_timebin == length(geoms) &
-      num_colnames_timebin == length(labs_subtitle) &
-      num_colnames_timebin == length(color_values)
+      num_timebins == length(geoms) &
+      num_timebins == length(labs_subtitle) &
+      num_timebins == length(color_values)
     )) {
       stop("List elements must have same length.", call. = FALSE)
     }
 
     data_proc <- data %>% tidyr::nest()
     # This is temisc::repeat_df().
-    num_rep <- length(colnames_timebin)
+    num_rep <- length(timebins)
     data_rep <- data_proc[rep(seq_len(nrow(data_proc)), num_rep),]
     viz_time_params <-
       list(
         data = data_rep$data,
-        timebin = colnames_timebin,
+        timebin = timebins,
         geom = geoms,
         add_alpha = add_alphas,
         # alpha_range = alpha_ranges,
-        color = colnames_color,
+        color = colors,
         color_value = color_values,
         lab_title = labs_title,
         lab_subtitle = labs_subtitle,
@@ -228,10 +235,10 @@ visualize_time_batch_at <-
         # theme_base = themes_base
       )
 
-    if (!missing(colnames_color)) {
-      if (length(colnames_color != num_colnames_timebin))
+    if (!missing(colors)) {
+      if (length(colors != num_timebins))
         stop("List elements must have same length.", call. = FALSE)
-      viz_time_params$color <- colnames_color
+      viz_time_params$color <- colors
     }
 
     viz_time_list <- purrr::pmap(viz_time_params, visualize_time_at)
@@ -281,15 +288,15 @@ visualize_time_batch <- visualize_time_batch_at
 #' @export
 visualize_hh_multi_at <-
   function(data = NULL,
-           # timebin = intersect(names(data), c("hh", "hour")),
            timebin = NULL,
            multi = NULL,
            color = multi,
            color_value = "grey50",
-           lab_title = "Count Over Time",
-           lab_subtitle = "By Time of Day",
            lab_x = NULL,
            lab_y = NULL,
+           lab_title = "Count Over Time",
+           lab_subtitle = "By Time of Day",
+           lab_caption = NULL,
            theme_base = theme_tetext()) {
     if (is.null(data))
       stop("`data` must not be NULL.", call. = FALSE)
@@ -325,7 +332,8 @@ visualize_hh_multi_at <-
         x = lab_x,
         y = lab_y,
         title = lab_title,
-        subtitle = lab_subtitle
+        subtitle = lab_subtitle,
+        caption = lab_caption
       )
     viz_theme <-
       theme_base +

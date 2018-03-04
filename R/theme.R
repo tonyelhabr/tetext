@@ -1,10 +1,11 @@
 
 #'  Custom theme
 #'
-#' @description A custom \code{ggplot2} theme.
-#' @details Copy-paste of theme from \code{teplot} package.
+#' @description A custom \code{ggplot2} theme (that is similar to \code{ggplot2::theme_minimal()}.
+#' @details This theme is 'copy-pasted' of theme from \code{teplot} package.
 #' @param base_family character.
 #' @param base_size,plot_title_size,subtitle_size numeric.
+#' @param void logical. Whether or not to modifly theme to mimic \code{ggplot2::theme_void()}/
 #' @param ... dots. Additional parameters passed to \code{ggplot2::theme()}.
 #' @export
 #' @seealso \url{https://github.com/hrbrmstr/hrbrthemes/blob/master/R/theme-ipsum.r}
@@ -12,6 +13,7 @@ theme_tetext <- function (base_family = "",
                           base_size = 11,
                           plot_title_size = 16,
                           subtitle_size = 12,
+                          void = FALSE,
                           ...) {
   out <-
     ggplot2::theme_minimal(base_family = base_family, base_size = base_size)
@@ -40,6 +42,22 @@ theme_tetext <- function (base_family = "",
       plot.caption = ggplot2::element_text(face = "italic"),
       ...
     )
+
+  # out <-
+  #   out +
+  #   ggplot2::theme(legend.position = "none")
+
+  if(void) {
+    out <-
+      out +
+      ggplot2::theme(
+        line = ggplot2::element_blank(),
+        rect = ggplot2::element_blank(),
+        axis.text = ggplot2::element_blank(),
+        axis.ticks = ggplot2::element_blank()
+      ) +
+      ggplot2::theme(legend.position = "none")
+  }
   out
 }
 

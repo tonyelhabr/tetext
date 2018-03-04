@@ -119,9 +119,10 @@ visualize_corrs_network_at <-
            seed = 42,
            lab_title = "Network of Pairwise Correlations",
            lab_subtitle = NULL,
+           lab_caption = NULL,
            lab_x = NULL,
            lab_y = NULL,
-           theme_base = ggplot2::theme_void()) {
+           theme_base = theme_tetext(void = TRUE)) {
 
     require_ns("ggraph")
 
@@ -137,7 +138,7 @@ visualize_corrs_network_at <-
       )
 
     set.seed(seed)
-    # browser()
+
     viz <-
       ggraph::ggraph(data_viz, layout = "fr") +
       ggraph::geom_edge_link(edge_width = 1)
@@ -169,13 +170,11 @@ visualize_corrs_network_at <-
         x = lab_x,
         y = lab_y,
         title = lab_title,
-        subtitle = lab_subtitle
+        subtitle = lab_subtitle,
+        caption = lab_caption
       )
     viz_theme <-
-      theme_base +
-      ggplot2::theme(
-        legend.position = "none"
-      )
+      theme_base
 
     viz <-
       viz +
