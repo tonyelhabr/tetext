@@ -50,9 +50,9 @@ get_sents <- function(lexicon = c("bing", "afinn", "nrc", "loughran"),
 }
 
 
-#' @rdname compute_sent_summary
+#' @rdname comput_sent_summ
 #' @export
-compute_sent_summary_facet_at <-
+comput_sent_summ_facet_at <-
   function(data = NULL,
            token = NULL,
            feature = NULL,
@@ -91,9 +91,9 @@ compute_sent_summary_facet_at <-
       dplyr::ungroup()
   }
 
-#' @rdname compute_sent_summary
+#' @rdname comput_sent_summ
 #' @export
-compute_sent_summary_facet <-
+comput_sent_summ_facet <-
   function(..., token, feature, facet) {
     stopifnot(!missing(token))
     stopifnot(!missing(feature))
@@ -101,7 +101,7 @@ compute_sent_summary_facet <-
     token <- rlang::quo_text(rlang::enquo(token))
     feature <- rlang::quo_text(rlang::enquo(feature))
     facet <- rlang::quo_text(rlang::enquo(facet))
-    compute_sent_summary_facet_at(..., token = token, feature = feature, facet = facet)
+    comput_sent_summ_facet_at(..., token = token, feature = feature, facet = facet)
   }
 
 #' Compute sentiment scores.
@@ -119,10 +119,10 @@ compute_sent_summary_facet <-
 #' or, in the case of Twitter data, 'status_id'.
 #' @param ... dots. Parameters to pass to \code{get_sents()} internally.
 #' @return data.frame.
-#' @rdname compute_sent_summary
+#' @rdname comput_sent_summ
 #' @export
 #' @seealso Don't have an explicit url.
-compute_sent_summary_at <-
+comput_sent_summ_at <-
   function(data = NULL,
            # token = NULL,
            # feature = NULL,
@@ -132,7 +132,6 @@ compute_sent_summary_at <-
     # stopifnot(!is.null(token), is.character(token))
     # stopifnot(!is.null(feature), is.character(feature))
 
-    browser()
     if (is.null(facet)) {
       add_dummy <- TRUE
       data <- data %>% dplyr::mutate(`.facet` = "dummy")
@@ -142,7 +141,7 @@ compute_sent_summary_at <-
     }
 
     out <-
-      compute_sent_summary_facet_at(
+      comput_sent_summ_facet_at(
         data = data,
         facet = facet,
         ...
@@ -153,9 +152,9 @@ compute_sent_summary_at <-
     out
   }
 
-#' @rdname compute_sent_summary
+#' @rdname comput_sent_summ
 #' @export
-compute_sent_summary <-
+comput_sent_summ <-
   function(..., token, feature, facet) {
     stopifnot(!missing(token))
     stopifnot(!missing(feature))
@@ -166,7 +165,7 @@ compute_sent_summary <-
     } else {
       facet <- rlang::quo_text(rlang::enquo(facet))
     }
-    compute_sent_summary_at(..., token = token, feature = feature, facet = facet)
+    comput_sent_summ_at(..., token = token, feature = feature, facet = facet)
   }
 
 #' Compute token sentiment log ratios in pairs
@@ -201,7 +200,6 @@ compute_sentratios_facet_by2_at <-
     stopifnot(!is.null(token), is.character(token))
     stopifnot(!is.null(facet), is.character(facet))
 
-
     if(missing(xy_grid) | missing(xy_nms)) {
       facets <-
         data %>%
@@ -229,16 +227,15 @@ compute_sentratios_facet_by2_at <-
 
     name_xy <- sentiment <- logratio <- NULL
 
-    out <-
-      data_proc %>%
+    data_proc %>%
       dplyr::rename(word = !!token_quo) %>%
       dplyr::inner_join(sents, by = "word") %>%
-      dplyr::group_by(name_xy, token, sentiment) %>%
+      dplyr::group_by(name_xy, word, sentiment) %>%
       dplyr::mutate(logratio = mean(logratio)) %>%
       dplyr::ungroup() %>%
+      dplyr::rename(!!token_quo := word) %>%
       dplyr::arrange(name_xy, sentiment, dplyr::desc(abs(logratio)))
 
-    out
   }
 
 #' @rdname compute_sentratios_facet_by2
@@ -250,9 +247,11 @@ compute_sentratios_facet_by2 <-
     token <- rlang::quo_text(rlang::enquo(token))
     facet <- rlang::quo_text(rlang::enquo(facet))
 
-    compute_sentratios_facet_by2(...,
-                                 token = token,
-                                 facet = facet)
+    compute_sentratios_facet_by2_at(
+      ...,
+      token = token,
+      facet = facet
+    )
   }
 
 #' Visualize token sentiment log ratios in pairs
@@ -281,29 +280,28 @@ visualize_sentratios_facet_by2_at <-
            cnt_min = 10,
            lexicon = "bing",
            ...,
-           filter_sent = TRUE,
-           sent_main = NULL,
            filter_facet = TRUE,
            facet_main = NULL,
-           x_include = NULL,
-           y_include = NULL,
-           x_exclude = NULL,
-           y_exclude = NULL,
+           filter_facet_base = filter_facet_tetext(facet_main),
+           filter_facet_params = list(),
+           filter_sent = TRUE,
+           sent_main = NULL,
            color = NULL,
-           color_value = c("grey50", "grey80"),
-           num_top = 3,
-           flip_axes = FALSE,
            lab_other = "other",
-           title = "Most Significant Words Contributing to Sentiment Differences",
-           subtitle = NULL,
-           caption = NULL,
-           lab_x = NULL,
-           lab_y = "Log Odds Ratio",
+           num_top = 5,
+           scale_manual_params = scale_manual_tetext(values = c("grey50", "grey80")),
+           labs_base = labs_tetext(),
+           labs_params = list(title = "Most Significant Words Contributing to Sentiment Differences",
+                              y = "Log Odds Ratio"),
            theme_base = theme_tetext_facet(),
-           scales = "free",
-           ncol = 3,
-           nrow = NULL,
-           strip.position = "right") {
+           theme_params =
+             list(axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
+                  panel.grid.major.y = ggplot2::element_blank()),
+           facet_base =
+             facet_tetext(ifelse(is.null(sent_main),
+                                   "sentiment ~ name_xy",
+                                   "name_xy")),
+           facet_params = list()) {
 
     if(missing(xy_grid) | missing(xy_nms)) {
       facets <-
@@ -336,17 +334,17 @@ visualize_sentratios_facet_by2_at <-
         x_main = facet_main
       )
 
+    if(!("name_xy" %in% facet)) {
+      message("Correcting facetting variable.")
+    }
     data_proc <-
       data_proc %>%
       filter_data_facet_at(
         filter_facet = filter_facet,
-        facet_main = facet_main,
-        x_include = x_include,
-        y_include = y_include,
-        x_exclude = x_exclude,
-        y_exclude = y_exclude
+        params = combine_base_and_params(filter_facet_base, filter_facet_params)
       )
 
+    # NOTE: This sentiment processing is not in the logratio function.
     data_proc <-
       data_proc %>%
       validate_x_main(
@@ -369,7 +367,7 @@ visualize_sentratios_facet_by2_at <-
     logratio_dir <- logratio <- name_xy <- name_x <- name_y <- sentiment <- NULL
 
     # NOTE: Unlike the logratio function, must also group by sentiment.
-    # NOTE: Not sure if should arrange with abs().
+    # NOTE: Not sure if should use arrange with abs().
     data_proc <-
       data_proc %>%
       dplyr::mutate(logratio_dir = dplyr::if_else(logratio < 0, TRUE, FALSE)) %>%
@@ -383,12 +381,11 @@ visualize_sentratios_facet_by2_at <-
       data_proc %>%
       dplyr::mutate(name_xy = paste0(name_x, " vs. ", name_y))
 
-    data_proc <- wrangle_facet_col(data_proc, "name_xy")
-
     if (is.null(color)) {
       data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
       color <- ".dummy"
     }
+    # NOTE: Don't need this.
     # data_proc <- wrangle_color_col(data_proc, color)
 
     token_quo <- rlang::sym(token)
@@ -409,69 +406,35 @@ visualize_sentratios_facet_by2_at <-
       # ggplot2::geom_bar(stat = "identity") +
       ggplot2::geom_col() +
       scale_x_reordered() +
-      ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) +
-      ggplot2::scale_fill_manual(values = color_value)
+      do_call_scale_manual(scale_manual_params, type = "fill") +
+      ggplot2::geom_hline(ggplot2::aes(yintercept = 0))
 
-    if(filter_sent) {
-      facet_fmla <- stats::as.formula(paste0(" ~ name_xy"))
-    } else {
-      facet_fmla <- stats::as.formula(paste0("sentiment ~ name_xy"))
-    }
     viz <-
-      viz +
-      ggplot2::facet_wrap(
-        facet_fmla,
-        scales = scales,
-        ncol = ncol,
-        nrow = nrow,
-        strip.position = strip.position
-      )
-
-    viz_labs <-
-      ggplot2::labs(
-        x = lab_x,
-        y = lab_y,
-        title = title,
-        subtitle = subtitle,
-        caption = caption
-      )
-
-    viz_theme <-
-      theme_base +
-      ggplot2::theme(
-        legend.position = "bottom",
-        legend.title = ggplot2::element_blank()
-      )
-
-    if(flip_axes) {
-      viz_theme <-
-        viz_theme +
-        ggplot2::theme(
-          axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
-          panel.grid.major.y = ggplot2::element_blank()
-        )
-    } else {
-      viz_theme <-
-        viz_theme +
-        ggplot2::theme(
-          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
-          panel.grid.major.x = ggplot2::element_blank()
-        )
-    }
+      viz  +
+      generate_facets(facet_base, facet_params)
 
     viz <-
       viz +
-      viz_labs +
-      viz_theme
+      labs_base + do_call_labs(labs_params) +
+      theme_base + do_call_theme(theme_params)
 
-    if(flip_axes) {
-      viz <-
-        viz +
-        ggplot2::coord_flip()
-    }
-    viz
+    viz <-
+      viz +
+      ggplot2::coord_flip()
   }
 
 #' @rdname visualize_sentratios_facet_by2
 #' @export
-visualize_sentratios_facet_by2 <- visualize_sentratios_facet_by2_at
+visualize_sentratios_facet_by2 <-
+  function(..., token, color, facet) {
+    stopifnot(!missing(token))
+    stopifnot(!missing(facet))
+    token <- rlang::quo_text(rlang::enquo(token))
+    facet <- rlang::quo_text(rlang::enquo(facet))
+    if (missing(color)) {
+      color <- NULL
+    } else {
+      color <- rlang::quo_text(rlang::enquo(color))
+    }
+    visualize_sentratios_facet_by2_at(..., token = token, color = color, facet = facet)
+  }

@@ -16,15 +16,27 @@ path_data_facet <-
   system.file(dir, filename_data_facet, package = "tetext", mustWork = TRUE)
 
 data <- readRDS(file = path_data_facet)
-colors_tms <- c("blue", "red", "cadetblue", "purple", "black")
 
-tms <- c("DAL", "HOU", "MEM", "NOP", "SAS")
+idx_main <- 5
+# colors <- c("blue", "red", "cadetblue", "purple", "black")
+colors <-
+  c(
+    "#061922",
+    "#ce1141",
+    "#7399c6",
+    "#002b5c",
+    "#061922"
+  )
+color_main <- colors[idx_main]
+
+names <- c("DAL", "HOU", "MEM", "NOP", "SAS")
+name_main <- names[idx_main]
 
 message("Tests are in order of likely usage in script.")
 
 data_facet <-
   data %>%
-  filter(name %in% tms) %>%
+  filter(name %in% names) %>%
   clean_tweets(facet = name)
 
 data_facet_timefilter <-
@@ -46,7 +58,7 @@ testthat::test_that(
   "trim",
   {
     actual <- data_facet %>% distinct(name) %>% arrange(name) %>% pull(name)
-    expected <- tms
+    expected <- names
     testthat::expect_equal(actual, expected)
 
     testthat::expect_true(is.list(data_facet_timefilter))
@@ -83,11 +95,11 @@ testthat::test_that(
   {
     viz_time_all <-
       data_facet_trim %>%
-      filter(name %in% "SAS") %>%
+      filter(name %in% name_main) %>%
       visualize_time(
         timebin = timestamp,
         color = name,
-        scale_manual_params = list(values = colors_tms[5])
+        scale_manual_params = list(values = color_main)
       )
     viz_time_all
 
@@ -97,7 +109,7 @@ testthat::test_that(
         timebin = timestamp,
         color = name,
         facet = name,
-        scale_manual_params = list(values = colors_tms),
+        scale_manual_params = list(values = colors),
         facet_params = list(
           strip.position = "right",
           ncol = 1
@@ -113,7 +125,7 @@ testthat::test_that(
         timebin = hh4,
         color = name,
         facet = name,
-        scale_manual_params = list(values = colors_tms)
+        scale_manual_params = list(values = colors)
       )
     viz_time_facet_hh
     testthat::expect_true(ggplot2::is.ggplot(viz_time_facet_hh))
@@ -125,7 +137,7 @@ testthat::test_that(
         timebin = hh,
         color = name,
         facet = name,
-        scale_manual_params = list(values = colors_tms)
+        scale_manual_params = list(values = colors)
       )
     viz_time_hh
     testthat::expect_true(ggplot2::is.ggplot(viz_time_hh))
@@ -191,8 +203,8 @@ testthat::test_that(
         facet = name,
         color = name,
         num_top = 10,
-        scale_manual_params = list(values = colors_tms),
-        labs_params = list(title = lab_title, subtitle = lab_subtitle
+        scale_manual_params = list(values = colors),
+        labs_params = list(title = lab_title, subtitle = lab_subtitle)
       )
     viz_cnts_facet
     testthat::expect_true(ggplot2::is.ggplot(viz_cnts_facet))
@@ -202,15 +214,15 @@ testthat::test_that(
       visualize_cnts_wordcloud_facet(
         token = word,
         facet = name,
-        value_facet = "SAS",
-        wordcloud_params = list(colors = colors_tms[5])
+        value_facet = name_main,
+        wordcloud_params = list(colors = color_main)
       )
     # viz_cnts_wordcloud_facet
 
     par(mfrow = c(2, 3))
     purrr::map2(
-      tms,
-      colors_tms,
+      names,
+      colors,
       ~visualize_cnts_wordcloud_facet(
         data = unigrams,
         token = word,
@@ -235,7 +247,7 @@ testthat::test_that(
         facet = name,
         color = name,
         num_top = 2,
-        scale_manual_params = list(values = colors_tms),
+        scale_manual_params = list(values = colors),
         labs_params = list(title = lab_title, subtitle = lab_subtitle)
       )
     viz_bigram_freqs_facet
@@ -246,11 +258,10 @@ testthat::test_that(
 testthat::test_that(
   "sents",
   {
-
     unigrams_sent_summ <-
       unigrams %>%
-      filter(name %in% c("SAS")) %>%
-      compute_sent_summary(
+      filter(name %in% c(name_main)) %>%
+      comput_sent_summ(
         token = word,
         feature = status_id
       )
@@ -262,7 +273,7 @@ testthat::test_that(
 
     unigrams_sent_summ_facet <-
       unigrams %>%
-      compute_sent_summary_facet(
+      comput_sent_summ_facet(
         token = word,
         feature = status_id,
         facet = name
@@ -272,10 +283,15 @@ testthat::test_that(
     actual <- nrow(unigrams_sent_summ_facet)
     expect <- 10
     testthat::expect_equal(actual, expect)
+  }
+)
 
+testthat::test_that(
+  "sents_by2",
+  {
     unigrams_sentratios <-
       unigrams %>%
-      compute_sentratios_facet_by2_at(
+      compute_sentratios_facet_by2(
         token = word,
         facet = name
       )
@@ -293,23 +309,23 @@ testthat::test_that(
 )
 
 testthat::test_that(
-  "xy",
+  "_by2",
   {
-    # xy_grid <- create_xy_grid(tms)
+    # xy_grid <- create_xy_grid(names)
     # xy_nms <- xy_grid %>% dplyr::pull(xy)
 
     unigrams_freqs_facet <-
       unigrams %>%
-      compute_freqs_facet_at(
-        token = NULL,
-        facet = "name"
+      compute_freqs_facet(
+        token = word,
+        facet = name
       )
 
     unigrams_freqs_facet_by2 <-
       unigrams %>%
-      compute_freqs_facet_by2_at(
-        token = NULL,
-        facet = "name"
+      compute_freqs_facet_by2(
+        token = word,
+        facet = name
       )
     unigrams_freqs_facet_by2
 
@@ -318,52 +334,54 @@ testthat::test_that(
 
     viz_freqs_facet_by2 <-
       unigrams %>%
-      visualize_freqs_facet_by2_at(
-        token = NULL,
-        facet = "name",
+      visualize_freqs_facet_by2(
+        token = word,
+        facet = name,
         filter_facet = TRUE,
-        # x_include = "SAS"
-        facet_main = "SAS"
+        facet_main = name_main
       )
     viz_freqs_facet_by2
     testthat::expect_true(ggplot2::is.ggplot(viz_freqs_facet_by2))
 
     unigrams_logratios_facet_by2 <-
       unigrams %>%
-      compute_logratios_facet_by2_at(
-        token = NULL,
-        facet = "name",
+      compute_logratios_facet_by2(
+        token = word,
+        facet = name,
         cnt_min = 50
       )
     unigrams_logratios_facet_by2
 
+    actual <- nrow(unigrams_logratios_facet_by2)
+    expect <- 882
+    testthat::expect_equal(actual, expect)
+
+    # Testing.... ----
     viz_logratios_facet_by2 <-
       unigrams %>%
-      visualize_logratios_facet_by2_at(
-        token = NULL,
-        facet = "name",
+      visualize_logratios_facet_by2(
+        token = word,
+        facet = name,
         filter_facet = TRUE,
-        facet_main = "SAS",
-        num_top = 3,
-        color_value = c(colors_tms[5], "grey50")
+        facet_main = name_main,
+        num_top = 3
       )
     viz_logratios_facet_by2
-    testthat::expect_true(ggplot2::is.ggplot(viz_logratios_facet_byy2)
+    testthat::expect_true(ggplot2::is.ggplot(viz_logratios_facet_by2))
 
     viz_sentratios_facet_by2 <-
       unigrams %>%
-      visualize_sentratios_facet_by2_at(
-        token = NULL,
-        facet = "name",
+      visualize_sentratios_facet_by2(
+        token = word,
+        facet = name,
         filter_facet = TRUE,
-        facet_main = "SAS",
+        facet_main = name_main,
+        filter_sent = TRUE,
         sent_main = "positive",
-        num_top = 3,
-        flip_axes = TRUE,
-        color_value = c(colors_tms[5], "grey50")
+        num_top = 3
       )
     viz_sentratios_facet_by2
-    testthat::expect_true(ggplot2::is.ggplot(viz_sentratios_facet_byy2)
+    testthat::expect_true(ggplot2::is.ggplot(viz_sentratios_facet_by2))
   }
 )
 

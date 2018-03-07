@@ -99,6 +99,7 @@ compute_freqs_at <-
     if(add_dummy) {
       out <- out %>% dplyr::select(-dplyr::one_of(c(facet)))
     }
+    out
   }
 
 #' @rdname compute_freqs
@@ -344,11 +345,12 @@ compute_freqs_facet_by2 <-
 visualize_freqs_facet_by2_at <-
   function(data = NULL,
            token = NULL,
-           facet = NULL,
+           facet = "name_xy",
            xy_nms,
            xy_grid,
            filter_facet = FALSE,
-           filter_facet_base = filter_facet_tetext(),
+           facet_main = NULL,
+           filter_facet_base = filter_facet_tetext(facet_main),
            filter_facet_params = list(),
            color = NULL,
            add_labels = TRUE,
@@ -356,9 +358,13 @@ visualize_freqs_facet_by2_at <-
            labs_base = labs_tetext(),
            labs_params = list(title = "Relative Token Frequency"),
            theme_base = theme_tetext_facet(),
-           theme_params = list(),
-           facet_base = facet_tetext(facet),
+           theme_params = list(legend.position = "none"),
+           facet_base = facet_tetext("name_xy"),
            facet_params = list()) {
+
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(token), is.character(token))
+    stopifnot(!is.null(facet), is.character(facet))
 
     if(missing(xy_grid) | missing(xy_nms)) {
       facets <-
@@ -388,6 +394,9 @@ visualize_freqs_facet_by2_at <-
         x_main = facet_main
       )
 
+    if(facet != "name_xy") {
+      message("Correcting facetting variable to `name_xy`.")
+    }
     data_proc <-
       data_proc %>%
       filter_data_facet_at(
@@ -401,13 +410,11 @@ visualize_freqs_facet_by2_at <-
       data_proc %>%
       dplyr::mutate(name_xy = paste0(name_x, " vs. ", name_y))
 
-    # data_proc <- wrangle_facet_col(data_proc, "name_xy")
-
-    # if (is.null(color)) {
-    #   data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
-    #   color <- ".dummy"
-    #
-    # }
+    if (is.null(color)) {
+      data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
+      color <- ".dummy"
+    }
+    # NOTE: This is not necessary here.
     # data_proc <- wrangle_color_col(data_proc, color)
 
     viz <-
@@ -439,8 +446,6 @@ visualize_freqs_facet_by2_at <-
 
     viz <-
       viz + generate_facets(facet_base, facet_params)
-
-
     viz <-
       viz +
       labs_base + do_call_labs(labs_params) +
@@ -449,5 +454,17 @@ visualize_freqs_facet_by2_at <-
 
 #' @rdname visualize_freqs_facet_by2
 #' @export
-visualize_freqs_facet_by2 <- visualize_freqs_facet_by2_at
+visualize_freqs_facet_by2 <-
+  function(..., token, color, facet) {
+    stopifnot(!missing(token))
+    stopifnot(!missing(facet))
+    token <- rlang::quo_text(rlang::enquo(token))
+    facet <- rlang::quo_text(rlang::enquo(facet))
+    if (missing(color)) {
+      color <- NULL
+    } else {
+      color <- rlang::quo_text(rlang::enquo(color))
+    }
+    visualize_freqs_facet_by2_at(..., token = token, color = color, facet = facet)
+  }
 

@@ -1,10 +1,5 @@
-#
-# compute_ratios_facet <- function(xy_grid, xy_nms, data, ...) {
-#   wrapper_func(xy_grid = xy_grid, xy_nms = xy_nms, data = data, func = compute_ratios)
-# }
-#
 
-#' Create a 'xy grid'
+#' Create a of name pairs
 #'
 #' @description Create a grid of each comibination of the values in the input vector.
 #' @details This function works similarly to \code{expand.grid()}.
@@ -13,9 +8,8 @@
 #' @return data.frame.
 #' @rdname create_xy_grid
 #' @export
-create_xy_grid <- function(xy_nms) {
-  if (is.null(xy_nms))
-    stop("`xy_nms` cannot be NULL.", call. = FALSE)
+create_xy_grid <- function(xy_nms = NULL) {
+  stopifnot(!is.null(xy_nms), is.character(xy_nms))
 
   x <- y <- xy <- i <- NULL
 
@@ -47,12 +41,9 @@ get_xy_info <-
   function(xy_grid = NULL,
            xy_nms = NULL,
            i = NULL) {
-    if (is.null(xy_grid))
-      stop("`xy_grid` cannot be NULL.", call. = FALSE)
-    if (is.null(xy_nms))
-      stop("`xy_nms` cannot be NULL.", call. = FALSE)
-    if (is.null(i))
-      stop("`i` cannot be NULL.", call. = FALSE)
+    stopifnot(!is.null(xy_grid), is.data.frame(xy_grid))
+    stopifnot(!is.null(xy_nms), is.character(xy_nms))
+    stopifnot(!is.null(i), is.numeric(i))
 
     x <- y <- xy <- NULL
 
@@ -72,9 +63,7 @@ get_xy_info <-
 #' @return data.frame.
 preprocess_xy_data <- function(data = NULL, xy_info = NULL) {
   stopifnot(!is.null(data), is.data.frame(data))
-    
-  if (is.null(xy_info))
-    stop("`xy_info` cannot be NULL.", call. = FALSE)
+  stopifnot(!is.null(xy_info), is.list(xy_info))
   name <- NULL
   data %>%
     dplyr::filter(name %in% c(xy_info$x, xy_info$y))
@@ -91,9 +80,7 @@ preprocess_xy_data <- function(data = NULL, xy_info = NULL) {
 #' @return data.frame.
 postprocess_xy_data <- function(data = NULL, xy_info = NULL) {
   stopifnot(!is.null(data), is.data.frame(data))
-    
-  if (is.null(xy_info))
-    stop("`xy_info` cannot be NULL.", call. = FALSE)
+  stopifnot(!is.null(xy_info), is.list(xy_info))
 
   x <- y <- name_x <- name_y <- name_xy <- NULL
   out <-
@@ -132,13 +119,9 @@ wrapper_func <-
            xy_nms = NULL,
            ...) {
     stopifnot(!is.null(data), is.data.frame(data))
-      
-    if (is.null(func))
-      stop("`func` cannot be NULL.", call. = FALSE)
-    if (is.null(xy_grid))
-      stop("`xy_grid` cannot be NULL.", call. = FALSE)
-    if (is.null(xy_nms))
-      stop("`xy_nms` cannot be NULL.", call. = FALSE)
+    stopifnot(!is.null(func), is.function(func))
+    stopifnot(!is.null(xy_grid), is.data.frame(xy_grid))
+    stopifnot(!is.null(xy_nms), is.character(xy_nms))
 
     i <- 1
     while (i <= length(xy_nms)) {
@@ -169,9 +152,8 @@ wrapper_func <-
 #' @return data.frame.
 append_dummy_cols <- function(data = NULL, num_cols_expect = NULL, add = TRUE) {
   stopifnot(!is.null(data), is.data.frame(data))
-    
-  if (is.null(num_cols_expect))
-    stop("`num_cols_expect` cannot be NULL.", call. = FALSE)
+
+  stopifnot(!is.null(num_cols_expect), is.numeric(num_cols_expect))
 
   if(ncol(data) < num_cols_expect) {
     warning(sprintf("Expected %.0f columns but see only %.0f.", num_cols_expect, ncol(data)))

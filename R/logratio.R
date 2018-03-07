@@ -18,10 +18,10 @@ compute_logratios_facet_wide_at <-
            token = NULL,
            facet = NULL,
            cnt_min = 10) {
-    stopifnot(!is.null(data), is.data.frame(data))
-      stop("`data` must not be NULL.", call. = FALSE)
-    stopifnot(!is.null(facet), is.character(facet))
-      stop("`facet` must not be NULL.", call. = FALSE)
+
+    # stopifnot(!is.null(data), is.data.frame(data))
+    # stopifnot(!is.null(token), is.character(token))
+    # stopifnot(!is.null(facet), is.character(facet))
 
     token_quo <- rlang::sym(token)
     facet_quo <- rlang::sym(facet)
@@ -37,9 +37,10 @@ compute_logratios_facet_wide_at <-
       data_proc <-
         data_proc %>%
         dplyr::filter(n >= cnt_min)
+        # filter_num_top_at("n", cnt_min)
 
       if(nrow(data_proc) == 0)
-        return(stop("No data after filtering for `cnt_min`.", call. = FALSE))
+        stop("No data after filtering for `cnt_min`.", call. = FALSE)
     }
 
     data_proc <-
@@ -53,16 +54,15 @@ compute_logratios_facet_wide_at <-
       nms <- names(data_proc)
       out <-
         data_proc %>%
-        stats::setNames(c("token", "x", "y")) %>%
+        stats::setNames(c(token, "x", "y")) %>%
         dplyr::mutate_if(is.numeric, dplyr::funs((. + 1) / sum(. + 1))) %>%
         dplyr::mutate(logratio = log(x / y))
 
       x_i <- nms[2]
       y_i <- nms[3]
       out %>%
-        stats::setNames(c("token", x_i, y_i, "logratio")) %>%
+        stats::setNames(c(token, x_i, y_i, "logratio")) %>%
         dplyr::arrange(dplyr::desc(logratio))
-      out
     }
 
 #' @rdname compute_logratios_facet_wide
@@ -91,11 +91,8 @@ compute_logratios_facet_by2_at <-
            ...) {
 
     stopifnot(!is.null(data), is.data.frame(data))
-      
     # stopifnot(!is.null(token), is.character(token))
-    #   
     stopifnot(!is.null(facet), is.character(facet))
-      
 
     if(is.null(xy_grid) | is.null(xy_nms)) {
       facets <-
@@ -121,7 +118,19 @@ compute_logratios_facet_by2_at <-
 
 #' @rdname compute_logratios_facet_by2
 #' @export
-compute_logratios_facet_by2 <- compute_logratios_facet_by2_at
+compute_logratios_facet_by2 <-
+  function(..., token, facet) {
+    stopifnot(!missing(token))
+    stopifnot(!missing(facet))
+    token <- rlang::quo_text(rlang::enquo(token))
+    facet <- rlang::quo_text(rlang::enquo(facet))
+
+    compute_logratios_facet_by2_at(
+      ...,
+      token = token,
+      facet = facet
+    )
+  }
 
 #' Visualize token log ratios in pairs
 #'
@@ -132,10 +141,7 @@ compute_logratios_facet_by2 <- compute_logratios_facet_by2_at
 #' @inheritParams compute_logratios_facet_by2_at
 #' @param ... dots. Additional parameters to pass to \code{compute_logratios_facet_by2_at()}.
 #' @param num_top numeric. Number of tokens to show for each \code{facet} pair.
-#' @param flip_axes logical. Whether or not to call \code{ggplot2::coord_flip()}.
 #' @param lab_other bare for NSE; character for SE. Name to give to 'opposing' factor of \code{facet_main}.
-#' @param color_value character (vector). Should be a vector of length two (for dual colors)
-#' if \code{filter_facet = TRUE} and \code{!is.null(facet_main) & length(facet_main) == 1}.
 #' @return gg.
 #' @rdname visualize_logratios_facet_by2
 #' @export
@@ -149,29 +155,26 @@ visualize_logratios_facet_by2_at <-
            xy_grid,
            # cnt_min,
            ...,
-           filter_facet = TRUE,
+           filter_facet = FALSE,
            facet_main = NULL,
-           x_include = NULL,
-           y_include = NULL,
-           x_exclude = NULL,
-           y_exclude = NULL,
+           filter_facet_base = filter_facet_tetext(facet_main),
+           filter_facet_params = list(),
            color = NULL,
-           color_value = c("grey50", "grey80"),
-           num_top = 3,
-           flip_axes = FALSE,
            lab_other = "other",
-           title = "Most Unique Words",
-           subtitle = NULL,
-           caption = NULL,
-           lab_x = NULL,
-           lab_y = "Log Odds Ratio",
+           num_top = 5,
+           scale_manual_params = scale_manual_tetext(values = c("grey50", "grey80")),
+           labs_base = labs_tetext(),
+           labs_params = list(title = "Most Unique Words", y = "Log Odds Ratio"),
            theme_base = theme_tetext_facet(),
-           scales = "free",
-           ncol = 3,
-           nrow = NULL,
-           strip.position = "right") {
+           theme_params =
+             list(axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
+                  panel.grid.major.y = ggplot2::element_blank()),
+           facet_base = facet_tetext("name_xy"),
+           facet_params = list()) {
 
-    # NOTE: Checks for NULL are made in other function(s).
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(token), is.character(token))
+    stopifnot(!is.null(facet), is.character(facet))
 
     if(missing(xy_grid) | missing(xy_nms)) {
       facets <-
@@ -202,15 +205,14 @@ visualize_logratios_facet_by2_at <-
         x_main = facet_main
       )
 
+    if(!("name_xy" %in% facet)) {
+      message("Correcting facetting variable.")
+    }
     data_proc <-
       data_proc %>%
       filter_data_facet_at(
         filter_facet = filter_facet,
-        facet_main = facet_main,
-        x_include = x_include,
-        y_include = y_include,
-        x_exclude = x_exclude,
-        y_exclude = y_exclude
+        params = combine_base_and_params(filter_facet_base, filter_facet_params)
       )
 
     logratio_dir <- logratio <- name_xy <- name_x <- name_y <- NULL
@@ -227,12 +229,11 @@ visualize_logratios_facet_by2_at <-
       data_proc %>%
       dplyr::mutate(name_xy = paste0(name_x, " vs. ", name_y))
 
-    data_proc <- wrangle_facet_col(data_proc, "name_xy")
-
     if (is.null(color)) {
       data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
       color <- ".dummy"
     }
+    # NOTE: Don't need this.
     # data_proc <- wrangle_color_col(data_proc, color)
 
     token_quo <- rlang::sym(token)
@@ -253,63 +254,37 @@ visualize_logratios_facet_by2_at <-
       # ggplot2::geom_bar(stat = "identity") +
       ggplot2::geom_col() +
       scale_x_reordered() +
-      ggplot2::geom_hline(ggplot2::aes(yintercept = 0)) +
-      ggplot2::scale_fill_manual(values = color_value) +
-      ggplot2::facet_wrap(
-        ~ name_xy,
-        scales = scales,
-        ncol = ncol,
-        nrow = nrow,
-        strip.position = strip.position
-      )
+      do_call_scale_manual(scale_manual_params, type = "fill") +
+      ggplot2::geom_hline(ggplot2::aes(yintercept = 0))
 
-    viz_labs <-
-      ggplot2::labs(
-        x = lab_x,
-        y = lab_y,
-        title = title,
-        subtitle = subtitle,
-        caption = caption
-      )
-    viz_theme <-
-      theme_base +
-      ggplot2::theme(
-        legend.position = "bottom",
-        legend.title = ggplot2::element_blank(),
-        axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
-        panel.grid.major.x = ggplot2::element_blank()
-      )
-
-    if(flip_axes) {
-      viz_theme <-
-        viz_theme +
-        ggplot2::theme(
-          axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
-          panel.grid.major.y = ggplot2::element_blank()
-        )
-    } else {
-      viz_theme <-
-        viz_theme +
-        ggplot2::theme(
-          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
-          panel.grid.major.x = ggplot2::element_blank()
-        )
-    }
+    viz <-
+      viz  +
+      generate_facets(facet_base, facet_params)
 
     viz <-
       viz +
-      viz_labs +
-      viz_theme
+      labs_base + do_call_labs(labs_params) +
+      theme_base + do_call_theme(theme_params)
 
-    if(flip_axes) {
-      viz <-
-        viz +
-        ggplot2::coord_flip()
-    }
-    viz
+    viz <-
+      viz +
+      ggplot2::coord_flip()
+
   }
 
 #' @rdname visualize_logratios_facet_by2
 #' @export
-visualize_logratios_facet_by2 <- visualize_logratios_facet_by2_at
+visualize_logratios_facet_by2 <-
+  function(..., token, color, facet) {
+    stopifnot(!missing(token))
+    stopifnot(!missing(facet))
+    token <- rlang::quo_text(rlang::enquo(token))
+    facet <- rlang::quo_text(rlang::enquo(facet))
+    if (missing(color)) {
+      color <- NULL
+    } else {
+      color <- rlang::quo_text(rlang::enquo(color))
+    }
+    visualize_logratios_facet_by2_at(..., token = token, color = color, facet = facet)
+  }
 

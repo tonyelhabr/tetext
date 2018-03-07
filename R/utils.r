@@ -23,7 +23,8 @@ filter_num_top_at <-
            col = NULL,
            num_top = NULL,
            max = nrow(data),
-           min = 0) {
+           min = 0,
+           keep_rank_col = FALSE) {
     stopifnot(!is.null(data), is.data.frame(data))
     stopifnot(!is.null(col))
     stopifnot(!is.null(num_top))
@@ -43,6 +44,9 @@ filter_num_top_at <-
         data %>%
         dplyr::arrange(dplyr::desc(!!col_quo)) %>%
         dplyr::filter(!!col_quo >= stats::quantile(!!col_quo, num_top, na.rm = TRUE))
+    }
+    if(!keep_rank_col) {
+      out <- out %>% dplyr::select(-rank)
     }
     out
   }
@@ -96,7 +100,7 @@ filter_if_not_null_at <- function(data = NULL, col = NULL, value = NULL, invert 
   if(is.null(value))
     return(data)
 
-  stopifnot(!(col %in% names(data)))
+  stopifnot((col %in% names(data)))
 
   col_quo <- rlang::sym(col)
   if(!invert) {
@@ -113,7 +117,7 @@ filter_if_not_null_at <- function(data = NULL, col = NULL, value = NULL, invert 
 
 pull_distinctly_at <- function(data = NULL, col = NULL) {
   stopifnot(!is.null(data), is.data.frame(data))
-  stopifnot(!(col %in% names(data)))
+  stopifnot((col %in% names(data)))
 
   col_quo <- rlang::sym(col)
   data %>%

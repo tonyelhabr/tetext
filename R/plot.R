@@ -142,8 +142,20 @@ labs_tetext <-
 #' @export
 facet_tetext <-
   function(facet, scales = "free", ncol = 3, nrow = NULL, strip.position = "right", ...) {
-    stopifnot(!missing(facet))
-    list(facets = stats::as.formula(paste0("~ ", facet)),
+    stopifnot(!missing(facet), is.character(facet))
+    # if(!plyr::is.formula(facet)) {
+    if(!grepl("~", facet)) {
+      if(length(facet) > 1) {
+        if(length(facet) == 2) {
+          facet <- paste0(facet[1], "~ ", facet[2])
+        }
+      } else {
+        facet <- paste0("~ ", facet)
+      }
+      # facet <- stats::as.formula(facet)
+    }
+    facet <- stats::as.formula(facet)
+    list(facets = facet,
          scales = scales,
          ncol = ncol,
          nrow = nrow,
@@ -199,13 +211,13 @@ scale_manual_tetext <-
   }
 
 filter_facet_tetext <-
-  function(filter_main = NULL,
+  function(facet_main = NULL,
            x_include = NULL,
            y_include = NULL,
            x_exclude = NULL,
            y_exclude = NULL) {
     list(
-      filter_main = filter_main,
+      facet_main = facet_main,
       x_include = x_include,
       y_include = y_include,
       x_exclude = x_exclude,
