@@ -45,7 +45,7 @@ This package containts functions that I often use.
 
 ### Installation
 
-`devtools::install_github("tonyelhabr/temisc")`.
+`devtools::install_github("tonyelhabr/tetext")`.
 
 ## Notes
 
@@ -58,28 +58,23 @@ This package is heavily influenced by the blogs of
 Most of the functions in this package implement snippets of code that they have
 shared.
 
-### Syntax
+### Main Functions
 
-This package follows the `dplyr` convention of suffixing standard evaluation (SE)
-function with `_at`. These functions expect characters (as inputs) to indicate
-column names. 
+~~The following is a list of all functions in the package.~~
 
-There are non-suffixed versions of all major functions that serve as aliases to the `_at` SE functions. 
-In the future, if non-standard evaluation (NSE) is implemented,
-the non-suffixed versions will be altered to refer to the NSE versions.
-(This would comply with the `dplyr` convetion for NSE functions)
-
-Here is a list of all functions in the package.
-
-```{r echo = FALSE}
+```{r echo = FALSE, eval = FALSE}
 # library("tetext")
-ls("package:tetext")
+# ls("package:tetext")
 ```
+The following is a list is a list of the __main__ functions in the package.
+(Not shown: the SE aliases and various helper functions.)
 
 ```{r echo = FALSE}
+library("tetext")
 ls_all <- ls("package:tetext")
 ls_at <- grep("_at$", ls_all, value = TRUE)
-ls_show <- setdiff(ls_all, ls_at)
+ls_main <- grep("^compute_|^visualize_|^trim_|^tidify_", ls_all, value = TRUE)
+ls_show <- setdiff(ls_main, ls_at)
 print(sort(c(ls_show)))
 ```
 
@@ -114,17 +109,49 @@ Compute sentiment scores for n-grams.
 `compute_sentratios_multi_by2()`, `visualize_sentratios_multi_by2()`,
 Compute metrics across multiple `multi` entities. Uses a handful of internal
 function that are not intended to be called directly (although they can be).
-These internal functions include  the following:
+These internal functions include the following:
 `create_xy_grid()`, `filter_xy_grid()`, `preprocess_xy_data()`, `postprocess_xy_data()`, 
 `wrapper_func()`, `add_dummy_cols()`.
 Also, there are more specific internal functions, such as:
 `compute_freqs_multi_wide()`, `compute_logratios_multi_wide()`, `compute_sentratios_multi_wide()`
 
-### Notes To Self
+### Function Idioms
 
-#### TODO
+All major functions in this function have non-standard evaluation (NSE) and
+standard evaluation (SE) versions 
+To distinguish the NSE and SE functions,
+the `dplyr` convention of suffixing standard evaluation (SE)
+functions with `_at` is used. (These functions expect characters instead of
+"bare" string to indicate column names.
 
-Add `lab_caption` for visualization functions.
+Main functions used to return data.frames mostly begin with the verb `compute`.
+Visualization functions that call these functions internally begin with `visualize`.
+There are various `default_*()` functions (e.g. `default_theme()`, `default_labs()`,
+`default_facet()`) that are used to specify default
+arguments in the `visualize_*()` functions--these arguments end with the noun `_base`
+(e.g. `theme_base`, `labs_base`, `facet_base`, etc.). Accompanying these `_base` arguments
+are similarly-named `_params` arguments (e.g. `theme_params`, `labs_params`, `facet_params`, etc.).
+The intended use of this framework is that the `_base` arguments, which default to some `default_*()`
+function, are not to be altered; instead, this is the purpose of the `_params` arguments.
+This design is used as a means of providing "good" defaults while also providing
+a suitable means of customization.
+
+To explain this format more clearly, consider an example of proper usage of these arguments.
+In the `visualize_cnts()` function, there is a `theme_base` argument set equal
+to `default_theme()` by default--this function argument defines
+a "baseline" theme (very similar to `ggplot2::theme_minimal()`) that should not
+be directly changed. To make modifications to the `default_theme()`, the accompanying
+`theme_params` argument should be set equal to a names list corresponding
+to the appropriate `ggplot2::theme()` parameters that are to be customized.
+For example, one might set `theme_params = list(legend.title = ggplot2::element_text("Legend Title"))`.
+(The `default_theme()` function sets `ggplot::theme(legend.title = ggplot2::element_blank()`.)
+
+(Notably, the only `_base`/`_params`/`default_*()` combination that does not truly follow this design pattern
+is that for `scale_manual`. There is a `default_scale_manual()` function for 
+a `scale_manual_params` argument in the visualization function, but no corresponding
+`_base` argument.)
+
+### Functions to add?
 
 + ~~__model:__~~ `model_lda()`, `visualize_lda_betas()`, `visualize_lda_gammas()`
 + ~~__poisson:__~~
@@ -132,7 +159,19 @@ Add `lab_caption` for visualization functions.
 
 ## Examples
 
-For now, see the tests.
+Check out 
+[this blog post analyzing the text in _R Weekly posts_](https://tonyelhabr.rbind.io/posts/tidy-text-analysis-rweekly/)
+to see usage of an earlier version of this package:
+
+(_Warning:_ At the time, only SE functions had been implemented. Also, since then, some
+function names and arguments may have been changed.)
+
+Additionally, see 
+[this blog post analyzing personal Google search history](https://tonyelhabr.rbind.io/posts/tidy-text-analysis-google-search-history/)
+to see code that are similar
+to the code used to implement this package's functions:
+
+Additionally, one can review the tests files for further function usage
 
 ```{r echo = FALSE}
 # library("tetext")

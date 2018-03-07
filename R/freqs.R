@@ -201,7 +201,7 @@ visualize_bigram_freqs_facet_at <-
       dplyr::ungroup() %>%
       dplyr::arrange(!!facet_quo) %>%
       dplyr::mutate(!!token_quo := stringr::str_replace_all(!!token_quo, " ", "\n")) %>%
-      dplyr::mutate(!!token_quo := forcats::fct_reorder(factor(!!token_quo), freq))
+      dplyr::mutate(!!token_quo := factor(!!token_quo))
 
 
     if (is.null(color)) {
