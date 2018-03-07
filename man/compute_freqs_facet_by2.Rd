@@ -8,8 +8,7 @@
 compute_freqs_facet_by2_at(data = NULL, func = compute_freqs_facet_wide_at,
   xy_grid = NULL, xy_nms = NULL, facet = NULL, ...)
 
-compute_freqs_facet_by2(data = NULL, func = compute_freqs_facet_wide_at,
-  xy_grid = NULL, xy_nms = NULL, facet = NULL, ...)
+compute_freqs_facet_by2(..., token, facet)
 }
 \arguments{
 \item{data}{data.frame. Data to apply a function over.}
@@ -21,10 +20,14 @@ compute_freqs_facet_by2(data = NULL, func = compute_freqs_facet_wide_at,
 \item{xy_nms}{character (vector). Values to use to create a 'grid' of all
 combinations of values.}
 
-\item{facet}{bare for NSE; character for SE. Name of column in \code{data} corresponding to group
-by which count is made.}
+\item{facet}{character. Name of column in \code{data} to use for facetting.
+It is set to NULL by default in the non-\code{facet} function even though it is not necessary.
+If specified with the non-\code{facet} version of the function,
+then the function acts just like the \code{_facet} version.}
 
 \item{...}{dots. Additional parameters to pass to \code{compute_freqs_facet_wide_at()}.}
+
+\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use for count.}
 }
 \value{
 data.frame.

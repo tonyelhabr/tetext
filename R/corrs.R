@@ -99,6 +99,7 @@ compute_corrs <-
 #' are used (i.e. \code{color_point} \code{shape_point}
 #' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
+#' @inheritParams compute_corrs
 #' @param ... dots. Parameters passed directly to \code{compute_corrs()}.
 #' @param resize_points logical. Indicates whether or not to make size of points
 #' correspond to count of words.
@@ -107,7 +108,6 @@ compute_corrs <-
 #' @param color_point character. Hex value of color_value for points.
 #' @param shape_point numeric.
 #' @param seed numeric. Used to initialize \code{ggraph::ggraph()}.
-#' @inheritParams visualize_time
 #' @return gg.
 #' @rdname visualize_corrs_network
 #' @export
@@ -121,10 +121,10 @@ visualize_corrs_network_at <-
            color_point = "grey50",
            shape_point = 21,
            seed = 42,
-           labs_base = labs_tetext(),
+           labs_base = default_labs(),
            labs_params = list(title = "Network of Pairwise Correlations"),
-           theme_base = theme_tetext(void = TRUE),
-           theme_params = list(legend.position = "none")) {
+           theme_base = default_theme(void = TRUE),
+           theme_params = list()) {
 
     require_ns("ggraph")
 

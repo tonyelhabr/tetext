@@ -138,6 +138,7 @@ compute_change <-
 #' @param add_labels logical. Whether or not to add labels to the lines.
 #' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
+#' @inheritParams compute_change
 #' @return gg.
 #' @rdname visualize_change
 #' @export
@@ -147,12 +148,12 @@ visualize_change_at <-
            num_top = 5,
            color = token,
            add_labels = FALSE,
-           scale_manual_params = scale_manual_tetext(values = rep("grey50", num_top)),
-           labs_base = labs_tetext(),
+           scale_manual_params = default_scale_manual(values = rep("grey50", num_top)),
+           labs_base = default_labs(),
            labs_params = list(title = "Tokens with Most Significant Change in Frequency",
                               caption = paste0("Statistical significance is determined by a logistical model\n",
                                                "estimating token appearance in a given time period.")),
-           theme_base = theme_tetext_dx(),
+           theme_base = default_theme_dx(),
            theme_params = list(legend.position = ifelse(add_labels, "none", "bottom"))) {
 
     stopifnot(!is.null(token), is.character(token))

@@ -40,11 +40,11 @@ visualize_time_at <-
            geom = c("bar", "hist"),
            add_alpha = FALSE,
            alpha_range = c(0.25, 1),
-           scale_manual_params = scale_manual_tetext(),
-           labs_base = labs_tetext(),
+           scale_manual_params = default_scale_manual(),
+           labs_base = default_labs(),
            labs_params = list(title = "Count Over Time"),
-           theme_base = theme_tetext_dx(),
-           theme_params = list(legend.position = "none")) {
+           theme_base = default_theme_dx(),
+           theme_params = list()) {
     stopifnot(!is.null(data), is.data.frame(data))
     stopifnot(!is.null(timebin), is.character(timebin))
     geom <- match.arg(geom)
@@ -148,9 +148,9 @@ visualize_time <- function(...,
 #' @export
 visualize_time_facet_at <-
   function(...,
-           theme_base = theme_tetext_facet_dx(),
+           theme_base = default_theme_facet_dx(),
            facet = NULL,
-           facet_base = facet_tetext(facet),
+           facet_base = default_facet(facet),
            facet_params = list()) {
     stopifnot(!is.null(facet), is.character(facet))
     viz <-
@@ -199,12 +199,11 @@ visualize_time_hh_at <-
            timebin = NULL,
            facet = NULL,
            color = facet,
-           scale_manual_params = scale_manual_tetext(),
-           labs_base = labs_tetext(),
+           scale_manual_params = default_scale_manual(),
+           labs_base = default_labs(),
            labs_params = list(title = "Count Over Time"),
-           theme_base = theme_tetext(),
-           theme_params = list(panel.grid = ggplot2::element_blank(),
-                               legend.position = "none")) {
+           theme_base = default_theme(),
+           theme_params = list(panel.grid = ggplot2::element_blank())) {
     stopifnot(!is.null(data), is.data.frame(data))
     stopifnot(!is.null(timebin), is.character(timebin))
     stopifnot(!is.null(facet), is.character(facet))
@@ -243,7 +242,7 @@ visualize_time_hh_at <-
 
   }
 
-#' @rdname visualize_hh_facet
+#' @rdname visualize_time_hh
 #' @export
 visualize_time_hh <-
   function(..., timebin, color, facet) {

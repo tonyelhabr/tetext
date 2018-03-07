@@ -5,9 +5,9 @@
 \alias{trim_bytime}
 \title{Trim data.frame by time}
 \usage{
-trim_bytime_at(data = NULL, timebin = NULL, start, end, ...)
+trim_bytime_at(data = NULL, timebin = NULL, start, end, facet)
 
-trim_bytime(..., timebin)
+trim_bytime(..., timebin, facet)
 }
 \arguments{
 \item{data}{data.frame.}
@@ -15,6 +15,8 @@ trim_bytime(..., timebin)
 \item{timebin}{bare for NSE; character for SE. Name of columin in \code{data} to use for time filtering.}
 
 \item{start, end}{Date-time. If either is missing, then code{compute_timefilter_at()} is called.}
+
+\item{facet}{bare for NSE; character for SE. Name of column in \code{data} used for facetting.}
 
 \item{...}{dots. Additional parameters to pass to \code{compute_timefilter_at()}
 in the case that start and end are not specified.}

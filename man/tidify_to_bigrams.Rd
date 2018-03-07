@@ -5,11 +5,10 @@
 \alias{tidify_to_bigrams}
 \title{Prepare data for text analysis.}
 \usage{
-tidify_to_bigrams_at(data = NULL, text = "text", rgx_pattern,
-  rgx_replacement, stopwords = TRUE, stopwords_lexicon, rgx_ignore_custom)
-
-tidify_to_bigrams(data = NULL, text = "text", rgx_pattern, rgx_replacement,
+tidify_to_bigrams_at(data = NULL, text = NULL, rgx_pattern, rgx_replacement,
   stopwords = TRUE, stopwords_lexicon, rgx_ignore_custom)
+
+tidify_to_bigrams(..., text)
 }
 \arguments{
 \item{data}{data.frame.}
@@ -27,6 +26,8 @@ available in \code{tidytext} package.
 Otherwise, must be a lexicon available in the \code{tidytext} package.}
 
 \item{rgx_ignore_custom}{character. Custom regular expression to remove.}
+
+\item{...}{dots. Parameters to pass directly to \code{visualize_time()}.}
 }
 \value{
 data.frame.
@@ -36,6 +37,6 @@ Create a tidy data.frame of unigrams.
 }
 \details{
 Heavily influenced by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
-Creates output columns 'token', 'word1', and 'word2'.
-('token' is simply 'word1' and 'word2' toegether.)
+Creates output columns 'word', 'word1', and 'word2'.
+('word' is simply 'word1' and 'word2' toegether.)
 }

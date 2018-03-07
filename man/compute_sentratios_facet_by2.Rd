@@ -9,19 +9,19 @@ compute_sentratios_facet_by2_at(data = NULL,
   func = compute_logratios_facet_wide_at, token = NULL, facet = NULL,
   xy_grid, xy_nms, cnt_min = 10, lexicon = "bing", ...)
 
-compute_sentratios_facet_by2(data = NULL,
-  func = compute_logratios_facet_wide_at, token = NULL, facet = NULL,
-  xy_grid, xy_nms, cnt_min = 10, lexicon = "bing", ...)
+compute_sentratios_facet_by2(..., token, facet)
 }
 \arguments{
 \item{data}{data.frame. Data to apply a function over.}
 
 \item{func}{function. Wrapped by \code{do.call()}.}
 
-\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use for count. Default is provided}
+\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use for count.}
 
-\item{facet}{bare for NSE; character for SE. Name of column in \code{data} corresponding to group
-by which count is made.}
+\item{facet}{character. Name of column in \code{data} to use for facetting.
+It is set to NULL by default in the non-\code{facet} function even though it is not necessary.
+If specified with the non-\code{facet} version of the function,
+then the function acts just like the \code{_facet} version.}
 
 \item{xy_grid}{data.frame. Output from \code{create_xy_grid()}.}
 

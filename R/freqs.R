@@ -28,8 +28,6 @@ compute_freqs_old <-
 #' @inheritParams visualize_time_at
 #' @inheritParams visualize_cnts_at
 #' @inheritParams compute_freqs_at
-#' @param facet bare for NSE; character for SE. Name of column in \code{data} corresponding to group
-#' by which count is made.
 #' @return data.frame.
 #' @rdname compute_freqs
 #' @export
@@ -173,11 +171,11 @@ visualize_bigram_freqs_facet_at <-
            facet = NULL,
            color = facet,
            num_top = 3,
-           scale_manual_params = scale_manual_tetext(),
-           labs_base = labs_tetext(),
+           scale_manual_params = default_scale_manual(),
+           labs_base = default_labs(),
            labs_params = list(title = "Most Frequently Used Token Pairs"),
-           theme_base = theme_tetext(),
-           theme_params = list(legend.position = "none")) {
+           theme_base = default_theme(),
+           theme_params = list()) {
 
     # stopifnot(!is.null(data), is.data.frame(data))
     stopifnot(!is.null(token), is.character(token))
@@ -335,10 +333,10 @@ compute_freqs_facet_by2 <-
 #' @inheritParams compute_freqs_facet_by2_at
 #' @param add_labels logical. Whether or not to add text labels (of the tokens).
 #' @param filter_facet logical. Whether or not to filter the \code{facet} values.
-#' @param facet_main bare for NSE; character for SE. Name of single \code{facet} value to use as basis.
-#' Not used if \code{filter_facet = FALSE}.
-#' @param x_include,y_include,x_exclude,y_exclude character (vector).
 #' \code{facet} values to include and exclude. Not used if \code{filter_facet = FALSE}.
+#' @param facet_main of same type as \code{facet} values. Value of single 'main' facet.
+#' @param filter_facet_base stuff. Work similarly to other \code{_base} arguments.
+#' @param filter_facet_params list. Works similarly to other \code{_params} arguments.
 #' @return gg.
 #' @rdname visualize_freqs_facet_by2
 #' @export
@@ -350,16 +348,16 @@ visualize_freqs_facet_by2_at <-
            xy_grid,
            filter_facet = FALSE,
            facet_main = NULL,
-           filter_facet_base = filter_facet_tetext(facet_main),
+           filter_facet_base = default_filter_facet(facet_main),
            filter_facet_params = list(),
            color = NULL,
            add_labels = TRUE,
-           scale_manual_params = scale_manual_tetext(),
-           labs_base = labs_tetext(),
+           scale_manual_params = default_scale_manual(),
+           labs_base = default_labs(),
            labs_params = list(title = "Relative Token Frequency"),
-           theme_base = theme_tetext_facet(),
-           theme_params = list(legend.position = "none"),
-           facet_base = facet_tetext("name_xy"),
+           theme_base = default_theme_facet(),
+           theme_params = list(),
+           facet_base = default_facet("name_xy"),
            facet_params = list()) {
 
     stopifnot(!is.null(data), is.data.frame(data))

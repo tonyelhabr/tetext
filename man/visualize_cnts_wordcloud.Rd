@@ -8,7 +8,8 @@
 \title{Visualize counts}
 \usage{
 visualize_cnts_wordcloud_at(data = NULL, token = NULL,
-  wordcloud_base = wordcloud_tetext(data, token), wordcloud_params)
+  wordcloud_base = default_wordcloud(data, token),
+  wordcloud_params = list())
 
 visualize_cnts_wordcloud(..., token)
 
@@ -23,6 +24,10 @@ visualize_cnts_wordcloud_facet(..., token, facet)
 \item{token}{bare for NSE; character for SE. Name of column in \code{data}
 to use for \code{words} argument in \code{wordcloud::wordcloud()}.}
 
+\item{wordcloud_base}{function. Works similarly to other \code{_base} arguments.}
+
+\item{wordcloud_params}{function. Works similarly to other \code{_params} arguments.}
+
 \item{...}{dots. Parameters to pass to \code{visualize_cnts_wordcloud_at()}.}
 
 \item{facet}{bare for NSE; character for SE. Name of column in \code{data} to use to create
@@ -31,13 +36,6 @@ a separate wordcloud.}
 \item{value_facet}{charater or numeric. Value by which to filter the column
 specified by \code{facet}. Ignored if \code{all = TRUE}.
 Defaults are provided internally based on value of \code{all} and number of \code{facet} values.}
-
-\item{colors}{character. Passed directly to \code{colors} argument in \code{wordcloud::wordcloud()}.}
-
-\item{num_top}{numeric. Number of words to show. Passed directly to \code{max.words} argument}
-
-\item{random.order}{logical. Passed directly to \code{random.order} argument
-in \code{wordcloud::wordcloud()}.}
 }
 \value{
 plot.

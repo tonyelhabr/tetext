@@ -18,11 +18,11 @@ visualize_cnts_at <-
            token = NULL,
            color = NULL,
            num_top = 10,
-           scale_manual_params = scale_manual_tetext(),
-           labs_base = labs_tetext(),
+           scale_manual_params = default_scale_manual(),
+           labs_base = default_labs(),
            labs_params = list(title = "Count of Words"),
-           theme_base = theme_tetext_dy(),
-           theme_params = list(legend.position = "none")) {
+           theme_base = default_theme_dy(),
+           theme_params = list()) {
     stopifnot(!is.null(data), is.data.frame(data))
     stopifnot(!is.null(token), is.character(token))
 
@@ -55,7 +55,7 @@ visualize_cnts_at <-
       labs_base + do_call_labs(labs_params) +
       theme_base + do_call_theme(theme_params)
 
-    viz <- viz + coord_flip()
+    viz <- viz + ggplot2::coord_flip()
   }
 
 #' @rdname visualize_cnts
@@ -86,12 +86,12 @@ visualize_cnts_facet_at <-
            color = NULL,
            facet = NULL,
            num_top = 10,
-           scale_manual_params = scale_manual_tetext(),
-           labs_base = labs_tetext(),
+           scale_manual_params = default_scale_manual(),
+           labs_base = default_labs(),
            labs_params = list(title = "Count Over Time"),
-           theme_base = theme_tetext_facet_dy(),
-           theme_params = list(legend.position = "none"),
-           facet_base = facet_tetext(facet),
+           theme_base = default_theme_facet_dy(),
+           theme_params = list(),
+           facet_base = default_facet(facet),
            facet_params = list()) {
     stopifnot(!is.null(data), is.data.frame(data))
     stopifnot(!is.null(token), is.character(token))
@@ -167,18 +167,15 @@ visualize_cnts_facet <-
 #' @inheritParams visualize_cnts
 #' @param token bare for NSE; character for SE. Name of column in \code{data}
 #' to use for \code{words} argument in \code{wordcloud::wordcloud()}.
-#' @param colors character. Passed directly to \code{colors} argument in \code{wordcloud::wordcloud()}.
-#' @param num_top numeric. Number of words to show. Passed directly to \code{max.words} argument
-#' @param random.order logical. Passed directly to \code{random.order} argument
-#' in \code{wordcloud::wordcloud()}.
-#' @inheritParams visualize_time
+#' @param wordcloud_base function. Works similarly to other \code{_base} arguments.
+#' @param wordcloud_params function. Works similarly to other \code{_params} arguments.
 #' @return plot.
 #' @rdname visualize_cnts_wordcloud
 #' @export
 visualize_cnts_wordcloud_at <-
   function(data = NULL,
            token = NULL,
-           wordcloud_base = wordcloud_tetext(data, token),
+           wordcloud_base = default_wordcloud(data, token),
            wordcloud_params = list()) {
     stopifnot(!is.null(data), is.data.frame(data))
     stopifnot(!is.null(token), is.character(token))

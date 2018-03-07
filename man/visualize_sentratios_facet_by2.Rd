@@ -7,35 +7,31 @@
 \usage{
 visualize_sentratios_facet_by2_at(data = NULL, token = NULL, facet = NULL,
   xy_nms, xy_grid, cnt_min = 10, lexicon = "bing", ...,
-  filter_sent = TRUE, sent_main = NULL, filter_facet = TRUE,
-  facet_main = NULL, x_include = NULL, y_include = NULL,
-  x_exclude = NULL, y_exclude = NULL, color = NULL,
-  color_value = c("grey50", "grey80"), num_top = 3, flip_axes = FALSE,
-  lab_other = "other",
-  title = "Most Significant Words Contributing to Sentiment Differences",
-  subtitle = NULL, caption = NULL, lab_x = NULL,
-  lab_y = "Log Odds Ratio", theme_base = theme_tetext_facet(),
-  scales = "free", ncol = 3, nrow = NULL, strip.position = "right")
+  filter_facet = TRUE, facet_main = NULL,
+  filter_facet_base = default_filter_facet(facet_main),
+  filter_facet_params = list(), filter_sent = TRUE, sent_main = NULL,
+  color = NULL, lab_other = "other", num_top = 5,
+  scale_manual_params = default_scale_manual(values = c("grey50", "grey80")),
+  labs_base = default_labs(), labs_params = list(title =
+  "Most Significant Words Contributing to Sentiment Differences", y =
+  "Log Odds Ratio"), theme_base = default_theme_facet(),
+  theme_params = list(legend.position = "bottom", axis.text.y =
+  ggplot2::element_text(angle = 45, hjust = 1), panel.grid.major.y =
+  ggplot2::element_blank()),
+  facet_base = default_facet(ifelse(is.null(sent_main), "sentiment ~ name_xy",
+  "name_xy")), facet_params = list())
 
-visualize_sentratios_facet_by2(data = NULL, token = NULL, facet = NULL,
-  xy_nms, xy_grid, cnt_min = 10, lexicon = "bing", ...,
-  filter_sent = TRUE, sent_main = NULL, filter_facet = TRUE,
-  facet_main = NULL, x_include = NULL, y_include = NULL,
-  x_exclude = NULL, y_exclude = NULL, color = NULL,
-  color_value = c("grey50", "grey80"), num_top = 3, flip_axes = FALSE,
-  lab_other = "other",
-  title = "Most Significant Words Contributing to Sentiment Differences",
-  subtitle = NULL, caption = NULL, lab_x = NULL,
-  lab_y = "Log Odds Ratio", theme_base = theme_tetext_facet(),
-  scales = "free", ncol = 3, nrow = NULL, strip.position = "right")
+visualize_sentratios_facet_by2(..., token, color, facet)
 }
 \arguments{
 \item{data}{data.frame. Data to apply a function over.}
 
-\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use for count. Default is provided}
+\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use for count.}
 
-\item{facet}{bare for NSE; character for SE. Name of column in \code{data} corresponding to group
-by which count is made.}
+\item{facet}{character. Name of column in \code{data} to use for facetting.
+It is set to NULL by default in the non-\code{facet} function even though it is not necessary.
+If specified with the non-\code{facet} version of the function,
+then the function acts just like the \code{_facet} version.}
 
 \item{xy_nms}{character (vector). Values to use to create a 'grid' of all
 combinations of values.}
@@ -48,45 +44,54 @@ combinations of values.}
 
 \item{...}{dots. Additional parameters to pass to \code{compute_sentratios_facet_by2_at()}.}
 
+\item{filter_facet}{logical. Whether or not to filter the \code{facet} values.
+\code{facet} values to include and exclude. Not used if \code{filter_facet = FALSE}.}
+
+\item{facet_main}{of same type as \code{facet} values. Value of single 'main' facet.}
+
+\item{filter_facet_base}{stuff. Work similarly to other \code{_base} arguments.}
+
+\item{filter_facet_params}{list. Works similarly to other \code{_params} arguments.}
+
 \item{filter_sent}{logical. Whether or not to filter the sentiment values.}
 
 \item{sent_main}{bare for NSE; character for SE. Name of single sentiment value to use as basis.
 Not used if \code{filter_sent = FALSE}.}
-
-\item{filter_facet}{logical. Whether or not to filter the \code{facet} values.}
-
-\item{facet_main}{bare for NSE; character for SE. Name of single \code{facet} value to use as basis.
-Not used if \code{filter_facet = FALSE}.}
-
-\item{x_include}{character (vector).
-\code{facet} values to include and exclude. Not used if \code{filter_facet = FALSE}.}
-
-\item{y_include}{character (vector).
-\code{facet} values to include and exclude. Not used if \code{filter_facet = FALSE}.}
-
-\item{x_exclude}{character (vector).
-\code{facet} values to include and exclude. Not used if \code{filter_facet = FALSE}.}
-
-\item{y_exclude}{character (vector).
-\code{facet} values to include and exclude. Not used if \code{filter_facet = FALSE}.}
 
 \item{color}{bare for NSE; character for SE. Name of column in \code{data} to use for color basis.
 Even if \code{fill} is the actual \code{ggplot2} aesthetic, the internal code will 'coerce' this
 column to \code{fill}.
 In order to simplify internal code, MUST be specified.}
 
-\item{color_value}{character (vector). Should be a vector of length two (for dual colors)
-if \code{filter_facet = TRUE} and \code{!is.null(facet_main) & length(facet_main) == 1}.}
+\item{lab_other}{bare for NSE; character for SE. Name to give to 'opposing' factor of \code{facet_main}.}
 
 \item{num_top}{numeric. Number of tokens to show for each \code{facet} pair.}
 
-\item{flip_axes}{logical. Whether or not to call \code{ggplot2::coord_flip()}.}
+\item{scale_manual_params}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
+argument is specified, so if overwriting explicitly, then \code{values} should be included in the list.}
 
-\item{lab_other}{bare for NSE; character for SE. Name to give to 'opposing' factor of \code{facet_main}.}
+\item{labs_base}{\code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
+It is recommended NOT to modify this argument; isntead, the \code{_params} argument should
+be used for customization.}
+
+\item{labs_params}{list. Additional parameters to pass to \code{ggplot2::labs()} to use in addition
+to and/or override the parameters set in the \code{_base} parameter.}
 
 \item{theme_base}{\code{ggplot2::theme()} function. (e.g. as \code{ggplot2::theme_minimal()}.)
 A custom theme is supplied as a default. As with the the \code{labs_base} argument, it is NOT
 recommended to change this directly.}
+
+\item{theme_params}{list. Additional parameters to pass to \code{ggplot2::labs()}.
+Should be used in the same manner as \code{labs_params} for customization.}
+
+\item{facet_base}{\code{ggplot2::facet_wrap()} function. An internal function
+sets defaults for \code{facets}, \code{scales}, \code{ncol}, \code{nrow}, and \code{strip.position}
+As with the \code{labs_base} and \code{theme_base} arguments, it is NOT recommended to set
+this argument explicitly; instead, the accompanying \code{_params} argument should be used.}
+
+\item{facet_params}{list. Additional parameters to pass to \code{ggplot2::facet_wrap()}. Parameters
+passed to this argument override thos in the \code{_base} argument.}
 }
 \value{
 gg.

@@ -9,8 +9,7 @@ tidify_to_unigrams_at(data = NULL, text = "text", rgx_pattern,
   rgx_replacement, rgx_unnest, stopwords = TRUE, stopwords_lexicon,
   rgx_ignore_custom)
 
-tidify_to_unigrams(data = NULL, text = "text", rgx_pattern, rgx_replacement,
-  rgx_unnest, stopwords = TRUE, stopwords_lexicon, rgx_ignore_custom)
+tidify_to_unigrams(..., text)
 }
 \arguments{
 \item{data}{data.frame. Not in 'tidy' format.}
@@ -31,6 +30,8 @@ available in \code{tidytext} package.
 Otherwise, must be a lexicon available in the \code{tidytext} package.}
 
 \item{rgx_ignore_custom}{character. Custom regular expression to remove.}
+
+\item{...}{dots. Parameters to pass directly to \code{visualize_time()}.}
 }
 \value{
 data.frame.
@@ -40,7 +41,7 @@ Create a tidy data.frame of unigrams.
 }
 \details{
 Heavily influenced by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
-Creates output column 'token'.
+Creates output column 'word'.
 }
 \seealso{
 \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.

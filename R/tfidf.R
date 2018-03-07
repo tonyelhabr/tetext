@@ -66,12 +66,12 @@ visualize_tfidf_at <-
            facet = doc,
            color = facet,
            num_top = 10,
-           scale_manual_params = scale_manual_tetext(),
-           labs_base = labs_tetext(),
+           scale_manual_params = default_scale_manual(),
+           labs_base = default_labs(),
            labs_params = list(title = "Highest TF-IDF Tokens"),
-           theme_base = theme_tetext_facet_dy(),
-           theme_params = list(legend.position = "none"),
-           facet_base = facet_tetext(facet),
+           theme_base = default_theme_facet_dy(),
+           theme_params = list(),
+           facet_base = default_facet(facet),
            facet_params = list()) {
 
     # stopifnot(!is.null(data), is.data.frame(data))

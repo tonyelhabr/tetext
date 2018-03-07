@@ -17,6 +17,7 @@
 #' @param cols character (vector). Name(s) of column(s) in \code{data} to keep.
 #' Only relevant if \code{trim = TRUE}.
 #' @param timezone character. Passed directly to \code{lubridate::with_tz()} as \code{tzone} parameter.
+#' @param ... dots. Additional paramaters.
 #' @return data.frame.
 #' @rdname clean_tweets
 #' @export
@@ -79,7 +80,6 @@ clean_tweets_at <-
 clean_tweets <-
   function(..., facet) {
     if(missing(facet)) {
-
       facet <- NULL
     } else {
       facet <- rlang::quo_text(rlang::enquo(facet))

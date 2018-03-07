@@ -8,18 +8,18 @@
 \title{Visualize counts}
 \usage{
 visualize_cnts_at(data = NULL, token = NULL, color = NULL, num_top = 10,
-  scale_manual_params = scale_manual_tetext(), labs_base = labs_tetext(),
+  scale_manual_params = default_scale_manual(), labs_base = default_labs(),
   labs_params = list(title = "Count of Words"),
-  theme_base = theme_tetext_dy(), theme_params = list(legend.position =
-  "none"))
+  theme_base = default_theme_dy(), theme_params = list())
 
 visualize_cnts(..., token, color)
 
 visualize_cnts_facet_at(data = NULL, token = NULL, color = NULL,
-  num_top = 10, scale_manual_params = scale_manual_tetext(),
-  labs_base = labs_tetext(), labs_params = list(title = "Count Over Time"),
-  theme_base = theme_tetext_facet_dy(), theme_params = list(legend.position
-  = "none"), facet = NULL, facet_base = facet_tetext(facet), facet_params)
+  facet = NULL, num_top = 10,
+  scale_manual_params = default_scale_manual(), labs_base = default_labs(),
+  labs_params = list(title = "Count Over Time"),
+  theme_base = default_theme_facet_dy(), theme_params = list(),
+  facet_base = default_facet(facet), facet_params = list())
 
 visualize_cnts_facet(..., token, color, facet)
 }

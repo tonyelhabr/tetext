@@ -5,9 +5,9 @@
 \alias{compute_tfidf}
 \title{Compute TF-IDF}
 \usage{
-compute_tfidf_at(data = NULL, token = NULL, doc = "document")
+compute_tfidf_at(data = NULL, token = NULL, doc = NULL)
 
-compute_tfidf(data = NULL, token = NULL, doc = "document")
+compute_tfidf(..., token, doc)
 }
 \arguments{
 \item{data}{data.frame.}
@@ -17,6 +17,8 @@ as \code{term} in \code{tidytext::bind_tf_idf()}.}
 
 \item{doc}{bare for NSE; character for SE. Name of column in \code{data} to use
 as \code{document} in \code{tidytext::bind_tf_idf()}.}
+
+\item{...}{dots. Parameters to pass directly to \code{visualize_time()}.}
 }
 \value{
 data.frame.

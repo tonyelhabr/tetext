@@ -9,15 +9,14 @@
 \usage{
 visualize_time_at(data = NULL, timebin = NULL, color = NULL,
   geom = c("bar", "hist"), add_alpha = FALSE, alpha_range = c(0.25, 1),
-  scale_manual_params = scale_manual_tetext(), labs_base = labs_tetext(),
+  scale_manual_params = default_scale_manual(), labs_base = default_labs(),
   labs_params = list(title = "Count Over Time"),
-  theme_base = theme_tetext_dx(), theme_params = list(legend.position =
-  "none"))
+  theme_base = default_theme_dx(), theme_params = list())
 
 visualize_time(..., timebin, color)
 
-visualize_time_facet_at(..., theme_base = theme_tetext_facet_dx(),
-  facet = NULL, facet_base = facet_tetext(facet), facet_params)
+visualize_time_facet_at(..., theme_base = default_theme_facet_dx(),
+  facet = NULL, facet_base = default_facet(facet), facet_params = list())
 
 visualize_time_facet(..., timebin, color, facet)
 }

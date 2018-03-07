@@ -166,6 +166,7 @@ compute_timefilter <-
 #' given an unknown data set where visualization across a single, appropriate time period
 #' is desired. (The unkown data set may have different 'max' and 'min' times
 #' for each \code{facet} column.
+#' @inheritParams compute_timefilter_facet_at
 #' @param data data.frame.
 #' @param timebin bare for NSE; character for SE. Name of columin in \code{data} to use for time filtering.
 #' @param start,end Date-time. If either is missing, then code{compute_timefilter_at()} is called.
@@ -179,12 +180,15 @@ trim_bytime_at <-
            timebin = NULL,
            start,
            end,
-           ...) {
+           facet) {
     stopifnot(!is.null(data), is.data.frame(data))
     stopifnot(!is.null(timebin), is.character(timebin))
 
     if(missing(start) | missing(end)) {
-      data_proc <- compute_timefilter_at(data = data, timebin = timebin, ...)
+      if(missing(facet)) {
+        facet <- NULL
+      }
+      data_proc <- compute_timefilter_at(data = data, timebin = timebin, facet = facet)
       message("Computing max and min dates.")
       start <- data_proc$date_start
       end <- data_proc$date_end

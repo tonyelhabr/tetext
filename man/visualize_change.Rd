@@ -6,13 +6,13 @@
 \title{Visualize change}
 \usage{
 visualize_change_at(..., token = NULL, num_top = 5, color = token,
-  add_labels = FALSE, scale_manual_params = scale_manual_tetext(values =
-  rep("grey50", num_top)), labs_base = labs_tetext(),
+  add_labels = FALSE, scale_manual_params = default_scale_manual(values =
+  rep("grey50", num_top)), labs_base = default_labs(),
   labs_params = list(title =
   "Tokens with Most Significant Change in Frequency", caption =
   paste0("Statistical significance is determined by a logistical model\\n",
   "estimating token appearance in a given time period.")),
-  theme_base = theme_tetext_dx(), theme_params = list(legend.position =
+  theme_base = default_theme_dx(), theme_params = list(legend.position =
   ifelse(add_labels, "none", "bottom")))
 
 visualize_change(..., token, timebin, timefloor, color)
@@ -52,6 +52,9 @@ Should be used in the same manner as \code{labs_params} for customization.}
 
 \item{timebin}{bare for NSE; character for SE. Name of column in \code{data} to use for time axis.
 Probably something like 'yyyy', 'mm', etc.}
+
+\item{timefloor}{bare for NSE; character for SE. Name of column passed directly to \code{unit} parameter of
+\code{lubridate::floor_date()} if \code{bin = FALSE}.}
 }
 \value{
 gg.

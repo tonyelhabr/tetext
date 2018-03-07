@@ -5,27 +5,21 @@
 \alias{visualize_freqs_facet_by2}
 \title{Visualize token frequencies in pairs}
 \usage{
-visualize_freqs_facet_by2_at(data = NULL, token = NULL, facet = NULL,
+visualize_freqs_facet_by2_at(data = NULL, token = NULL, facet = "name_xy",
   xy_nms, xy_grid, filter_facet = FALSE, facet_main = NULL,
-  x_include = NULL, y_include = NULL, x_exclude = NULL,
-  y_exclude = NULL, color = NULL, color_value = "grey50",
-  add_labels = TRUE, title = "Relative Word Frequency", subtitle = NULL,
-  caption = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = theme_tetext_facet(), scales = "free", ncol = 3,
-  nrow = NULL, strip.position = "top")
+  filter_facet_base = default_filter_facet(facet_main),
+  filter_facet_params = list(), color = NULL, add_labels = TRUE,
+  scale_manual_params = default_scale_manual(), labs_base = default_labs(),
+  labs_params = list(title = "Relative Token Frequency"),
+  theme_base = default_theme_facet(), theme_params = list(),
+  facet_base = default_facet("name_xy"), facet_params = list())
 
-visualize_freqs_facet_by2(data = NULL, token = NULL, facet = NULL, xy_nms,
-  xy_grid, filter_facet = FALSE, facet_main = NULL, x_include = NULL,
-  y_include = NULL, x_exclude = NULL, y_exclude = NULL, color = NULL,
-  color_value = "grey50", add_labels = TRUE,
-  title = "Relative Word Frequency", subtitle = NULL, caption = NULL,
-  lab_x = NULL, lab_y = NULL, theme_base = theme_tetext_facet(),
-  scales = "free", ncol = 3, nrow = NULL, strip.position = "top")
+visualize_freqs_facet_by2(..., token, color, facet)
 }
 \arguments{
 \item{data}{data.frame.}
 
-\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use for count. Default is provided}
+\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use for count.}
 
 \item{facet}{bare for NSE; character for SE. Name of column in \code{data} to use for facetting.}
 
@@ -34,13 +28,14 @@ combinations of values.}
 
 \item{xy_grid}{data.frame. Output from \code{create_xy_grid()}.}
 
-\item{filter_facet}{logical. Whether or not to filter the \code{facet} values.}
-
-\item{facet_main}{bare for NSE; character for SE. Name of single \code{facet} value to use as basis.
-Not used if \code{filter_facet = FALSE}.}
-
-\item{x_include, y_include, x_exclude, y_exclude}{character (vector).
+\item{filter_facet}{logical. Whether or not to filter the \code{facet} values.
 \code{facet} values to include and exclude. Not used if \code{filter_facet = FALSE}.}
+
+\item{facet_main}{of same type as \code{facet} values. Value of single 'main' facet.}
+
+\item{filter_facet_base}{stuff. Work similarly to other \code{_base} arguments.}
+
+\item{filter_facet_params}{list. Works similarly to other \code{_params} arguments.}
 
 \item{color}{bare for NSE; character for SE. Name of column in \code{data} to use for color basis.
 Even if \code{fill} is the actual \code{ggplot2} aesthetic, the internal code will 'coerce' this
@@ -49,9 +44,33 @@ In order to simplify internal code, MUST be specified.}
 
 \item{add_labels}{logical. Whether or not to add text labels (of the tokens).}
 
+\item{scale_manual_params}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
+argument is specified, so if overwriting explicitly, then \code{values} should be included in the list.}
+
+\item{labs_base}{\code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
+It is recommended NOT to modify this argument; isntead, the \code{_params} argument should
+be used for customization.}
+
+\item{labs_params}{list. Additional parameters to pass to \code{ggplot2::labs()} to use in addition
+to and/or override the parameters set in the \code{_base} parameter.}
+
 \item{theme_base}{\code{ggplot2::theme()} function. (e.g. as \code{ggplot2::theme_minimal()}.)
 A custom theme is supplied as a default. As with the the \code{labs_base} argument, it is NOT
 recommended to change this directly.}
+
+\item{theme_params}{list. Additional parameters to pass to \code{ggplot2::labs()}.
+Should be used in the same manner as \code{labs_params} for customization.}
+
+\item{facet_base}{\code{ggplot2::facet_wrap()} function. An internal function
+sets defaults for \code{facets}, \code{scales}, \code{ncol}, \code{nrow}, and \code{strip.position}
+As with the \code{labs_base} and \code{theme_base} arguments, it is NOT recommended to set
+this argument explicitly; instead, the accompanying \code{_params} argument should be used.}
+
+\item{facet_params}{list. Additional parameters to pass to \code{ggplot2::facet_wrap()}. Parameters
+passed to this argument override thos in the \code{_base} argument.}
+
+\item{...}{dots. Parameters to pass directly to \code{visualize_time()}.}
 }
 \value{
 gg.

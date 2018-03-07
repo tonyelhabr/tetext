@@ -10,7 +10,7 @@ add_tweet_kind_cols(data = NULL)
 \item{data}{data.frame (created using \code{rtweet} package).}
 }
 \value{
-data.frame
+data.frame.
 }
 \description{
 Add columns to \code{rtweet} data.frame for 'kind' data.

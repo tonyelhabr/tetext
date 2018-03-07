@@ -5,20 +5,16 @@
 \alias{visualize_bigram_freqs_facet}
 \title{Visualize bigrams}
 \usage{
-visualize_bigram_freqs_facet_at(data = NULL, token = NULL, facet = NULL,
-  color = facet, color_value = "grey50", num_top = 3,
-  title = "Most Frequently Used Pairs of Words", subtitle = NULL,
-  caption = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = theme_tetext())
+visualize_bigram_freqs_facet_at(..., token = NULL, facet = NULL,
+  color = facet, num_top = 3,
+  scale_manual_params = default_scale_manual(), labs_base = default_labs(),
+  labs_params = list(title = "Most Frequently Used Token Pairs"),
+  theme_base = default_theme(), theme_params = list())
 
-visualize_bigram_freqs_facet(data = NULL, token = NULL, facet = NULL,
-  color = facet, color_value = "grey50", num_top = 3,
-  title = "Most Frequently Used Pairs of Words", subtitle = NULL,
-  caption = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = theme_tetext())
+visualize_bigram_freqs_facet(..., token, color, facet)
 }
 \arguments{
-\item{data}{data.frame.}
+\item{...}{dots. Parameters to pass directly to \code{visualize_time()}.}
 
 \item{token}{bare for NSE; character for SE. Name of column in \code{data} to use as unit for counting.
 Probably something like 'word' or 'bigram'.}
@@ -32,9 +28,23 @@ In order to simplify internal code, MUST be specified.}
 
 \item{num_top}{numeric. Number of words to show. If between 0 and 1, then assumed to be a percentage.}
 
+\item{scale_manual_params}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
+argument is specified, so if overwriting explicitly, then \code{values} should be included in the list.}
+
+\item{labs_base}{\code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
+It is recommended NOT to modify this argument; isntead, the \code{_params} argument should
+be used for customization.}
+
+\item{labs_params}{list. Additional parameters to pass to \code{ggplot2::labs()} to use in addition
+to and/or override the parameters set in the \code{_base} parameter.}
+
 \item{theme_base}{\code{ggplot2::theme()} function. (e.g. as \code{ggplot2::theme_minimal()}.)
 A custom theme is supplied as a default. As with the the \code{labs_base} argument, it is NOT
 recommended to change this directly.}
+
+\item{theme_params}{list. Additional parameters to pass to \code{ggplot2::labs()}.
+Should be used in the same manner as \code{labs_params} for customization.}
 }
 \value{
 gg.

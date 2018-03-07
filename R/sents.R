@@ -225,7 +225,7 @@ compute_sentratios_facet_by2_at <-
 
     token_quo <- rlang::sym(token)
 
-    name_xy <- sentiment <- logratio <- NULL
+    name_xy <- sentiment <- logratio <- word <- NULL
 
     data_proc %>%
       dplyr::rename(word = !!token_quo) %>%
@@ -282,26 +282,33 @@ visualize_sentratios_facet_by2_at <-
            ...,
            filter_facet = TRUE,
            facet_main = NULL,
-           filter_facet_base = filter_facet_tetext(facet_main),
+           filter_facet_base = default_filter_facet(facet_main),
            filter_facet_params = list(),
            filter_sent = TRUE,
            sent_main = NULL,
            color = NULL,
            lab_other = "other",
            num_top = 5,
-           scale_manual_params = scale_manual_tetext(values = c("grey50", "grey80")),
-           labs_base = labs_tetext(),
+           scale_manual_params = default_scale_manual(values = c("grey50", "grey80")),
+           labs_base = default_labs(),
            labs_params = list(title = "Most Significant Words Contributing to Sentiment Differences",
                               y = "Log Odds Ratio"),
-           theme_base = theme_tetext_facet(),
+           theme_base = default_theme_facet(),
            theme_params =
-             list(axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
+             list(legend.position = "bottom",
+                  axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
                   panel.grid.major.y = ggplot2::element_blank()),
            facet_base =
-             facet_tetext(ifelse(is.null(sent_main),
-                                   "sentiment ~ name_xy",
-                                   "name_xy")),
+             default_facet(ifelse(is.null(sent_main),
+                                  "sentiment ~ name_xy",
+                                  "name_xy")),
            facet_params = list()) {
+
+
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(token), is.character(token))
+    stopifnot(!is.null(facet), is.character(facet))
+    stopifnot(!is.null(lexicon), is.character(lexicon))
 
     if(missing(xy_grid) | missing(xy_nms)) {
       facets <-

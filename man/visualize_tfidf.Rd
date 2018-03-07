@@ -5,18 +5,17 @@
 \alias{visualize_tfidf}
 \title{Visualize TF-IDF}
 \usage{
-visualize_tfidf_at(data = NULL, token = NULL, doc = "document",
-  facet = doc, num_top = 10, color = facet, color_value = "grey50",
-  lab_x = NULL, lab_y = NULL, title = "Highest TF-IDF Words",
-  subtitle = NULL, caption = NULL, theme_base = theme_tetext_facet())
+visualize_tfidf_at(..., token = NULL, doc = NULL, facet = doc,
+  color = facet, num_top = 10,
+  scale_manual_params = default_scale_manual(), labs_base = default_labs(),
+  labs_params = list(title = "Highest TF-IDF Tokens"),
+  theme_base = default_theme_facet_dy(), theme_params = list(),
+  facet_base = default_facet(facet), facet_params = list())
 
-visualize_tfidf(data = NULL, token = NULL, doc = "document",
-  facet = doc, num_top = 10, color = facet, color_value = "grey50",
-  lab_x = NULL, lab_y = NULL, title = "Highest TF-IDF Words",
-  subtitle = NULL, caption = NULL, theme_base = theme_tetext_facet())
+visualize_tfidf(..., token, doc, facet, color)
 }
 \arguments{
-\item{data}{data.frame.}
+\item{...}{dots. Parameters to pass directly to \code{visualize_time()}.}
 
 \item{token}{bare for NSE; character for SE. Name of column in \code{data} to use as unit for counting.
 Probably something like 'word' or 'bigram'.}
@@ -26,16 +25,38 @@ as \code{document} in \code{tidytext::bind_tf_idf()}.}
 
 \item{facet}{bare for NSE; character for SE. Name of column in \code{data} to use for facetting.}
 
-\item{num_top}{numeric. Number of words to show. If between 0 and 1, then assumed to be a percentage.}
-
 \item{color}{bare for NSE; character for SE. Name of column in \code{data} to use for color basis.
 Even if \code{fill} is the actual \code{ggplot2} aesthetic, the internal code will 'coerce' this
 column to \code{fill}.
 In order to simplify internal code, MUST be specified.}
 
+\item{num_top}{numeric. Number of words to show. If between 0 and 1, then assumed to be a percentage.}
+
+\item{scale_manual_params}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
+argument is specified, so if overwriting explicitly, then \code{values} should be included in the list.}
+
+\item{labs_base}{\code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
+It is recommended NOT to modify this argument; isntead, the \code{_params} argument should
+be used for customization.}
+
+\item{labs_params}{list. Additional parameters to pass to \code{ggplot2::labs()} to use in addition
+to and/or override the parameters set in the \code{_base} parameter.}
+
 \item{theme_base}{\code{ggplot2::theme()} function. (e.g. as \code{ggplot2::theme_minimal()}.)
 A custom theme is supplied as a default. As with the the \code{labs_base} argument, it is NOT
 recommended to change this directly.}
+
+\item{theme_params}{list. Additional parameters to pass to \code{ggplot2::labs()}.
+Should be used in the same manner as \code{labs_params} for customization.}
+
+\item{facet_base}{\code{ggplot2::facet_wrap()} function. An internal function
+sets defaults for \code{facets}, \code{scales}, \code{ncol}, \code{nrow}, and \code{strip.position}
+As with the \code{labs_base} and \code{theme_base} arguments, it is NOT recommended to set
+this argument explicitly; instead, the accompanying \code{_params} argument should be used.}
+
+\item{facet_params}{list. Additional parameters to pass to \code{ggplot2::facet_wrap()}. Parameters
+passed to this argument override thos in the \code{_base} argument.}
 }
 \value{
 gg.

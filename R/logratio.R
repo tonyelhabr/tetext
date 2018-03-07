@@ -157,19 +157,20 @@ visualize_logratios_facet_by2_at <-
            ...,
            filter_facet = FALSE,
            facet_main = NULL,
-           filter_facet_base = filter_facet_tetext(facet_main),
+           filter_facet_base = default_filter_facet(facet_main),
            filter_facet_params = list(),
            color = NULL,
            lab_other = "other",
            num_top = 5,
-           scale_manual_params = scale_manual_tetext(values = c("grey50", "grey80")),
-           labs_base = labs_tetext(),
+           scale_manual_params = default_scale_manual(values = c("grey50", "grey80")),
+           labs_base = default_labs(),
            labs_params = list(title = "Most Unique Words", y = "Log Odds Ratio"),
-           theme_base = theme_tetext_facet(),
+           theme_base = default_theme_facet(),
            theme_params =
-             list(axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
+             list(legend.position = "bottom",
+                  axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
                   panel.grid.major.y = ggplot2::element_blank()),
-           facet_base = facet_tetext("name_xy"),
+           facet_base = default_facet("name_xy"),
            facet_params = list()) {
 
     stopifnot(!is.null(data), is.data.frame(data))

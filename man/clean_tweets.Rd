@@ -5,26 +5,21 @@
 \alias{clean_tweets}
 \title{Clean (and augment) \code{rtweet} data.frame}
 \usage{
-clean_tweets_at(data = NULL, facet, trim = TRUE, cols = c("status_id",
-  "created_at", "user_id", "screen_name", "text", "display_text_width",
-  "reply_to_status_id", "is_quote", "is_retweet", "favorite_count",
-  "retweet_count", "hashtags", "symbols", "urls_url", "urls_expanded_url",
-  "media_expanded_url", "ext_media_expanded_url"),
+clean_tweets_at(data = NULL, facet = NULL, trim = TRUE,
+  cols = c("status_id", "created_at", "user_id", "screen_name", "text",
+  "display_text_width", "reply_to_status_id", "is_quote", "is_retweet",
+  "favorite_count", "retweet_count", "hashtags", "symbols", "urls_url",
+  "urls_expanded_url", "media_expanded_url", "ext_media_expanded_url"),
   timezone = "America/Chicago")
 
-clean_tweets(data = NULL, facet, trim = TRUE, cols = c("status_id",
-  "created_at", "user_id", "screen_name", "text", "display_text_width",
-  "reply_to_status_id", "is_quote", "is_retweet", "favorite_count",
-  "retweet_count", "hashtags", "symbols", "urls_url", "urls_expanded_url",
-  "media_expanded_url", "ext_media_expanded_url"),
-  timezone = "America/Chicago")
+clean_tweets(..., facet)
 }
 \arguments{
 \item{data}{data.frame (created using \code{rtweet} package).}
 
 \item{facet}{bare for NSE; character for SE. Name of column in \code{data} used for facetting.
-Does not need to be specified.
-Included in \code{cols} if specified.}
+Set to NULL as default even though it is not required in order to simplify internal code.
+Included in \code{cols} if \code{trim = TRUE}.}
 
 \item{trim}{logical. Indicates whether or not to select only certain columns
 (and drop the others).}
@@ -33,9 +28,11 @@ Included in \code{cols} if specified.}
 Only relevant if \code{trim = TRUE}.}
 
 \item{timezone}{character. Passed directly to \code{lubridate::with_tz()} as \code{tzone} parameter.}
+
+\item{...}{dots. Additional paramaters.}
 }
 \value{
-data.frame
+data.frame.
 }
 \description{
 Munge an \code{rtweet} data.frame (according to personal preferences)

@@ -7,14 +7,14 @@
 \usage{
 visualize_corrs_network_at(..., resize_points = TRUE, size_point = "n",
   add_point_labels = TRUE, color_point = "grey50", shape_point = 21,
-  seed = 42, labs_base = labs_tetext(), labs_params = list(title =
-  "Network of Pairwise Correlations"), theme_base = theme_tetext(void = TRUE),
-  theme_params = list(legend.position = "none"))
+  seed = 42, labs_base = default_labs(), labs_params = list(title =
+  "Network of Pairwise Correlations"), theme_base = default_theme(void =
+  TRUE), theme_params = list())
 
 visualize_corrs_network(..., token, feature)
 }
 \arguments{
-\item{...}{dots. Parameters passed directly to \code{compute_corrs_at()}.}
+\item{...}{dots. Parameters passed directly to \code{compute_corrs()}.}
 
 \item{resize_points}{logical. Indicates whether or not to make size of points
 correspond to count of words.}
@@ -27,7 +27,7 @@ correspond to count of words.}
 
 \item{shape_point}{numeric.}
 
-\item{seed}{numeric. Used to by \code{ggraph::ggraph}.}
+\item{seed}{numeric. Used to initialize \code{ggraph::ggraph()}.}
 
 \item{labs_base}{\code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
 It is recommended NOT to modify this argument; isntead, the \code{_params} argument should
@@ -45,12 +45,20 @@ Should be used in the same manner as \code{labs_params} for customization.}
 
 \item{token}{bare for NSE; character for SE. Name of column in \code{data} to use as unit for counting.
 Probably something like 'word' or 'bigram'.}
+
+\item{feature}{bare for NSE; character for SE. Name of column in \code{data} to use as \code{feature}
+in \code{widyr::pairwise_cor()}.}
 }
 \value{
 gg.
 }
 \description{
 Visualize correlations with a network
+}
+\details{
+It's not straightforward to create \code{_base} and \code{_params} arguments
+for this function to map to the \code{ggraph} arguments, so explicit arguments
+are used (i.e. \code{color_point} \code{shape_point}
 }
 \seealso{
 \url{https://www.tidytextmining.com/ngrams.html}.

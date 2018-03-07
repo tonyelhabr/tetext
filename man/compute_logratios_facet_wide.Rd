@@ -14,10 +14,12 @@ compute_logratios_facet_wide(data = NULL, token = NULL, facet = NULL,
 \arguments{
 \item{data}{data.frame.}
 
-\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use for count. Default is provided}
+\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use for count.}
 
-\item{facet}{bare for NSE; character for SE. Name of column in \code{data} corresponding to group
-by which count is made.}
+\item{facet}{character. Name of column in \code{data} to use for facetting.
+It is set to NULL by default in the non-\code{facet} function even though it is not necessary.
+If specified with the non-\code{facet} version of the function,
+then the function acts just like the \code{_facet} version.}
 
 \item{cnt_min}{numeric. If not null, serves as a filter for which to compute log ratios.}
 }

@@ -2,15 +2,18 @@
 % Please edit documentation in R/trim.R
 \name{compute_timefilter_facet_at}
 \alias{compute_timefilter_facet_at}
+\alias{compute_timefilter_facet}
 \alias{compute_timefilter_at}
 \alias{compute_timefilter}
 \title{Add time-related columns}
 \usage{
 compute_timefilter_facet_at(data = NULL, timebin = NULL, facet = NULL)
 
-compute_timefilter_at(data, timebin, facet)
+compute_timefilter_facet(..., timebin, facet)
 
-compute_timefilter(data, timebin, facet)
+compute_timefilter_at(data = NULL, timebin = NULL, facet = NULL)
+
+compute_timefilter(..., timebin, facet)
 }
 \arguments{
 \item{data}{data.frame.}
@@ -18,11 +21,13 @@ compute_timefilter(data, timebin, facet)
 \item{timebin}{bare for NSE; character for SE. Name of column in \code{data} to use for time axis.}
 
 \item{facet}{bare for NSE; character for SE. Name of column in \code{data} used for facetting.}
+
+\item{...}{dots. Parameters to pass directly to \code{visualize_time()}.}
 }
 \value{
-list
+list.
 
-list
+list.
 }
 \description{
 Adds useful columns for subsequent time calculations and filtering.
