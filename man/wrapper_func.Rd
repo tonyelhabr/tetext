@@ -23,7 +23,7 @@ combinations of values.}
 data.frame.
 }
 \description{
-Apply a function to \code{data} in pairs (over a \code{multi} column).
+Apply a function to \code{data} in pairs (over a \code{facet} column).
 }
 \details{
 Should be replaced by a \code{purrr} function in the future.

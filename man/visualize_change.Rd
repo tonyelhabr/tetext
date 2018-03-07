@@ -5,67 +5,53 @@
 \alias{visualize_change}
 \title{Visualize change}
 \usage{
-visualize_change_at(..., num_top = 5, color = NULL,
-  color_value = rep("grey50", num_top), add_labels = FALSE,
-  lab_title = "Words with Most Statistically Significant Change in Frequency",
-  lab_subtitle = NULL,
-  lab_caption = paste0("Statistical Significance is determined by a logistical model\\n",
-  "estimating word appearance in a given time period."), lab_x = NULL,
-  lab_y = NULL, theme_base = theme_tetext())
+visualize_change_at(..., token = NULL, num_top = 5, color = token,
+  add_labels = FALSE, scale_manual_params = scale_manual_tetext(values =
+  rep("grey50", num_top)), labs_base = labs_tetext(),
+  labs_params = list(title =
+  "Tokens with Most Significant Change in Frequency", caption =
+  paste0("Statistical significance is determined by a logistical model\\n",
+  "estimating token appearance in a given time period.")),
+  theme_base = theme_tetext_dx(), theme_params = list(legend.position =
+  ifelse(add_labels, "none", "bottom")))
 
-visualize_change(..., num_top = 5, color = NULL,
-  color_value = rep("grey50", num_top), add_labels = FALSE,
-  lab_title = "Words with Most Statistically Significant Change in Frequency",
-  lab_subtitle = NULL,
-  lab_caption = paste0("Statistical Significance is determined by a logistical model\\n",
-  "estimating word appearance in a given time period."), lab_x = NULL,
-  lab_y = NULL, theme_base = theme_tetext())
+visualize_change(..., token, timebin, timefloor, color)
 }
 \arguments{
 \item{...}{dots. Parameters passed to \code{compute_change_at()}.}
 
+\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use as unit for counting.
+Probably something like 'word' or 'bigram'.}
+
 \item{num_top}{numeric. Number of words to show. If between 0 and 1, then assumed to be a percentage.}
 
-\item{color}{character. Name of column in \code{data} to use for color basis.
-Set to \code{NULL} by default although not actually required in order to simplify internal code.}
-
-\item{color_value}{character (vector). Hex value(s) of color. May be a vector.
-Should not be a function.}
+\item{color}{bare for NSE; character for SE. Name of column in \code{data} to use for color basis.
+Even if \code{fill} is the actual \code{ggplot2} aesthetic, the internal code will 'coerce' this
+column to \code{fill}.
+In order to simplify internal code, MUST be specified.}
 
 \item{add_labels}{logical. Whether or not to add labels to the lines.}
 
-\item{lab_title}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
+\item{scale_manual_params}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
+argument is specified, so if overwriting explicitly, then \code{values} should be included in the list.}
 
-\item{lab_subtitle}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
+\item{labs_base}{\code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
+It is recommended NOT to modify this argument; isntead, the \code{_params} argument should
+be used for customization.}
 
-\item{lab_caption}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
+\item{labs_params}{list. Additional parameters to pass to \code{ggplot2::labs()} to use in addition
+to and/or override the parameters set in the \code{_base} parameter.}
 
-\item{lab_x}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
+\item{theme_base}{\code{ggplot2::theme()} function. (e.g. as \code{ggplot2::theme_minimal()}.)
+A custom theme is supplied as a default. As with the the \code{labs_base} argument, it is NOT
+recommended to change this directly.}
 
-\item{lab_y}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
+\item{theme_params}{list. Additional parameters to pass to \code{ggplot2::labs()}.
+Should be used in the same manner as \code{labs_params} for customization.}
 
-\item{theme_base}{\code{ggplot2} theme (e.g. as \code{ggplot2::theme_minimal()}.)
-A custom \code{tetext} thems is supplied as a default.}
+\item{timebin}{bare for NSE; character for SE. Name of column in \code{data} to use for time axis.
+Probably something like 'yyyy', 'mm', etc.}
 }
 \value{
 gg.
@@ -74,6 +60,6 @@ gg.
 Visualize the words that have changed the most across \code{timebin}
 }
 \details{
-Calls \code{compute_change_at()} internally. Works similarly to \code{visualize_corrs}.
+Calls \code{compute_change()} internally. Works similarly to \code{visualize_corrs}.
 (Two data sets are returned from the list that is returned by the \code{compute_} function.)
 }

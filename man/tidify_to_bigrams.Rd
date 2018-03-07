@@ -14,7 +14,7 @@ tidify_to_bigrams(data = NULL, text = "text", rgx_pattern, rgx_replacement,
 \arguments{
 \item{data}{data.frame.}
 
-\item{text}{character. Name of column in \code{data} to parse.}
+\item{text}{bare for NSE; character for SE. Name of column in \code{data} to parse.}
 
 \item{rgx_pattern}{character. Regular expression to substitute.}
 
@@ -36,6 +36,6 @@ Create a tidy data.frame of unigrams.
 }
 \details{
 Heavily influenced by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
-Creates output columns 'word', 'word1', and 'word2'.
-('word' is simply 'word1' and 'word2' toegether.)
+Creates output columns 'token', 'word1', and 'word2'.
+('token' is simply 'word1' and 'word2' toegether.)
 }

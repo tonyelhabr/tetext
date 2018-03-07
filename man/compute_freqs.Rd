@@ -3,27 +3,27 @@
 \name{compute_freqs_at}
 \alias{compute_freqs_at}
 \alias{compute_freqs}
-\alias{compute_freqs_multi_at}
-\alias{compute_freqs_multi}
-\alias{compute_freqs_multi_wide_at}
-\title{Compute n-gram frequency}
+\alias{compute_freqs_facet_at}
+\alias{compute_freqs_facet}
+\alias{compute_freqs_facet_wide_at}
+\title{Compute token frequency}
 \usage{
-compute_freqs_at(data = NULL, word = "word")
+compute_freqs_at(data = NULL, token = NULL)
 
-compute_freqs(data = NULL, word = "word")
+compute_freqs(data = NULL, token = NULL)
 
-compute_freqs_multi_at(data = NULL, word = "word", multi = NULL)
+compute_freqs_facet_at(data = NULL, token = NULL, facet = NULL)
 
-compute_freqs_multi(data = NULL, word = "word", multi = NULL)
+compute_freqs_facet(data = NULL, token = NULL, facet = NULL)
 
-compute_freqs_multi_wide_at(data = NULL, word = "word", multi = NULL)
+compute_freqs_facet_wide_at(data = NULL, token = NULL, facet = NULL)
 }
 \arguments{
 \item{data}{data.frame.}
 
-\item{word}{character. Name of column in \code{data} to use for count. Default is provided}
+\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use for count. Default is provided}
 
-\item{multi}{character. Name of column in \code{data} corresponding to group
+\item{facet}{bare for NSE; character for SE. Name of column in \code{data} corresponding to group
 by which count is made.}
 }
 \value{
@@ -32,13 +32,13 @@ data.frame.
 data.frame.
 }
 \description{
-Compute the frequency of n-grams.
+Compute the frequency of tokens.
 
-Manipulates output from \code{compute_freqs_multi_at()}
+Manipulates output from \code{compute_freqs_facet_at()}
 for \code{compute_freqs_mult_by2} function.
 }
 \details{
-Inspired by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
+None.
 
 To be used by \code{_by2} function only.
 }

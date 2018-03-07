@@ -5,22 +5,20 @@
 \alias{compute_corrs}
 \title{Compute correlations}
 \usage{
-compute_corrs_at(data = NULL, word = "word", feature = NULL,
+compute_corrs_at(data = NULL, token = NULL, feature = NULL,
   num_top_ngrams = 50, num_top_corrs = 50, return_corrs = TRUE,
   return_words = FALSE, return_both = FALSE)
 
-compute_corrs(data = NULL, word = "word", feature = NULL,
-  num_top_ngrams = 50, num_top_corrs = 50, return_corrs = TRUE,
-  return_words = FALSE, return_both = FALSE)
+compute_corrs(..., token, feature)
 }
 \arguments{
 \item{data}{data.frame.}
 
-\item{word}{character. Name of column in \code{data} to use as \code{item}
+\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use as \code{item}
 in \code{widyr::pairwise_cor()}.}
 
-\item{feature}{character. Name of column in \code{data} to use as \code{feature}
-in \code{widyr::pairwise_cor()}. No default is provided}
+\item{feature}{bare for NSE; character for SE. Name of column in \code{data} to use as \code{feature}
+in \code{widyr::pairwise_cor()}.}
 
 \item{num_top_ngrams}{numeric. Useful primarily to prevent \code{widyr::pairwise_cor()}
 from hanging up. If between 0 and 1, then interpreted as a percentage.}
@@ -28,14 +26,16 @@ from hanging up. If between 0 and 1, then interpreted as a percentage.}
 \item{num_top_corrs}{numeric. Useful primarily to limit input to a network visualation.
 does not hang up. If between 0 and 1, then interpreted as a percentage.}
 
-\item{return_corrs}{logical. Whether to return just the correlations and word pairs,
-but not the word counts. This is the default option.}
+\item{return_corrs}{logical. Whether to return just the correlations and token pairs,
+but not the token counts. This is the default option.}
 
 \item{return_words}{logical. Whether to return the counts used to compute
 the correlations. Useful when creating a network visualization.}
 
 \item{return_both}{logical. Useful when creating a network visualization so that
 words can be used as nodes and correlations can be used weights.}
+
+\item{...}{dots. Parameters to pass directly to \code{visualize_time()}.}
 }
 \value{
 data.frame.
@@ -44,8 +44,7 @@ data.frame.
 Compute correlations among pairs of words.
 }
 \details{
-Call \code{widyr::pairwise_cor()} internally.
-Is called by \code{visualize_corrs_network_at()}, so there is no need to call this directly.
+Calls \code{widyr::pairwise_cor()} internally.
 }
 \seealso{
 \url{http://varianceexplained.org/r/seven-fav-packages/}.

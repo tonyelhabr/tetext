@@ -5,17 +5,17 @@
 \alias{compute_tfidf}
 \title{Compute TF-IDF}
 \usage{
-compute_tfidf_at(data = NULL, word = "word", doc = "document")
+compute_tfidf_at(data = NULL, token = NULL, doc = "document")
 
-compute_tfidf(data = NULL, word = "word", doc = "document")
+compute_tfidf(data = NULL, token = NULL, doc = "document")
 }
 \arguments{
 \item{data}{data.frame.}
 
-\item{word}{character. Name of column in \code{data} to use
+\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use
 as \code{term} in \code{tidytext::bind_tf_idf()}.}
 
-\item{doc}{character. Name of column in \code{data} to use
+\item{doc}{bare for NSE; character for SE. Name of column in \code{data} to use
 as \code{document} in \code{tidytext::bind_tf_idf()}.}
 }
 \value{

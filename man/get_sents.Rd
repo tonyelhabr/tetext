@@ -19,7 +19,7 @@ data.frame
 Get words associated with a lexicon for subsequent sentiment analysis.
 }
 \details{
-Called by \code{compute_sent_multi_summary()}.
+Called by \code{compute_sent_facet_summary()}.
 This function is essentially a customized version of  \code{tidytext::get_sentiments()}.
 }
 \seealso{

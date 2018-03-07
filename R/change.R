@@ -1,15 +1,15 @@
 
 #' Compute change
 #'
-#' @description Compute change in n-gram usage over time.
+#' @description Compute change in token usage over time.
 #' @details None.
 #' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
-#' @param word character. Name of column in \code{data} corresponding to n-gram.
-#' @param timebin character. Name of column in \code{data} specifying temporal period
+#' @param token bare for NSE; character for SE. Name of column in \code{data} corresponding to token.
+#' @param timebin bare for NSE; character for SE. Name of column in \code{data} specifying temporal period
 #' to use to compute change.
 #' @param bin logical. Whether or not to call \code{lubridate::floor_date()} to truncate \code{timebin}.
-#' @param timefloor character. Name of column passed directly to \code{unit} parameter of
+#' @param timefloor bare for NSE; character for SE. Name of column passed directly to \code{unit} parameter of
 #' \code{lubridate::floor_date()} if \code{bin = FALSE}.
 #' @param top_pct numeric. Number between 0 and 1. Useful primarily to limit the number of models
 #' that need to be computed and to reduce 'nose' regarding what is deemed significant.
@@ -25,10 +25,10 @@
 #' @return data.frame.
 #' @rdname compute_change
 #' @export
-#' @seealso \url{https://www.tidytextmining.com/twitter.html#changes-in-word-use}
+#' @seealso \url{https://www.tidytextmining.com/twitter.html#changes-in-token-use}
 compute_change_at <-
   function(data = NULL,
-           word = "word",
+           token = NULL,
            timebin = NULL,
            bin = TRUE,
            timefloor = NULL,
@@ -38,22 +38,20 @@ compute_change_at <-
            return_models = TRUE,
            return_data = FALSE,
            return_both = FALSE) {
-    if (is.null(data))
-      stop("`data` cannot be NULL.", call. = FALSE)
-    if (is.null(timebin))
-      stop("`timebin` cannot be NULL.", call. = FALSE)
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(token), is.character(token))
+    stopifnot(!is.null(timebin), is.character(timebin))
 
     n <-
       time_total <-
-      word_total <-
+      token_total <-
       time_floor <- models <- term <- p.value <- adjusted_p_value <- NULL
 
-    word_quo <- rlang::sym(word)
+    token_quo <- rlang::sym(token)
     timebin_quo <- rlang::sym(timebin)
 
     if(bin) {
-      if (is.null(timefloor))
-        stop("`timefloor` cannot be NULL.", call. = FALSE)
+      stopifnot(!is.null(timefloor), is.character(timefloor))
       data <-
         data %>%
         dplyr::mutate(time_floor = lubridate::floor_date(!!timebin_quo, unit = timefloor))
@@ -62,28 +60,26 @@ compute_change_at <-
         data %>% dplyr::mutate(time_floor = !!timebin_quo)
     }
 
-    # browser()
     data_bytime <-
       data %>%
-      dplyr::group_by(time_floor, !!word_quo) %>%
+      dplyr::group_by(time_floor, !!token_quo) %>%
       dplyr::summarise(n = n()) %>%
       # dplyr::summarise(n = sum(!is.na(time_floor))) %>%
       dplyr::ungroup() %>%
       dplyr::group_by(time_floor) %>%
       dplyr::mutate(time_total = sum(n)) %>%
       dplyr::ungroup() %>%
-      dplyr::group_by(!!word_quo) %>%
-      dplyr::mutate(word_total = sum(n)) %>%
+      dplyr::group_by(!!token_quo) %>%
+      dplyr::mutate(token_total = sum(n)) %>%
       dplyr::ungroup() %>%
-      filter_num_top_at("word_total", top_pct, 1, 0) %>%
-      # dplyr::filter(word_total >= stats::quantile(word_total, top_pct)) %>%
-      dplyr::arrange(dplyr::desc(word_total))
+      filter_num_top_at("token_total", (1 - top_pct), 1, 0) %>%
+      dplyr::arrange(dplyr::desc(token_total))
 
-    # NOTE: This supplies a formula to `stats::sglm()` in an atypical fashion:
+    # NOTE: This supplies a formula to `stats::glm()` in an atypical fashion:
     # "... as a two-column matrix with the columns giving the numbers of successes and failures".
     data_bytime_models <-
       data_bytime %>%
-      tidyr::nest(-!!word_quo) %>%
+      tidyr::nest(-!!token_quo) %>%
       dplyr::mutate(models =
                       purrr::map(data, ~ stats::glm(
                         cbind(n, time_total) ~ time_floor, ., family = "binomial"
@@ -115,12 +111,28 @@ compute_change_at <-
 
 #' @rdname compute_change
 #' @export
-compute_change <- compute_change_at
+compute_change <-
+  function(...,
+           token,
+           timebin,
+           timefloor) {
+    stopifnot(!missing(token))
+    stopifnot(!missing(timebin))
+    timebin <- rlang::quo_text(rlang::enquo(timebin))
+    token <- rlang::quo_text(rlang::enquo(token))
+    if (missing(timefloor)) {
+      timefloor <- NULL
+    }
+    compute_change_at(...,
+                      token = token,
+                      timebin = timebin,
+                      timefloor = timefloor)
+}
 
 #' Visualize change
 #'
 #' @description Visualize the words that have changed the most across \code{timebin}
-#' @details Calls \code{compute_change_at()} internally. Works similarly to \code{visualize_corrs}.
+#' @details Calls \code{compute_change()} internally. Works similarly to \code{visualize_corrs}.
 #' (Two data sets are returned from the list that is returned by the \code{compute_} function.)
 #' @param ... dots. Parameters passed to \code{compute_change_at()}.
 #' @param add_labels logical. Whether or not to add labels to the lines.
@@ -131,21 +143,24 @@ compute_change <- compute_change_at
 #' @export
 visualize_change_at <-
   function(...,
+           token = NULL,
            num_top = 5,
-           color = NULL,
-           color_value = rep("grey50", num_top),
+           color = token,
            add_labels = FALSE,
-           lab_title = "Words with Most Statistically Significant Change in Frequency",
-           lab_subtitle = NULL,
-           lab_caption = paste0("Statistical Significance is determined by a logistical model\n",
-                                "estimating word appearance in a given time period."),
-           lab_x = NULL,
-           lab_y = NULL,
-           theme_base = theme_tetext()) {
+           scale_manual_params = scale_manual_tetext(values = rep("grey50", num_top)),
+           labs_base = labs_tetext(),
+           labs_params = list(title = "Tokens with Most Significant Change in Frequency",
+                              caption = paste0("Statistical significance is determined by a logistical model\n",
+                                               "estimating token appearance in a given time period.")),
+           theme_base = theme_tetext_dx(),
+           theme_params = list(legend.position = ifelse(add_labels, "none", "bottom"))) {
+
+    stopifnot(!is.null(token), is.character(token))
 
     data_list <-
       compute_change_at(
         ...,
+        token = token,
         return_both = TRUE
       )
     data <- data_list$data
@@ -158,27 +173,30 @@ visualize_change_at <-
       dplyr::mutate(temp = 1 - adjusted_p_value) %>%
       filter_num_top_at("temp", num_top) %>%
       dplyr::select(-temp)
-      # filter_num_top_at("adjusted_p_value", num_top)
 
     if (is.null(color)) {
       data_models_top <- data_models_top %>% dplyr::mutate(`.dummy` = "dummy")
       color <- ".dummy"
     }
-    data_models_top <- wrangle_color_col(data_models_top, color)
+    # NOTE: DON'T NEED THIS!
+    # data_models_top <- wrangle_color_col(data_models_top color)
 
-    time_total <- time_floor <- word <- pct <- label <- n <- NULL
+    time_total <- time_floor <- pct <- label <- n <- NULL
 
+
+    token_quo <- rlang::sym(token)
     # Create label column even if `add_labels = FALSE`.
+
     data_proc <-
       data %>%
-      dplyr::inner_join(data_models_top, by = c("word")) %>%
+      dplyr::inner_join(data_models_top, by = token) %>%
       dplyr::mutate(pct = n / time_total) %>%
-      dplyr::mutate(label = dplyr::if_else(time_floor == max(time_floor), word, NA_character_))
+      dplyr::mutate(label = dplyr::if_else(time_floor == max(time_floor), !!token_quo, NA_character_))
 
     viz <-
       data_proc %>%
-      ggplot2::ggplot(ggplot2::aes(x = time_floor, y = pct, color = word)) +
-      ggplot2::scale_color_manual(values = color_value) +
+      ggplot2::ggplot(ggplot2::aes_string(x = "time_floor", y = "pct", color = color)) +
+      do_call_scale_manual(scale_manual_params, type = "color") +
       ggplot2::geom_line(size = 1.5) +
       ggplot2::scale_y_continuous(labels = scales::percent_format())
 
@@ -188,28 +206,39 @@ visualize_change_at <-
         ggrepel::geom_label_repel(ggplot2::aes(label = label), nudge_x = 1, na.rm = TRUE)
     }
 
-
-    viz_labs <-
-      ggplot2::labs(
-        x = lab_x,
-        y = lab_y,
-        title = lab_title,
-        subtitle = lab_subtitle,
-        caption = lab_caption
-      )
-    viz_theme <-
-      theme_base +
-      ggplot2::theme(
-        legend.position = ifelse(add_labels, "none", "bottom")
-      )
     viz <-
       viz +
-      viz_labs +
-      viz_theme
-    viz
+      labs_base + do_call_labs(labs_params) +
+      theme_base + do_call_theme(theme_params)
 }
 
 #' @rdname visualize_change
 #' @export
-visualize_change <- visualize_change_at
+visualize_change <-
+  function(...,
+           token,
+           timebin,
+           timefloor,
+           color) {
+    stopifnot(!missing(token))
+    stopifnot(!missing(timebin))
+    token <- rlang::quo_text(rlang::enquo(token))
+    timebin <- rlang::quo_text(rlang::enquo(timebin))
+    if (missing(color)) {
+      # color <- NULL
+      color <- token
+    } else {
+      color <- rlang::quo_text(rlang::enquo(color))
+    }
+    if (missing(timefloor)) {
+      timefloor <- NULL
+    }
+    visualize_change_at(
+      ...,
+      token = token,
+      timebin = timebin,
+      timefloor = timefloor,
+      color = color
+    )
+  }
 

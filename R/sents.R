@@ -16,7 +16,7 @@ get_sents_valid <-
 #' Get sentiment dictionary
 #'
 #' @description Get words associated with a lexicon for subsequent sentiment analysis.
-#' @details Called by \code{compute_sent_multi_summary()}.
+#' @details Called by \code{compute_sent_facet_summary()}.
 #' This function is essentially a customized version of  \code{tidytext::get_sentiments()}.
 #' @param lexicon character. Specifies lexicon to use. Must be a lexicon available in the \code{tidytext::package}.
 #' @param normalize logical. Only releveant if \code{lexicon = 'afinn'}. Renormalizes
@@ -52,65 +52,70 @@ get_sents <- function(lexicon = c("bing", "afinn", "nrc", "loughran"),
 
 #' @rdname compute_sent_summary
 #' @export
-compute_sent_summary_multi_at <-
+compute_sent_summary_facet_at <-
   function(data = NULL,
-           word = "word",
-           multi = NULL,
+           token = NULL,
            feature = NULL,
+           facet = NULL,
            lexicon = "bing",
            ...) {
-    if (is.null(data))
-      stop("`data` cannot be NULL.", call. = FALSE)
-    if (is.null(multi))
-      stop("`multi` cannot be NULL.", call. = FALSE)
-    if (is.null(feature))
-      stop("`feature` cannot be NULL.", call. = FALSE)
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(token), is.character(token))
+    stopifnot(!is.null(feature), is.character(feature))
+    stopifnot(!is.null(facet), is.character(facet))
 
-    word_quo <- rlang::sym(word)
-    multi_quo <- rlang::sym(multi)
+    token_quo <- rlang::sym(token)
+    facet_quo <- rlang::sym(facet)
     feature_quo <- rlang::sym(feature)
 
-    total_words <- sentiment <- n <- word <- words <- sentiment_pct <- NULL
+    total_words <- sentiment <- n <- cnt <- sentiment_pct <- NULL
 
-    data_multi_cnt <-
+    data_facet_cnt <-
       data %>%
-      dplyr::group_by(!!multi_quo) %>%
+      dplyr::group_by(!!facet_quo) %>%
       dplyr::mutate(total_words = n()) %>%
       dplyr::ungroup() %>%
-      dplyr::distinct(!!multi_quo, !!feature_quo, total_words)
+      dplyr::distinct(!!facet_quo, !!feature_quo, total_words)
 
     sents <- get_sents(lexicon = lexicon, ...)
 
-    out <-
-      data %>%
-      dplyr::rename(word = !!word_quo) %>%
+    data %>%
+      dplyr::rename(word = !!token_quo) %>%
       dplyr::inner_join(sents, by = "word") %>%
       dplyr::count(!!feature_quo, sentiment) %>%
       tidyr::complete(sentiment, !!feature_quo, fill = list(n = 0)) %>%
-      dplyr::inner_join(data_multi_cnt, by = c(feature)) %>%
-      dplyr::group_by(!!multi_quo, sentiment, total_words) %>%
-      dplyr::summarize(words = sum(n)) %>%
+      dplyr::inner_join(data_facet_cnt, by = feature) %>%
+      dplyr::group_by(!!facet_quo, sentiment, total_words) %>%
+      dplyr::summarize(cnt = sum(n)) %>%
       # dplyr::mutate(sentiment_pct = words / total_words) %>%
       dplyr::ungroup()
-    out
   }
 
 #' @rdname compute_sent_summary
 #' @export
-compute_sent_summary_multi <- compute_sent_summary_multi_at
+compute_sent_summary_facet <-
+  function(..., token, feature, facet) {
+    stopifnot(!missing(token))
+    stopifnot(!missing(feature))
+    stopifnot(!missing(facet))
+    token <- rlang::quo_text(rlang::enquo(token))
+    feature <- rlang::quo_text(rlang::enquo(feature))
+    facet <- rlang::quo_text(rlang::enquo(facet))
+    compute_sent_summary_facet_at(..., token = token, feature = feature, facet = facet)
+  }
 
 #' Compute sentiment scores.
 #'
-#' @description Compute sentiment scores given n-grams.
+#' @description Compute sentiment scores given tokens.
 #' @details Heavily influenced by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
 #' Creates output columns 'sentiment' and 'score'.
 #' @inheritParams get_sents
 #' @param data data.frame. Must already be in 'tidy' format.
-#' @param word character. Name of column in \code{data} whose values are scored.
-#' @param multi character. Name of column in \code{data} used for grouping in the case
+#' @param token bare for NSE; character for SE. Name of column in \code{data} whose values are scored.
+#' @param facet bare for NSE; character for SE. Name of column in \code{data} used for grouping in the case
 #' that there are more than one entitiy.
-#' @param feature character. Name of column in \code{data} whose values serve as
-#' entity across which 'word' values are scored. Probably something like 'sentence',
+#' @param feature bare for NSE; character for SE. Name of column in \code{data} whose values serve as
+#' entity across which 'token' values are scored. Probably something like 'sentence',
 #' or, in the case of Twitter data, 'status_id'.
 #' @param ... dots. Parameters to pass to \code{get_sents()} internally.
 #' @return data.frame.
@@ -119,77 +124,92 @@ compute_sent_summary_multi <- compute_sent_summary_multi_at
 #' @seealso Don't have an explicit url.
 compute_sent_summary_at <-
   function(data = NULL,
-           word,
-           multi,
-           feature,
+           # token = NULL,
+           # feature = NULL,
+           facet = NULL,
            ...) {
-    if (missing(multi)) {
+    stopifnot(!is.null(data), is.data.frame(data))
+    # stopifnot(!is.null(token), is.character(token))
+    # stopifnot(!is.null(feature), is.character(feature))
+
+    browser()
+    if (is.null(facet)) {
       add_dummy <- TRUE
-      data <- data %>% dplyr::mutate(`.multi` = "dummy")
-      multi <- ".multi"
+      data <- data %>% dplyr::mutate(`.facet` = "dummy")
+      facet <- ".facet"
     } else {
       add_dummy <- FALSE
     }
 
     out <-
-      compute_sent_summary_multi_at(
+      compute_sent_summary_facet_at(
         data = data,
-        multi = multi,
+        facet = facet,
         ...
       )
     if (add_dummy) {
-      out <- out %>% dplyr::select(-dplyr::one_of(c(multi)))
+      out <- out %>% dplyr::select(-dplyr::one_of(c(facet)))
     }
     out
   }
 
 #' @rdname compute_sent_summary
 #' @export
-compute_sent_summary <- compute_sent_summary_at
+compute_sent_summary <-
+  function(..., token, feature, facet) {
+    stopifnot(!missing(token))
+    stopifnot(!missing(feature))
+    token <- rlang::quo_text(rlang::enquo(token))
+    feature <- rlang::quo_text(rlang::enquo(feature))
+    if(missing(facet)) {
+      facet <- NULL
+    } else {
+      facet <- rlang::quo_text(rlang::enquo(facet))
+    }
+    compute_sent_summary_at(..., token = token, feature = feature, facet = facet)
+  }
 
-#' Compute n-gram sentiment log ratios in pairs
+#' Compute token sentiment log ratios in pairs
 #'
-#' @description Apply \code{compute_logratios_multi_wide_at()} to
-#' \code{data} in pairs of \code{multi} values, then do post-processing for sentiments.
+#' @description Apply \code{compute_logratios_facet_wide_at()} to
+#' \code{data} in pairs of \code{facet} values, then do post-processing for sentiments.
 #' @details Calls \code{wrapper_func} internally. This function is very
-#' similar to \code{compute_sentratios_multi_by2_at()}, but with some post-processing.
+#' similar to \code{compute_sentratios_facet_by2_at()}, but with some post-processing.
 #' Note that \code{...} are passed to \code{get_sents()} here (instead of to
-#' \code{compute_logratios_multi_wide_at()}, so \code{word} and \code{cnt_min} must
+#' \code{compute_logratios_facet_wide_at()}, so \code{token} and \code{cnt_min} must
 #' be checked for NULL explicilty.
 #' @inheritParams wrapper_func
-#' @inheritParams compute_logratios_multi_wide_at
-#' @inheritParams compute_logratios_multi_by2_at
+#' @inheritParams compute_logratios_facet_wide_at
+#' @inheritParams compute_logratios_facet_by2_at
 #' @inheritParams get_sents
 #' @param ... dots. Adddition parameters to pass to \code{get_sents()}.
 #' @return data.frame.
-#' @rdname compute_sentratios_multi_by2
+#' @rdname compute_sentratios_facet_by2
 #' @export
-compute_sentratios_multi_by2_at <-
+compute_sentratios_facet_by2_at <-
   function(data = NULL,
-           func = compute_logratios_multi_wide_at,
-           word = "word",
-           multi = NULL,
+           func = compute_logratios_facet_wide_at,
+           token = NULL,
+           facet = NULL,
            xy_grid,
            xy_nms,
            cnt_min = 10,
            lexicon = "bing",
            ...) {
 
-    if (is.null(data))
-      stop("`data` cannot be NULL.", call. = FALSE)
-    if (is.null(word))
-      stop("`word` cannot be NULL.", call. = FALSE)
-    if (is.null(multi))
-      stop("`multi` cannot be NULL.", call. = FALSE)
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(token), is.character(token))
+    stopifnot(!is.null(facet), is.character(facet))
+
 
     if(missing(xy_grid) | missing(xy_nms)) {
-      multis <-
+      facets <-
         data %>%
-        pull_distinctly_at(multi)
-      xy_grid <- create_xy_grid(multis)
+        pull_distinctly_at(facet)
+      xy_grid <- create_xy_grid(facets)
       xy <- NULL
       xy_nms <- xy_grid %>% dplyr::pull(xy)
-      message("Generating output for all combinations of `multi`.")
+      message("Generating output for all combinations of `facet`.")
     }
 
     data_proc <-
@@ -198,22 +218,22 @@ compute_sentratios_multi_by2_at <-
         func = func,
         xy_grid = xy_grid,
         xy_nms = xy_nms,
-        word = word,
-        multi = multi,
+        token = token,
+        facet = facet,
         cnt_min = cnt_min
       )
 
     sents <- get_sents(lexicon = lexicon, ...)
 
-    word_quo <- rlang::sym(word)
+    token_quo <- rlang::sym(token)
 
     name_xy <- sentiment <- logratio <- NULL
 
     out <-
       data_proc %>%
-      dplyr::rename(word = !!word_quo) %>%
+      dplyr::rename(word = !!token_quo) %>%
       dplyr::inner_join(sents, by = "word") %>%
-      dplyr::group_by(name_xy, word, sentiment) %>%
+      dplyr::group_by(name_xy, token, sentiment) %>%
       dplyr::mutate(logratio = mean(logratio)) %>%
       dplyr::ungroup() %>%
       dplyr::arrange(name_xy, sentiment, dplyr::desc(abs(logratio)))
@@ -221,31 +241,41 @@ compute_sentratios_multi_by2_at <-
     out
   }
 
-#' @rdname compute_sentratios_multi_by2
+#' @rdname compute_sentratios_facet_by2
 #' @export
-compute_sentratios_multi_by2 <- compute_sentratios_multi_by2_at
+compute_sentratios_facet_by2 <-
+  function(..., token, facet) {
+    stopifnot(!missing(token))
+    stopifnot(!missing(facet))
+    token <- rlang::quo_text(rlang::enquo(token))
+    facet <- rlang::quo_text(rlang::enquo(facet))
 
-#' Visualize n-gram sentiment log ratios in pairs
+    compute_sentratios_facet_by2(...,
+                                 token = token,
+                                 facet = facet)
+  }
+
+#' Visualize token sentiment log ratios in pairs
 #'
-#' @description Visualize n-gram sentiment log ratios across pairs of \code{multi} values.
-#' @details \code{compute_sentratios_multi_by2_at()} should NOT be called beforehand.
-#' @inheritParams compute_logratios_multi_by2_at
-#' @inheritParams visualize_logratios_multi_by2
-#' @inheritParams compute_sentratios_multi_by2_at
-#' @param ... dots. Additional parameters to pass to \code{compute_sentratios_multi_by2_at()}.
+#' @description Visualize token sentiment log ratios across pairs of \code{facet} values.
+#' @details \code{compute_sentratios_facet_by2_at()} should NOT be called beforehand.
+#' @inheritParams compute_logratios_facet_by2_at
+#' @inheritParams visualize_logratios_facet_by2
+#' @inheritParams compute_sentratios_facet_by2_at
+#' @param ... dots. Additional parameters to pass to \code{compute_sentratios_facet_by2_at()}.
 #' @param filter_sent logical. Whether or not to filter the sentiment values.
-#' @param sent_main character. Name of single sentiment value to use as basis.
+#' @param sent_main bare for NSE; character for SE. Name of single sentiment value to use as basis.
 #' Not used if \code{filter_sent = FALSE}.
 #' @return gg.
-#' @rdname visualize_sentratios_multi_by2
+#' @rdname visualize_sentratios_facet_by2
 #' @export
-#' @seealso \url{https://www.tidytextmining.com/twitter.html#comparing-word-usage}.
+#' @seealso \url{https://www.tidytextmining.com/twitter.html#comparing-token-usage}.
 #' \url{http://varianceexplained.org/r/trump-tweets/}.
 #' \url{https://www.tidytextmining.com/sentiment.html#most-positive-negative}.
-visualize_sentratios_multi_by2_at <-
+visualize_sentratios_facet_by2_at <-
   function(data = NULL,
-           word = "word",
-           multi = NULL,
+           token = NULL,
+           facet = NULL,
            xy_nms,
            xy_grid,
            cnt_min = 10,
@@ -253,8 +283,8 @@ visualize_sentratios_multi_by2_at <-
            ...,
            filter_sent = TRUE,
            sent_main = NULL,
-           filter_multi = TRUE,
-           multi_main = NULL,
+           filter_facet = TRUE,
+           facet_main = NULL,
            x_include = NULL,
            y_include = NULL,
            x_exclude = NULL,
@@ -264,34 +294,34 @@ visualize_sentratios_multi_by2_at <-
            num_top = 3,
            flip_axes = FALSE,
            lab_other = "other",
-           lab_title = "Most Significant Words Contributing to Sentiment Differences",
-           lab_subtitle = NULL,
-           lab_caption = NULL,
+           title = "Most Significant Words Contributing to Sentiment Differences",
+           subtitle = NULL,
+           caption = NULL,
            lab_x = NULL,
            lab_y = "Log Odds Ratio",
            theme_base = theme_tetext_facet(),
-           facet_scales = "free",
-           facet_ncol = 3,
-           facet_nrow = NULL,
-           facet_strip_position = "right") {
+           scales = "free",
+           ncol = 3,
+           nrow = NULL,
+           strip.position = "right") {
 
     if(missing(xy_grid) | missing(xy_nms)) {
-      multis <-
+      facets <-
         data %>%
-        pull_distinctly_at(multi)
-      xy_grid <- create_xy_grid(multis)
+        pull_distinctly_at(facet)
+      xy_grid <- create_xy_grid(facets)
       xy <- NULL
       xy_nms <- xy_grid %>% dplyr::pull(xy)
-      message("Generating output for all combinations of `multi`.")
+      message("Generating output for all combinations of `facet`.")
     }
 
     data_proc <-
-      compute_sentratios_multi_by2_at(
+      compute_sentratios_facet_by2_at(
         data = data,
         xy_grid = xy_grid,
         xy_nms = xy_nms,
-        word = word,
-        multi = multi,
+        token = token,
+        facet = facet,
         cnt_min = cnt_min,
         lexicon = lexicon,
         ...
@@ -300,17 +330,17 @@ visualize_sentratios_multi_by2_at <-
     data_proc <-
       data_proc %>%
       validate_x_main(
-        filter_x = filter_multi,
-        x = multi,
-        xs = data %>% pull_distinctly_at(multi),
-        x_main = multi_main
+        filter_x = filter_facet,
+        x = facet,
+        xs = data %>% pull_distinctly_at(facet),
+        x_main = facet_main
       )
 
     data_proc <-
       data_proc %>%
-      filter_data_multi_at(
-        filter_multi = filter_multi,
-        multi_main = multi_main,
+      filter_data_facet_at(
+        filter_facet = filter_facet,
+        facet_main = facet_main,
         x_include = x_include,
         y_include = y_include,
         x_exclude = x_exclude,
@@ -353,7 +383,7 @@ visualize_sentratios_multi_by2_at <-
       data_proc %>%
       dplyr::mutate(name_xy = paste0(name_x, " vs. ", name_y))
 
-    data_proc <- wrangle_multi_col(data_proc, "name_xy")
+    data_proc <- wrangle_facet_col(data_proc, "name_xy")
 
     if (is.null(color)) {
       data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
@@ -361,21 +391,21 @@ visualize_sentratios_multi_by2_at <-
     }
     # data_proc <- wrangle_color_col(data_proc, color)
 
-    word_quo <- rlang::sym(word)
+    token_quo <- rlang::sym(token)
     color_quo <- rlang::sym(color)
-    multi_quo <- rlang::sym(multi)
-    multi_other <- lab_other
+    facet_quo <- rlang::sym(facet)
+    facet_other <- lab_other
 
     data_proc <-
       data_proc %>%
-      dplyr::mutate(!!color_quo := dplyr::if_else(logratio_dir, name_x, multi_other)) %>%
-      dplyr::mutate(!!color_quo := factor(!!color_quo, levels = c(multi_main, multi_other))) %>%
-      dplyr::mutate(!!word_quo := reorder_within(!!word_quo, dplyr::desc(logratio), name_xy))
-      # dplyr::mutate(!!word_quo := stats::reorder(!!word_quo, dplyr::desc(logratio))
+      dplyr::mutate(!!color_quo := dplyr::if_else(logratio_dir, name_x, facet_other)) %>%
+      dplyr::mutate(!!color_quo := factor(!!color_quo, levels = c(facet_main, facet_other))) %>%
+      dplyr::mutate(!!token_quo := reorder_within(!!token_quo, dplyr::desc(logratio), name_xy))
+      # dplyr::mutate(!!token_quo := stats::reorder(!!token_quo, dplyr::desc(logratio))
 
     viz <-
       data_proc %>%
-      ggplot2::ggplot(ggplot2::aes_string(x = word, y = "logratio", fill = color)) +
+      ggplot2::ggplot(ggplot2::aes_string(x = token, y = "logratio", fill = color)) +
       # ggplot2::geom_bar(stat = "identity") +
       ggplot2::geom_col() +
       scale_x_reordered() +
@@ -391,19 +421,19 @@ visualize_sentratios_multi_by2_at <-
       viz +
       ggplot2::facet_wrap(
         facet_fmla,
-        scales = facet_scales,
-        ncol = facet_ncol,
-        nrow = facet_nrow,
-        strip.position = facet_strip_position
+        scales = scales,
+        ncol = ncol,
+        nrow = nrow,
+        strip.position = strip.position
       )
 
     viz_labs <-
       ggplot2::labs(
         x = lab_x,
         y = lab_y,
-        title = lab_title,
-        subtitle = lab_subtitle,
-        caption = lab_caption
+        title = title,
+        subtitle = subtitle,
+        caption = caption
       )
 
     viz_theme <-
@@ -442,6 +472,6 @@ visualize_sentratios_multi_by2_at <-
     viz
   }
 
-#' @rdname visualize_sentratios_multi_by2
+#' @rdname visualize_sentratios_facet_by2
 #' @export
-visualize_sentratios_multi_by2 <- visualize_sentratios_multi_by2_at
+visualize_sentratios_facet_by2 <- visualize_sentratios_facet_by2_at

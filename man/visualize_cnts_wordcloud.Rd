@@ -3,47 +3,41 @@
 \name{visualize_cnts_wordcloud_at}
 \alias{visualize_cnts_wordcloud_at}
 \alias{visualize_cnts_wordcloud}
-\alias{visualize_cnts_wordcloud_multi_at}
-\alias{visualize_cnts_wordcloud_multi}
+\alias{visualize_cnts_wordcloud_facet_at}
+\alias{visualize_cnts_wordcloud_facet}
 \title{Visualize counts}
 \usage{
-visualize_cnts_wordcloud_at(data = NULL, word = "word",
-  color_value = "grey50", num_top = 50, random_order = FALSE)
+visualize_cnts_wordcloud_at(data = NULL, token = NULL,
+  wordcloud_base = wordcloud_tetext(data, token), wordcloud_params)
 
-visualize_cnts_wordcloud(data = NULL, word = "word",
-  color_value = "grey50", num_top = 50, random_order = FALSE)
+visualize_cnts_wordcloud(..., token)
 
-visualize_cnts_wordcloud_multi_at(data = NULL, ..., multi = NULL,
-  all = FALSE, value_multi = NULL, num_par_row, num_par_col)
+visualize_cnts_wordcloud_facet_at(data = NULL, ..., facet = NULL,
+  value_facet = NULL)
 
-visualize_cnts_wordcloud_multi(data = NULL, ..., multi = NULL,
-  all = FALSE, value_multi = NULL, num_par_row, num_par_col)
+visualize_cnts_wordcloud_facet(..., token, facet)
 }
 \arguments{
 \item{data}{data.frame.}
 
-\item{word}{character. Name of column in \code{data} to use for words.}
-
-\item{color_value}{character (vector). Hex value(s) of color. May be a vector.
-Should not be a function.}
-
-\item{num_top}{numeric. Number of words to show.}
-
-\item{random_order}{logical. Passed directly to \code{random.order} parameter
-in \code{wordcloud::wordcloud()}}
+\item{token}{bare for NSE; character for SE. Name of column in \code{data}
+to use for \code{words} argument in \code{wordcloud::wordcloud()}.}
 
 \item{...}{dots. Parameters to pass to \code{visualize_cnts_wordcloud_at()}.}
 
-\item{multi}{character. Name of column in \code{data} to use to create
+\item{facet}{bare for NSE; character for SE. Name of column in \code{data} to use to create
 a separate wordcloud.}
 
-\item{all}{logical. Whether or not to create a wordcloud for each value of \code{multi}.}
+\item{value_facet}{charater or numeric. Value by which to filter the column
+specified by \code{facet}. Ignored if \code{all = TRUE}.
+Defaults are provided internally based on value of \code{all} and number of \code{facet} values.}
 
-\item{value_multi}{charater or numeric. Value by which to filter the column
-specified by \code{multi}. Ignored if \code{all = TRUE}.}
+\item{colors}{character. Passed directly to \code{colors} argument in \code{wordcloud::wordcloud()}.}
 
-\item{num_par_row, num_par_col}{numeric. Values to pass to \code{mfrow} in \code{par}.
-Defaults are provided internally based on value of \code{all} and number of \code{multi} values.}
+\item{num_top}{numeric. Number of words to show. Passed directly to \code{max.words} argument}
+
+\item{random.order}{logical. Passed directly to \code{random.order} argument
+in \code{wordcloud::wordcloud()}.}
 }
 \value{
 plot.
@@ -51,10 +45,10 @@ plot.
 plots.
 }
 \description{
-Visualize n-gram counts with a word cloud.
+Visualize token counts with a token cloud.
 }
 \details{
-'multi' version is for creating multiple plots simulatenously
+\code{facet} version is for creating multiple plots simulatenously
 (probably using a \code{purrr} 'map' function).
-Fairly original function.
+Calls \code{wordcloud::wordcloud()}.
 }

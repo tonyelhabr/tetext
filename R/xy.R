@@ -1,5 +1,5 @@
 #
-# compute_ratios_multi <- function(xy_grid, xy_nms, data, ...) {
+# compute_ratios_facet <- function(xy_grid, xy_nms, data, ...) {
 #   wrapper_func(xy_grid = xy_grid, xy_nms = xy_nms, data = data, func = compute_ratios)
 # }
 #
@@ -71,8 +71,8 @@ get_xy_info <-
 #' @param xy_info list. Output from \code{get_xy_info()}.
 #' @return data.frame.
 preprocess_xy_data <- function(data = NULL, xy_info = NULL) {
-  if (is.null(data))
-    stop("`data` cannot be NULL.", call. = FALSE)
+  stopifnot(!is.null(data), is.data.frame(data))
+    
   if (is.null(xy_info))
     stop("`xy_info` cannot be NULL.", call. = FALSE)
   name <- NULL
@@ -90,8 +90,8 @@ preprocess_xy_data <- function(data = NULL, xy_info = NULL) {
 #' @param data data.frame. Output from \code{do.call(...)}.
 #' @return data.frame.
 postprocess_xy_data <- function(data = NULL, xy_info = NULL) {
-  if (is.null(data))
-    stop("`data` cannot be NULL.", call. = FALSE)
+  stopifnot(!is.null(data), is.data.frame(data))
+    
   if (is.null(xy_info))
     stop("`xy_info` cannot be NULL.", call. = FALSE)
 
@@ -116,7 +116,7 @@ postprocess_xy_data <- function(data = NULL, xy_info = NULL) {
 
 #' 'Engine' for '_by2' functions
 #'
-#' @description Apply a function to \code{data} in pairs (over a \code{multi} column).
+#' @description Apply a function to \code{data} in pairs (over a \code{facet} column).
 #' @details Should be replaced by a \code{purrr} function in the future.
 #' Must be careful not to pass \code{NULL} in \code{...}.
 #' @inheritParams create_xy_grid
@@ -131,8 +131,8 @@ wrapper_func <-
            xy_grid = NULL,
            xy_nms = NULL,
            ...) {
-    if (is.null(data))
-      stop("`data` cannot be NULL.", call. = FALSE)
+    stopifnot(!is.null(data), is.data.frame(data))
+      
     if (is.null(func))
       stop("`func` cannot be NULL.", call. = FALSE)
     if (is.null(xy_grid))
@@ -168,8 +168,8 @@ wrapper_func <-
 #' (where the expected is greater than the actual).
 #' @return data.frame.
 append_dummy_cols <- function(data = NULL, num_cols_expect = NULL, add = TRUE) {
-  if (is.null(data))
-    stop("`data` cannot be NULL.", call. = FALSE)
+  stopifnot(!is.null(data), is.data.frame(data))
+    
   if (is.null(num_cols_expect))
     stop("`num_cols_expect` cannot be NULL.", call. = FALSE)
 

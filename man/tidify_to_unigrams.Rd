@@ -15,7 +15,7 @@ tidify_to_unigrams(data = NULL, text = "text", rgx_pattern, rgx_replacement,
 \arguments{
 \item{data}{data.frame. Not in 'tidy' format.}
 
-\item{text}{character. Name of column in \code{data} to parse.}
+\item{text}{bare for NSE; character for SE. Name of column in \code{data} to parse.}
 
 \item{rgx_pattern}{character. Regular expression to substitute.}
 
@@ -40,7 +40,7 @@ Create a tidy data.frame of unigrams.
 }
 \details{
 Heavily influenced by \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.
-Creates output column 'word'.
+Creates output column 'token'.
 }
 \seealso{
 \href{https://www.tidytextmining.com/}{\emph{Text Mining with R}}.

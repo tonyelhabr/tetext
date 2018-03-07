@@ -9,7 +9,7 @@
 #' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
 #' @param data data.frame. Not in 'tidy' format.
-#' @param text character. Name of column in \code{data} to parse.
+#' @param text bare for NSE; character for SE. Name of column in \code{data} to parse.
 #' @param rgx_pattern character. Regular expression to substitute.
 #' @param rgx_replacement character. Regular expression used as replacement.
 #' @param rgx_unnest character. Regular expression to use in \code{tidytext::unnest_tokens()}.
@@ -34,8 +34,8 @@ tidify_to_unigrams_at <-
            stopwords = TRUE,
            stopwords_lexicon,
            rgx_ignore_custom) {
-    if (is.null(data))
-      stop("`data` cannot be NULL.", call. = FALSE)
+    stopifnot(!is.null(data), is.data.frame(data))
+
 
     text_quo <- rlang::sym(text)
     word <- NULL
@@ -75,15 +75,19 @@ tidify_to_unigrams_at <-
         dplyr::filter(!stringr::str_detect(word, rgx_ignore_custom))
     }
 
-    out <-
-      out %>%
+    out %>%
       dplyr::filter(stringr::str_detect(word, "[a-z]"))
-    out
   }
 
 #' @rdname tidify_to_unigrams
 #' @export
-tidify_to_unigrams <- tidify_to_unigrams_at
+tidify_to_unigrams <-
+  function(..., text) {
+    stopifnot(!missing(text))
+    text <- rlang::quo_text(rlang::enquo(text))
+    tidify_to_unigrams_at(..., text = text)
+  }
+
 
 #' Prepare data for text analysis.
 #'
@@ -99,14 +103,14 @@ tidify_to_unigrams <- tidify_to_unigrams_at
 #' @export
 tidify_to_bigrams_at <-
   function(data = NULL,
-           text = "text",
+           text = NULL,
            rgx_pattern,
            rgx_replacement,
            stopwords = TRUE,
            stopwords_lexicon,
            rgx_ignore_custom) {
-    if (is.null(data))
-      stop("`data` cannot be NULL.", call. = FALSE)
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(text), is.character(text))
 
     text_quo <- rlang::sym(text)
     word <- word1 <- word2 <- NULL
@@ -147,14 +151,17 @@ tidify_to_bigrams_at <-
         dplyr::filter(!stringr::str_detect(word2, rgx_ignore_custom))
     }
 
-    out <-
-      out %>%
+    out %>%
       dplyr::filter(stringr::str_detect(word1, "[a-z]")) %>%
       dplyr::filter(stringr::str_detect(word2, "[a-z]"))
-    out
   }
 
 #' @rdname tidify_to_bigrams
 #' @export
-tidify_to_bigrams <- tidify_to_bigrams_at
+tidify_to_bigrams <-
+  function(..., text) {
+    stopifnot(!missing(text))
+    text <- rlang::quo_text(rlang::enquo(text))
+    tidify_to_bigrams_at(..., text = text)
+  }
 

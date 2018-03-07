@@ -5,14 +5,14 @@
 \alias{clean_tweets}
 \title{Clean (and augment) \code{rtweet} data.frame}
 \usage{
-clean_tweets_at(data = NULL, multi, trim = TRUE, cols = c("status_id",
+clean_tweets_at(data = NULL, facet, trim = TRUE, cols = c("status_id",
   "created_at", "user_id", "screen_name", "text", "display_text_width",
   "reply_to_status_id", "is_quote", "is_retweet", "favorite_count",
   "retweet_count", "hashtags", "symbols", "urls_url", "urls_expanded_url",
   "media_expanded_url", "ext_media_expanded_url"),
   timezone = "America/Chicago")
 
-clean_tweets(data = NULL, multi, trim = TRUE, cols = c("status_id",
+clean_tweets(data = NULL, facet, trim = TRUE, cols = c("status_id",
   "created_at", "user_id", "screen_name", "text", "display_text_width",
   "reply_to_status_id", "is_quote", "is_retweet", "favorite_count",
   "retweet_count", "hashtags", "symbols", "urls_url", "urls_expanded_url",
@@ -22,7 +22,7 @@ clean_tweets(data = NULL, multi, trim = TRUE, cols = c("status_id",
 \arguments{
 \item{data}{data.frame (created using \code{rtweet} package).}
 
-\item{multi}{character. Name of column in \code{data} used for facetting.
+\item{facet}{bare for NSE; character for SE. Name of column in \code{data} used for facetting.
 Does not need to be specified.
 Included in \code{cols} if specified.}
 

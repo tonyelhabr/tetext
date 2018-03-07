@@ -5,69 +5,37 @@
 \alias{visualize_tfidf}
 \title{Visualize TF-IDF}
 \usage{
-visualize_tfidf_at(data = NULL, word = "word", doc = "document",
-  multi = doc, num_top = 10, color = multi, color_value = "grey50",
-  lab_x = NULL, lab_y = NULL, lab_title = "Highest TF-IDF Words",
-  lab_subtitle = NULL, lab_caption = NULL,
-  theme_base = theme_tetext_facet())
+visualize_tfidf_at(data = NULL, token = NULL, doc = "document",
+  facet = doc, num_top = 10, color = facet, color_value = "grey50",
+  lab_x = NULL, lab_y = NULL, title = "Highest TF-IDF Words",
+  subtitle = NULL, caption = NULL, theme_base = theme_tetext_facet())
 
-visualize_tfidf(data = NULL, word = "word", doc = "document",
-  multi = doc, num_top = 10, color = multi, color_value = "grey50",
-  lab_x = NULL, lab_y = NULL, lab_title = "Highest TF-IDF Words",
-  lab_subtitle = NULL, lab_caption = NULL,
-  theme_base = theme_tetext_facet())
+visualize_tfidf(data = NULL, token = NULL, doc = "document",
+  facet = doc, num_top = 10, color = facet, color_value = "grey50",
+  lab_x = NULL, lab_y = NULL, title = "Highest TF-IDF Words",
+  subtitle = NULL, caption = NULL, theme_base = theme_tetext_facet())
 }
 \arguments{
 \item{data}{data.frame.}
 
-\item{word}{character. Name of column in \code{data} to use for words.
+\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use as unit for counting.
 Probably something like 'word' or 'bigram'.}
 
-\item{doc}{character. Name of column in \code{data} to use
+\item{doc}{bare for NSE; character for SE. Name of column in \code{data} to use
 as \code{document} in \code{tidytext::bind_tf_idf()}.}
 
-\item{multi}{character. Name of column in \code{data} to use for facetting.}
+\item{facet}{bare for NSE; character for SE. Name of column in \code{data} to use for facetting.}
 
 \item{num_top}{numeric. Number of words to show. If between 0 and 1, then assumed to be a percentage.}
 
-\item{color}{character. Name of column in \code{data} to use for color basis.
-Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+\item{color}{bare for NSE; character for SE. Name of column in \code{data} to use for color basis.
+Even if \code{fill} is the actual \code{ggplot2} aesthetic, the internal code will 'coerce' this
+column to \code{fill}.
+In order to simplify internal code, MUST be specified.}
 
-\item{color_value}{character (vector). Hex value(s) of color. May be a vector.
-Should not be a function.}
-
-\item{lab_x}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
-
-\item{lab_y}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
-
-\item{lab_title}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
-
-\item{lab_subtitle}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
-
-\item{lab_caption}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
-
-\item{theme_base}{\code{ggplot2} theme (e.g. as \code{ggplot2::theme_minimal()}.)
-A custom \code{tetext} thems is supplied as a default.}
+\item{theme_base}{\code{ggplot2::theme()} function. (e.g. as \code{ggplot2::theme_minimal()}.)
+A custom theme is supplied as a default. As with the the \code{labs_base} argument, it is NOT
+recommended to change this directly.}
 }
 \value{
 gg.

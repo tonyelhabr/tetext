@@ -5,7 +5,7 @@
 #            sentiment = "sentiment",
 #            cnt = "cnt",
 #            total = "total") {
-#     if (is.null(data))
+#     stopifnot(!is.null(data), is.data.frame(data))
 #       stop("`data` must not be NULL.", call. = FALSE)
 #     if (is.null(sentiment))
 #       stop("`sentiment` must not be NULL.", call. = FALSE)

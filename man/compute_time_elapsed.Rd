@@ -23,7 +23,7 @@ Computes the difference in time between two Date-time values
 in a specified time 'unit'.
 }
 \details{
-Called in \code{compute_timefilter_multi_at()}.
+Called in \code{compute_timefilter_facet_at()}.
 }
 \seealso{
 https://stackoverflow.com/

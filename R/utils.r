@@ -1,6 +1,8 @@
 
+
 invert_pct <- function(num) {
   if(num < 0.5) {
+    # message(sprintf("Inverting %f to %f.", num, 1 - num))
     num <- 1 - num
   }
   num
@@ -22,12 +24,9 @@ filter_num_top_at <-
            num_top = NULL,
            max = nrow(data),
            min = 0) {
-    if (is.null(data))
-      stop("`data` cannot be NULL.", call. = FALSE)
-    if (is.null(col))
-      stop("`col` cannot be NULL.", call. = FALSE)
-    if (is.null(num_top))
-      stop("`num_top` cannot be NULL.", call. = FALSE)
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(col))
+    stopifnot(!is.null(num_top))
     num_top <- validate_range(x = num_top, max = max, min = min)
 
     rank <- NULL
@@ -39,7 +38,7 @@ filter_num_top_at <-
         dplyr::mutate(rank = dplyr::row_number(dplyr::desc(!!col_quo))) %>%
         dplyr::filter(rank <= num_top)
     } else {
-      # num_top <- invert_pct(num_top)
+      num_top <- invert_pct(num_top)
       out <-
         data %>%
         dplyr::arrange(dplyr::desc(!!col_quo)) %>%
@@ -50,59 +49,46 @@ filter_num_top_at <-
 
 require_ns <- function(pkg) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
-    stop(sprintf('Package "%s" needed for this function to work. Please install it.', pkg), call. = FALSE)
+    stop(
+      sprintf(
+        'Package "%s" needed for this function to work. Please install it.',
+        pkg
+      ),
+      call. = FALSE
+    )
   }
 }
 
-# NOTE: Need this because NULLs cannot be used with lists, which would break visualize_time_batch_at().
-is_nothing <- function(x) {
-  any(is.null(x)) || any(is.na(x)) || any(is.nan(x))
+get_class <- function(data, col) {
+  classes <- sapply(data, class)
+  # classes[names(classes) == col]
+  rev(classes[[col]])[1]
 }
 
-coerce_col_to_factor <- function(data, colname) {
-  classes <- sapply(names(data), class)
-  class_i <- classes[names(classes) == colname]
-  nm_i <- names(class_i)
+coerce_col_to_factor <- function(data, col) {
+  class_i <- get_class(data, col)
   if (class_i != "factor") {
     data <-
-      data %>% dplyr::mutate_at(dplyr::vars(dplyr::contains(nm_i)), dplyr::funs(factor))
+      data %>% dplyr::mutate_at(dplyr::vars(dplyr::contains(col)), dplyr::funs(factor))
     # message(sprintf("Coercing %s to a factor.", nm_i))
   }
   data
 }
 
-# wrangle_color_col <-
-#   function(data,
-#            color,
-#            dummy = "color_value",
-#            value_dummy = "dummy") {
-#     if (!is.null(color)) {
-#       out <- list(data = data, color = color)
-#     } else {
-#       dummy_quo <- rlang::sym(dummy)
-#       value_dummy_quo <- rlang::sym(value_dummy)
-#       data <- data %>% dplyr::mutate(!!dummy := !!value_dummy)
-#       data_proc <- coerce_col_to_factor(data_proc, color)
-#       out <- list(data = data, color = dummy)
-#     }
-#     data <- coerce_col_to_factor(data, color)
-#     out
-#   }
-
 # NOTE: These could change in the future.
 wrangle_color_col <-
-  function(data, colname) {
-    coerce_col_to_factor(data, colname)
+  function(data, col) {
+    coerce_col_to_factor(data, col)
   }
 
-wrangle_multi_col <-
-  function(data, colname) {
-    coerce_col_to_factor(data, colname)
-  }
+# wrangle_facet_col <-
+#   function(data, col) {
+#     coerce_col_to_factor(data, col)
+#   }
 
 filter_if_not_null_at <- function(data = NULL, col = NULL, value = NULL, invert = FALSE) {
-  if (is.null(data))
-    stop("`data` cannot be NULL.", call. = FALSE)
+  stopifnot(!is.null(data), is.data.frame(data))
+
 
   if(is.null(col))
     return(data)
@@ -110,8 +96,7 @@ filter_if_not_null_at <- function(data = NULL, col = NULL, value = NULL, invert 
   if(is.null(value))
     return(data)
 
-  if(!(col %in% names(data)))
-    return(stop("`col` must be in `data`.", call. = FALSE))
+  stopifnot(!(col %in% names(data)))
 
   col_quo <- rlang::sym(col)
   if(!invert) {
@@ -127,11 +112,8 @@ filter_if_not_null_at <- function(data = NULL, col = NULL, value = NULL, invert 
 }
 
 pull_distinctly_at <- function(data = NULL, col = NULL) {
-  if (is.null(data))
-    stop("`data` cannot be NULL.", call. = FALSE)
-
-  if(!(col %in% names(data)))
-    return(stop("`col` must be in `data`.", call. = FALSE))
+  stopifnot(!is.null(data), is.data.frame(data))
+  stopifnot(!(col %in% names(data)))
 
   col_quo <- rlang::sym(col)
   data %>%
@@ -141,90 +123,36 @@ pull_distinctly_at <- function(data = NULL, col = NULL) {
 }
 
 
-filter_data_multi_at <-
+filter_data_facet_at <-
   function(data = NULL,
-           filter_multi = NULL,
+           filter_facet = NULL,
+           params = NULL,
            x_include = NULL,
            y_include = NULL,
            x_exclude = NULL,
            y_exclude = NULL,
-           multi_main = NULL) {
-    if (is.null(data))
-      stop("`data` cannot be NULL.", call. = FALSE)
-    if (is.null(filter_multi))
-      stop("`filter_multi` cannot be NULL.", call. = FALSE)
+           facet_main = NULL) {
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(filter_facet), is.logical(filter_facet))
 
-    if (filter_multi) {
+    if (filter_facet) {
+      stopifnot(!is.null(params), is.list(params))
       data <-
-        data %>% filter_if_not_null_at("name_x", multi_main, invert = FALSE)
+        data %>% filter_if_not_null_at("name_x", params$facet_main, invert = FALSE)
       data <-
-        data %>% filter_if_not_null_at("name_x", x_include, invert = FALSE)
+        data %>% filter_if_not_null_at("name_x", params$x_include, invert = FALSE)
       data <-
-        data %>% filter_if_not_null_at("name_y", y_include, invert = FALSE)
+        data %>% filter_if_not_null_at("name_y", params$y_include, invert = FALSE)
       data <-
-        data %>% filter_if_not_null_at("name_x", x_exclude, invert = TRUE)
+        data %>% filter_if_not_null_at("name_x", params$x_exclude, invert = TRUE)
       data <-
-        data %>% filter_if_not_null_at("name_y", y_exclude, invert = TRUE)
+        data %>% filter_if_not_null_at("name_y", params$y_exclude, invert = TRUE)
 
     } else {
-      message("It's recommended to set `filter_multi = TRUE`.")
+      message("It's recommended to set `filter_facet = TRUE`.")
     }
     data
   }
-
-# validate_multi_main <-
-#   function(data = NULL,
-#            filter_multi = NULL,
-#            multi = NULL,
-#            multis = NULL,
-#            multi_main = NULL) {
-#     if (is.null(data))
-#       stop("`data` cannot be NULL.", call. = FALSE)
-#     if (is.null(filter_multi))
-#       stop("`filter_multi` cannot be NULL.", call. = FALSE)
-#
-#     if (filter_multi) {
-#       if (is.null(multi))
-#         stop("`multi` cannot be NULL.", call. = FALSE)
-#       if (is.null(multis))
-#         stop("`multis` cannot be NULL.", call. = FALSE)
-#       if (is.null(multi_main))
-#         return(stop(
-#           "`multi_main` must not be NULL if `filter_multi = TRUE`.",
-#           call. = FALSE
-#         ))
-#       if (!(multi_main %in% multis))
-#         return(stop(sprintf(
-#           "`multi_main` is not in %s.", paste(multis, collapse = ",")
-#         ), call. = FALSE))
-#       if (length(multi_main) > 1)
-#         return(stop("`multi_main` should be a singular value.", call. = FALSE))
-#     }
-#     invisible(data)
-#   }
-#
-# validate_sent_main <-
-#   function(data = NULL,
-#            filter_sent = NULL,
-#            sent = "sentiment",
-#            sent_main = NULL) {
-#     if (is.null(data))
-#       stop("`data` cannot be NULL.", call. = FALSE)
-#     if (is.null(filter_sent))
-#       stop("`filter_sent` cannot be NULL.", call. = FALSE)
-#     if (filter_sent) {
-#       if (is.null(sent))
-#         stop("`sent` cannot be NULL.", call. = FALSE)
-#       if (is.null(sent_main))
-#         return(stop(
-#           "`sent_main` must not be NULL if `filter_sent = TRUE`.",
-#           call. = FALSE
-#         ))
-#       if (length(sent_main) > 1)
-#         return(stop("`sent_main` should be a singular value.", call. = FALSE))
-#     }
-#     invisible(data)
-#   }
 
 validate_x_main <-
   function(data = NULL,
@@ -232,21 +160,15 @@ validate_x_main <-
            x = NULL,
            xs = NULL,
            x_main = NULL) {
-    if (is.null(data))
-      stop("`data` cannot be NULL.", call. = FALSE)
+    stopifnot(!is.null(data), is.data.frame(data))
+
     if (is.null(filter_x))
       stop("`filter_x` cannot be NULL.", call. = FALSE)
 
     if (filter_x) {
-      if (is.null(x))
-        stop("`x` cannot be NULL.", call. = FALSE)
-      if (is.null(xs))
-        stop("`xs` cannot be NULL.", call. = FALSE)
-      if (is.null(x_main))
-        return(stop(
-          "`x_main` must not be NULL if `filter_x = TRUE`.",
-          call. = FALSE
-        ))
+      stopifnot(!is.null(x))
+      stopifnot(!is.null(xs))
+      stopifnot(!is.null(x_main))
       if (!(x_main %in% xs))
         return(stop(sprintf(
           "`x_main` is not in %s.", paste(xs, collapse = ",")

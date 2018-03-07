@@ -9,23 +9,22 @@
 #' Adds a \code{timestamp} column that is derived from the \code{created_at}
 #' column. Also, adds a \code{time} column that represents the hour in the day of \code{created_at}.
 #' @param data data.frame (created using \code{rtweet} package).
-#' @param multi character. Name of column in \code{data} used for facetting.
-#' Does not need to be specified.
-#' Included in \code{cols} if specified.
+#' @param facet bare for NSE; character for SE. Name of column in \code{data} used for facetting.
+#' Set to NULL as default even though it is not required in order to simplify internal code.
+#' Included in \code{cols} if \code{trim = TRUE}.
 #' @param trim logical. Indicates whether or not to select only certain columns
 #' (and drop the others).
 #' @param cols character (vector). Name(s) of column(s) in \code{data} to keep.
 #' Only relevant if \code{trim = TRUE}.
 #' @param timezone character. Passed directly to \code{lubridate::with_tz()} as \code{tzone} parameter.
-#'
-#' @return data.frame
+#' @return data.frame.
 #' @rdname clean_tweets
 #' @export
 #' @seealso \url{https://juliasilge.com/blog/ten-thousand-data/}.
 #' \url{https://buzzfeednews.github.io/2018-01-trump-twitter-wars/}.
 clean_tweets_at <-
   function(data = NULL,
-           multi,
+           facet = NULL,
            trim = TRUE,
            cols =
              c(
@@ -48,14 +47,16 @@ clean_tweets_at <-
                "ext_media_expanded_url"
              ),
            timezone = "America/Chicago") {
-    if (is.null(data))
-      stop("`data` cannot be NULL.", call. = FALSE)
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(trim), is.logical(trim))
+    stopifnot(!is.null(timezone), is.character(timezone))
 
     if (trim) {
-      if (!missing(multi)) {
+      stopifnot(!is.null(cols), is.character(cols))
+      if (!is.null(facet)) {
         data <-
           data %>%
-          dplyr::select(dplyr::one_of(c(multi, cols)))
+          dplyr::select(dplyr::one_of(c(facet, cols)))
       } else {
         data <-
           data %>%
@@ -65,19 +66,26 @@ clean_tweets_at <-
 
     created_at <- timestamp <- time <- NULL
 
-    out <-
-      data %>%
+    data %>%
       dplyr::mutate_if(is.list, dplyr::funs(as.character)) %>%
       dplyr::mutate(timestamp = lubridate::ymd_hms(created_at)) %>%
       dplyr::mutate(timestamp = lubridate::with_tz(timestamp, timezone)) %>%
       dplyr::mutate(time = lubridate::hour(timestamp) + lubridate::minute(timestamp) / 60)
 
-    out
   }
 
 #' @rdname clean_tweets
 #' @export
-clean_tweets <- clean_tweets_at
+clean_tweets <-
+  function(..., facet) {
+    if(missing(facet)) {
+
+      facet <- NULL
+    } else {
+      facet <- rlang::quo_text(rlang::enquo(facet))
+    }
+    clean_tweets_at(..., facet = facet)
+  }
 
 #' Augment \code{rtweet} data.frame
 #'
@@ -86,15 +94,12 @@ clean_tweets <- clean_tweets_at
 #' 'hashtag', 'link', 'rt', 'quote', and 'reply', all of which are logicals.
 #' A 'type' column is also added--it is a factored version of 'rt', 'quote', and 'reply'.
 #' @inheritParams clean_tweets
-#' @return data.frame
+#' @return data.frame.
 #' @rdname add_tweet_kind_cols
 #' @export
-
 #' @seealso \url{https://juliasilge.com/blog/ten-thousand-data/}.
 add_tweet_kind_cols <- function(data = NULL) {
-  if (is.null(data))
-    stop("`data` cannot be NULL.", call. = FALSE)
-
+  stopifnot(!is.null(data), is.data.frame(data))
   hashtag <-
     hashtags <-
     link <-
@@ -104,8 +109,7 @@ add_tweet_kind_cols <- function(data = NULL) {
     is_retweet <-
     quote <- is_quote <- reply <- reply_to_status_id <- type <- NULL
 
-  out <-
-    data %>%
+  data %>%
     dplyr::mutate(
       hashtag = dplyr::if_else(!is.na(hashtags), 1, 0),
       link = dplyr::if_else(
@@ -126,8 +130,8 @@ add_tweet_kind_cols <- function(data = NULL) {
           TRUE ~ "original"
         )
     )
-  out
 }
+
 
 #' Get helper list for tidying
 #'

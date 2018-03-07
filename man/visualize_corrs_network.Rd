@@ -7,15 +7,11 @@
 \usage{
 visualize_corrs_network_at(..., resize_points = TRUE, size_point = "n",
   add_point_labels = TRUE, color_point = "grey50", shape_point = 21,
-  seed = 42, lab_title = "Network of Pairwise Correlations",
-  lab_subtitle = NULL, lab_caption = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = theme_tetext(void = TRUE))
+  seed = 42, labs_base = labs_tetext(), labs_params = list(title =
+  "Network of Pairwise Correlations"), theme_base = theme_tetext(void = TRUE),
+  theme_params = list(legend.position = "none"))
 
-visualize_corrs_network(..., resize_points = TRUE, size_point = "n",
-  add_point_labels = TRUE, color_point = "grey50", shape_point = 21,
-  seed = 42, lab_title = "Network of Pairwise Correlations",
-  lab_subtitle = NULL, lab_caption = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = theme_tetext(void = TRUE))
+visualize_corrs_network(..., token, feature)
 }
 \arguments{
 \item{...}{dots. Parameters passed directly to \code{compute_corrs_at()}.}
@@ -23,7 +19,7 @@ visualize_corrs_network(..., resize_points = TRUE, size_point = "n",
 \item{resize_points}{logical. Indicates whether or not to make size of points
 correspond to count of words.}
 
-\item{size_point}{character. Name of column in \code{data} to use for point sizing.}
+\item{size_point}{bare for NSE; character for SE. Name of column in \code{data} to use for point sizing.}
 
 \item{add_point_labels}{logical. Indicates whether or not to add labels to points.}
 
@@ -33,38 +29,22 @@ correspond to count of words.}
 
 \item{seed}{numeric. Used to by \code{ggraph::ggraph}.}
 
-\item{lab_title}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
+\item{labs_base}{\code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
+It is recommended NOT to modify this argument; isntead, the \code{_params} argument should
+be used for customization.}
 
-\item{lab_subtitle}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
+\item{labs_params}{list. Additional parameters to pass to \code{ggplot2::labs()} to use in addition
+to and/or override the parameters set in the \code{_base} parameter.}
 
-\item{lab_caption}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
+\item{theme_base}{\code{ggplot2::theme()} function. (e.g. as \code{ggplot2::theme_minimal()}.)
+A custom theme is supplied as a default. As with the the \code{labs_base} argument, it is NOT
+recommended to change this directly.}
 
-\item{lab_x}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
+\item{theme_params}{list. Additional parameters to pass to \code{ggplot2::labs()}.
+Should be used in the same manner as \code{labs_params} for customization.}
 
-\item{lab_y}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
-
-\item{theme_base}{\code{ggplot2} theme (e.g. as \code{ggplot2::theme_minimal()}.)
-A custom \code{tetext} thems is supplied as a default.}
+\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use as unit for counting.
+Probably something like 'word' or 'bigram'.}
 }
 \value{
 gg.

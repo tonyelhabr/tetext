@@ -3,7 +3,7 @@
 #'
 #' @description Computes the difference in time between two Date-time values
 #' in a specified time 'unit'.
-#' @details Called in \code{compute_timefilter_multi_at()}.
+#' @details Called in \code{compute_timefilter_facet_at()}.
 #' @param date_start Date-time (or character that can be converted to Date-time).
 #' @param date_end Date-time (or character that can be converted to Date-time).
 #' @param type character. 'unit' to use to calculate time difference.
@@ -16,12 +16,9 @@ compute_time_elapsed <-
   function(date_start = NULL,
            date_end = NULL,
            type = c("year", "month", "day", "hour")) {
-    if (is.null(date_start))
-      stop("`date_start` cannot be NULL.", call. = FALSE)
-    if (is.null(date_end))
-      stop("`date_end` cannot be NULL.", call. = FALSE)
-    if (is.null(type))
-      stop("`type` cannot be NULL.", call. = FALSE)
+    stopifnot(!is.null(date_start))
+    stopifnot(!is.null(date_end))
+    stopifnot(!is.null(type))
     type <- match.arg(type)
 
     if (type == "year" | type == "month") {
@@ -44,24 +41,21 @@ compute_time_elapsed <-
 
 
 #' @param data data.frame.
-#' @param timebin character. Name of column in \code{data} to use for time axis.
-#' @param multi character. Name of column in \code{data} used for facetting.
-#' @return list
+#' @param timebin bare for NSE; character for SE. Name of column in \code{data} to use for time axis.
+#' @param facet bare for NSE; character for SE. Name of column in \code{data} used for facetting.
+#' @return list.
 #' @rdname compute_timefilter
 #' @export
-compute_timefilter_multi_at <-
+compute_timefilter_facet_at <-
   function(data = NULL,
            timebin = NULL,
-           multi = NULL) {
-    if (is.null(data))
-      stop("`data` cannot be NULL.", call. = FALSE)
-    if (is.null(timebin))
-      stop("`timebin` cannot be NULL.", call. = FALSE)
-    if (is.null(multi))
-      stop("`multi` cannot be NULL.", call. = FALSE)
+           facet = NULL) {
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(timebin), is.character(timebin))
+    stopifnot(!is.null(facet), is.character(facet))
 
     timebin_quo <- rlang::sym(timebin)
-    multi_quo <- rlang::sym(multi)
+    facet_quo <- rlang::sym(facet)
 
     date_start <-
       date_end <-
@@ -69,13 +63,13 @@ compute_timefilter_multi_at <-
 
     data_proc <-
       data %>%
-      dplyr::group_by(!!multi_quo) %>%
+      dplyr::group_by(!!facet_quo) %>%
       dplyr::arrange(!!timebin_quo) %>%
       dplyr::mutate(date_start = dplyr::first(!!timebin_quo),
                     date_end = dplyr::last(!!timebin_quo)) %>%
       dplyr::slice(1) %>%
       dplyr::ungroup() %>%
-      dplyr::select(!!multi_quo, date_start, date_end) %>%
+      dplyr::select(!!facet_quo, date_start, date_end) %>%
       dplyr::mutate(
         yyyy_elapsed = compute_time_elapsed(date_start, date_end, "year"),
         mm_elapsed = compute_time_elapsed(date_start, date_end, "month"),
@@ -83,56 +77,87 @@ compute_timefilter_multi_at <-
         hh_elapsed = compute_time_elapsed(date_start, date_end, "hour")
       )
 
-    out <-
-      list(
-        data = data_proc,
-        date_start = max(data_proc$date_start),
-        date_end = min(data_proc$date_end)
-      )
-    out
+    list(
+      data = data_proc,
+      date_start = max(data_proc$date_start),
+      date_end = min(data_proc$date_end)
+    )
   }
 
+#' @rdname compute_timefilter
+#' @export
+compute_timefilter_facet <-
+  function(..., timebin, facet) {
+    stopifnot(!missing(timebin))
+    stopifnot(!missing(facet))
+    timebin <- rlang::quo_text(rlang::enquo(timebin))
+    facet <- rlang::quo_text(rlang::enquo(facet))
+    compute_timefilter_facet_at(..., timebin = timebin, facet = facet)
+  }
 
 #' Add time-related columns
 #'
 #' @description Adds useful columns for subsequent time calculations and filtering.
 #' @details
-#' Calls \code{compute_timefilter_multi_at()}. (Adds a dummy 'multi' column if none is specified.)
+#' Calls \code{compute_timefilter_facet_at()}. (Adds a dummy \code{facet} column if none is specified.)
 #' Adds columns for years, months, days, and hours elapsed.
-#' (Calls in \code{compute_time_elapsed()} multiple times.)
+#' (Calls in \code{compute_time_elapsed()} facetple times.)
 #' Returns list, where \code{data} is augmented data.frame,
 #' \code{date_start} is the very LAST Date-time value, and \code{date_end}
 #' is the very FIRST Date-time value. The \code{date_start} and \code{date_end}
-#' values are defined in this manner such that all data for each 'multi' variable
+#' values are defined in this manner such that all data for each \code{facet} variable
 #' fits in a singular frame (i.e. there are not 'gaps' where data exists
-#' for one 'multi' variable and not all others). This determination assumes
+#' for one \code{facet} variable and not all others). This determination assumes
 #' that the data is continuous.
-#' @inheritParams compute_timefilter_multi_at
-#' @return list
+#' @inheritParams compute_timefilter_facet_at
+#' @inheritParams compute_freqs
+#' @return list.
 #' @rdname compute_timefilter
 #' @export
 compute_timefilter_at <-
-  function(data,
-           timebin,
-           multi) {
-    if(missing(multi)) {
+  function(data = NULL,
+           timebin = NULL,
+           facet = NULL) {
+    # NOTE: Need to explicitly include `timebin` because this function might
+    # be called directly from `trim_bytime_at()`, which does not convert
+    # `timebin` to a quosure.
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(timebin), is.character(timebin))
+
+    if (is.null(facet)) {
       add_dummy <- TRUE
-      data <- data %>% dplyr::mutate(`.multi` = "dummy")
-      multi <- ".multi"
+      data <- data %>% dplyr::mutate(`.facet` = "dummy")
+      facet <- ".facet"
     } else {
       add_dummy <- FALSE
     }
 
-    out <- compute_timefilter_multi_at(data = data, timebin = timebin, multi = multi)
+    out <-
+      data %>%
+      compute_timefilter_facet_at(
+        timebin = timebin,
+        facet = facet
+      )
+
     if(add_dummy) {
-      out$data <- out$data %>% dplyr::select(-dplyr::one_of(c(multi)))
+      out$data <- out$data %>% dplyr::select(-dplyr::one_of(c(facet)))
     }
     out
   }
 
 #' @rdname compute_timefilter
 #' @export
-compute_timefilter <- compute_timefilter_at
+compute_timefilter <-
+  function(..., timebin, facet) {
+    stopifnot(!missing(timebin))
+    timebin <- rlang::quo_text(rlang::enquo(timebin))
+    if(missing(facet)) {
+      facet <- NULL
+    } else {
+      facet <- rlang::quo_text(rlang::enquo(facet))
+    }
+    compute_timefilter_at(..., timebin = timebin, facet = facet)
+  }
 
 #' Trim data.frame by time
 #'
@@ -140,9 +165,9 @@ compute_timefilter <- compute_timefilter_at
 #' @details Should be used to a trim data.frame appropriately/dynamically
 #' given an unknown data set where visualization across a single, appropriate time period
 #' is desired. (The unkown data set may have different 'max' and 'min' times
-#' for each 'multi' column.
+#' for each \code{facet} column.
 #' @param data data.frame.
-#' @param timebin character. Name of columin in \code{data} to use for time filtering.
+#' @param timebin bare for NSE; character for SE. Name of columin in \code{data} to use for time filtering.
 #' @param start,end Date-time. If either is missing, then code{compute_timefilter_at()} is called.
 #' @param ... dots. Additional parameters to pass to \code{compute_timefilter_at()}
 #' in the case that start and end are not specified.
@@ -155,14 +180,10 @@ trim_bytime_at <-
            start,
            end,
            ...) {
-    if (is.null(data))
-      stop("`data` cannot be NULL.", call. = FALSE)
-    if (is.null(timebin))
-      stop("`timebin` cannot be NULL.", call. = FALSE)
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(timebin), is.character(timebin))
 
     if(missing(start) | missing(end)) {
-      dots <- list(...)
-      # if(!("multi") %in% names(dots)) stop("`multi` must be specified." call. = FALSE)
       data_proc <- compute_timefilter_at(data = data, timebin = timebin, ...)
       message("Computing max and min dates.")
       start <- data_proc$date_start
@@ -172,13 +193,21 @@ trim_bytime_at <-
 
     timebin_quo <- rlang::sym(timebin)
 
-    out <-
-      data %>%
+    data %>%
       dplyr::filter(!!timebin_quo <= end, !!timebin_quo >= start)
-    out
   }
 
 #' @rdname trim_bytime
 #' @export
-trim_bytime <- trim_bytime_at
+trim_bytime <-
+  function(..., timebin, facet) {
+  stopifnot(!missing(timebin))
+  timebin <- rlang::quo_text(rlang::enquo(timebin))
+  if(missing(facet)) {
+    facet <- NULL
+  } else {
+    facet <- rlang::quo_text(rlang::enquo(facet))
+  }
+  trim_bytime_at(..., timebin = timebin, facet = facet)
+}
 

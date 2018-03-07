@@ -7,12 +7,12 @@
 \usage{
 trim_bytime_at(data = NULL, timebin = NULL, start, end, ...)
 
-trim_bytime(data = NULL, timebin = NULL, start, end, ...)
+trim_bytime(..., timebin)
 }
 \arguments{
 \item{data}{data.frame.}
 
-\item{timebin}{character. Name of columin in \code{data} to use for time filtering.}
+\item{timebin}{bare for NSE; character for SE. Name of columin in \code{data} to use for time filtering.}
 
 \item{start, end}{Date-time. If either is missing, then code{compute_timefilter_at()} is called.}
 
@@ -29,5 +29,5 @@ Trim a data.frame to 'fit' within specified 'start' and 'end' Date-time values.
 Should be used to a trim data.frame appropriately/dynamically
 given an unknown data set where visualization across a single, appropriate time period
 is desired. (The unkown data set may have different 'max' and 'min' times
-for each 'multi' column.
+for each \code{facet} column.
 }

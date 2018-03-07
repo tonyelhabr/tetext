@@ -1,27 +1,34 @@
 
-
 #' Visualize by time period.
 #'
 #' @description Visualize time-based data over time.
-#' @details 'multi' version is for facetting.
+#' @details \code{facet} version is for facetting. Lists are used for
+#' customization arguments (instead of dots) because there
+#' are multiple arguments that can be customized.
 #' @param data data.frame.
-#' @param timebin character. Name of column in \code{data} to use for time axis.
+#' @param timebin bare for NSE; character for SE. Name of column in \code{data} to use for time axis.
 #' Probably something like 'yyyy', 'mm', etc.
-#' @param geom character. 'bar' or 'hist'. 'bar' is probably best for everything except Date objects.
+#' @param color bare for NSE; character for SE. Name of column in \code{data} to use for color basis.
+#' Even if \code{fill} is the actual \code{ggplot2} aesthetic, the internal code will 'coerce' this
+#' column to \code{fill}.
+#' In order to simplify internal code, MUST be specified.
+#' @param geom character. 'bar' or 'hist'. 'bar' is probably best for everything except \code{Date} objects.
 #' @param add_alpha logical. Whether or not to use \code{ggplot2::scale_alpha()} based on count.
 #' @param alpha_range numeric (vector). Direct parameter passed to \code{range} parameter
 #' of \code{ggplot2::scale_alpha()}.
-#' @param color character. Name of column in \code{data} to use for color basis.
-#' Set to \code{NULL} by default although not actually required in order to simplify internal code.
-#' @param color_value character (vector). Hex value(s) of color. May be a vector.
-#' Should not be a function.
-#' @param lab_title,lab_subtitle,lab_caption,lab_x,lab_y character. It is recommended NOT
-#' to use these parameters directly. (Instead, it is recommended that they are modified
-#' 'after' the function is called.) Noneheless, they are provided as inputs and assigned
-#' reasonable defaults (e.g. 'Count Over Time')
-#' where appropriate. (Otherwise, they are given the value of NULL.)
-#' @param theme_base \code{ggplot2} theme (e.g. as \code{ggplot2::theme_minimal()}.)
-#' A custom \code{tetext} thems is supplied as a default.
+#' @param scale_manual_params list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+#' \code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
+#' argument is specified, so if overwriting explicitly, then \code{values} should be included in the list.
+#' @param labs_base \code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
+#' It is recommended NOT to modify this argument; isntead, the \code{_params} argument should
+#' be used for customization.
+#' @param labs_params list. Additional parameters to pass to \code{ggplot2::labs()} to use in addition
+#' to and/or override the parameters set in the \code{_base} parameter.
+#' @param theme_base \code{ggplot2::theme()} function. (e.g. as \code{ggplot2::theme_minimal()}.)
+#' A custom theme is supplied as a default. As with the the \code{labs_base} argument, it is NOT
+#' recommended to change this directly.
+#' @param theme_params list. Additional parameters to pass to \code{ggplot2::labs()}.
+#' Should be used in the same manner as \code{labs_params} for customization.
 #' @return gg
 #' @rdname visualize_time
 #' @export
@@ -29,54 +36,59 @@
 visualize_time_at <-
   function(data = NULL,
            timebin = NULL,
+           color = NULL,
            geom = c("bar", "hist"),
            add_alpha = FALSE,
            alpha_range = c(0.25, 1),
-           color = NULL,
-           color_value = "grey50",
-           lab_x = NULL,
-           lab_y = NULL,
-           lab_title = "Count Over Time",
-           lab_subtitle = NULL,
-           lab_caption = NULL,
-           theme_base = theme_tetext()) {
-    if (is.null(data))
-      stop("`data` must not be NULL.", call. = FALSE)
-    if (is_nothing(timebin))
-      stop("`timebin` must not be NULL.", call. = FALSE)
-
+           scale_manual_params = scale_manual_tetext(),
+           labs_base = labs_tetext(),
+           labs_params = list(title = "Count Over Time"),
+           theme_base = theme_tetext_dx(),
+           theme_params = list(legend.position = "none")) {
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(timebin), is.character(timebin))
     geom <- match.arg(geom)
 
-    if((class(data$timebin) %in% c("Date", "POSIXct")) & (geom != "hist")) {
-      message("It is recommended to set `geom = hist` for Date-time objects.")
+    timebin_class <- get_class(data, timebin)
+    if (!(
+      timebin_class %in% c(
+        "integer",
+        "double",
+        "numeric",
+        "character",
+        "factor",
+        "ordered"
+      )
+    ) | (timebin_class %in% c("POSIXct", "POSIXt"))) {
+      change_geom <- TRUE
+    } else {
+      change_geom <- FALSE
     }
 
-    if (is_nothing(color)) {
+    if (change_geom) {
+      if (geom != "hist") {
+        geom <- "hist"
+        message("Setting `geom = \"hist\"`.")
+      }
+    }
+
+    if (is.null(color)) {
       data <- data %>% dplyr::mutate(`.dummy` = "dummy")
       color <- ".dummy"
     }
+    # NOTE: DON'T NEED THIS!
+    # data <- wrangle_color_col(data, color)
 
-    # if(length(color_value) > 1) {
-    #   color_value <- color_value[1]
-    #   message("Only using the first color in the specified `color_value`.")
-    # }
-
-    data <- wrangle_color_col(data, color)
-
-    # browser()
     viz <-
-      ggplot2::ggplot(data = data, ggplot2::aes_string(x = timebin))
+      data %>%
+      ggplot2::ggplot(ggplot2::aes_string(x = timebin))
 
     if (geom == "bar") {
       if (!add_alpha) {
         viz <-
           viz +
-          ggplot2::geom_bar(
-            ggplot2::aes_string(
-              y = "..count..",
-              fill = color
-            )
-          )
+          ggplot2::geom_bar(ggplot2::aes_string(y = "..count..",
+                                                fill = color))
       } else {
         viz <-
           viz +
@@ -84,269 +96,168 @@ visualize_time_at <-
             y = "..count..",
             alpha = "..count..",
             fill = color
-          )
-          ) +
+          )) +
           ggplot2::scale_alpha(range = alpha_range)
       }
     } else if (geom == "hist") {
       viz <-
         viz +
-        ggplot2::geom_histogram(
-          ggplot2::aes_string(
-            y = "..count..",
-            fill = color
-          ),
-          bins = 30
-        )
+        ggplot2::geom_histogram(ggplot2::aes_string(y = "..count..",
+                                                    fill = color),
+                                bins = 30)
     }
     viz <-
-      viz +
-      ggplot2::scale_fill_manual(values = color_value)
-
-    viz_labs <-
-      ggplot2::labs(
-        x = lab_x,
-        y = lab_y,
-        title = lab_title,
-        subtitle = lab_subtitle,
-        caption = lab_caption
-      )
-    viz_theme <-
-      theme_base +
-      ggplot2::theme(panel.grid.major.x = ggplot2::element_blank()) +
-      ggplot2::theme(legend.position = "none")
+      viz + do_call_scale_manual(scale_manual_params, type = "fill")
 
     viz <-
       viz +
-      viz_labs +
-      viz_theme
-    viz
+      labs_base + do_call_labs(labs_params) +
+      theme_base + do_call_theme(theme_params)
   }
 
 #' @rdname visualize_time
 #' @export
-visualize_time <- visualize_time_at
+visualize_time <- function(...,
+                           timebin,
+                           color) {
+  stopifnot(!missing(timebin))
+  timebin <- rlang::quo_text(rlang::enquo(timebin))
+  if (missing(color)) {
+    color <- NULL
+  } else {
+    color <- rlang::quo_text(rlang::enquo(color))
+  }
+  visualize_time_at(
+    ...,
+    timebin = timebin,
+    color = color
+  )
+}
 
 #' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
-#' @param ... dots. Parameters to pass directly to \code{visualize_time_at()}.
-#' @param multi character. Name of column in \code{data} to use for facetting.
-#' @param facet_ncol,facet_nrow numeric. Direct parameters to analogous \code{ggplot2::facet_wrap()} parameters.
-#' @param facet_scales,facet_strip_position character. Direct parameters to analogous \code{ggplot2::facet_wrap()} parameters.
+#' @param ... dots. Parameters to pass directly to \code{visualize_time()}.
+#' @param facet bare for NSE; character for SE. Name of column in \code{data} to use for facetting.
+#' @param facet_base \code{ggplot2::facet_wrap()} function. An internal function
+#' sets defaults for \code{facets}, \code{scales}, \code{ncol}, \code{nrow}, and \code{strip.position}
+#' As with the \code{labs_base} and \code{theme_base} arguments, it is NOT recommended to set
+#' this argument explicitly; instead, the accompanying \code{_params} argument should be used.
+#' @param facet_params list. Additional parameters to pass to \code{ggplot2::facet_wrap()}. Parameters
+#' passed to this argument override thos in the \code{_base} argument.
 #' @rdname visualize_time
 #' @export
-visualize_time_multi_at <-
-  function(data = NULL,
-           ...,
-           theme_base = theme_tetext_facet(),
-           multi = NULL,
-           facet_scales = "free",
-           facet_ncol = 3,
-           facet_nrow = NULL,
-           facet_strip_position = "top") {
-    if (is.null(multi))
-      stop("`multi` cannot be NULL.", call. = FALSE)
-    # data <- wrangle_multi_col(data, multi)
+visualize_time_facet_at <-
+  function(...,
+           theme_base = theme_tetext_facet_dx(),
+           facet = NULL,
+           facet_base = facet_tetext(facet),
+           facet_params = list()) {
+    stopifnot(!is.null(facet), is.character(facet))
     viz <-
-      visualize_time_at(data = data, ..., theme_base = theme_base)
+      visualize_time_at(...,
+                        theme_base = theme_base)
 
-    viz <-
-      viz +
-      ggplot2::facet_wrap(
-        stats::as.formula(paste0("~ ", multi)),
-        scales = facet_scales,
-        ncol = facet_ncol,
-        nrow = facet_nrow,
-        strip.position = facet_strip_position
-      )
-    viz
+    viz <- viz + generate_facets(facet_base, facet_params)
   }
 
 #' @rdname visualize_time
 #' @export
-visualize_time_multi <- visualize_time_multi_at
-
-#' Visualize over multiple time periods
-#'
-#' @description Visualize time-based data over time.
-#' @details Calls \code{visualize_time_at()}.
-#' @inheritParams visualize_time
-#' @inheritParams visualize_cnts
-#' @param data data.frame (single).
-#' @param timebins character (vector).
-#' @param geoms character (vector).
-#' @param add_alphas logical (vector).
-#' @param colors character (vector).
-#' @param color_values character (vector).
-#' @param labs_title character (vector).
-#' @param labs_subtitle character (vector).
-#' @param labs_x character (vector).
-#' @param labs_y character (vector).
-#' @param arrange logical. Whether or not to plot in an arranged format.
-#' @param show logical. Whether or not to show plots.
-#' @return ggs (or gtable, if \code{arrange = TRUE})
-#' @rdname visualize_time_batch
-#' @export
-visualize_time_batch_at <-
-  function(data = NULL,
-           timebins = c("timestamp", "yyyy", "mm", "wd", "hh"),
-           geoms = c("hist", "bar", "bar", "bar", "bar"),
-           add_alphas = c(FALSE, rep(TRUE, length(timebins) - 1)),
-           # alpha_ranges = rep(c(0.25, 1), length(timebins)),
-           colors = rep(NA, length(timebins)),
-           color_values = rep("grey50", length(timebins)),
-           labs_x = rep("", length(timebins)),
-           labs_y = rep("", length(timebins)),
-           labs_title = rep("Count Over Time", length(timebins)),
-           labs_subtitle = c("", "By Year", "By Month", "By Day of Week", "By Hour"),
-           # lab_caption = rep("", length(timebins)),
-           # themes_base = rep(theme_tetext(), length(timebins)),
-           arrange = FALSE,
-           show = FALSE) {
-    if (is.null(data))
-      stop("`data` must not be NULL.", call. = FALSE)
-
-    num_timebins <- length(timebins)
-    if (!(
-      num_timebins == length(geoms) &
-      num_timebins == length(labs_subtitle) &
-      num_timebins == length(color_values)
-    )) {
-      stop("List elements must have same length.", call. = FALSE)
-    }
-
-    data_proc <- data %>% tidyr::nest()
-    # This is temisc::repeat_df().
-    num_rep <- length(timebins)
-    data_rep <- data_proc[rep(seq_len(nrow(data_proc)), num_rep),]
-    viz_time_params <-
-      list(
-        data = data_rep$data,
-        timebin = timebins,
-        geom = geoms,
-        add_alpha = add_alphas,
-        # alpha_range = alpha_ranges,
-        color = colors,
-        color_value = color_values,
-        lab_title = labs_title,
-        lab_subtitle = labs_subtitle,
-        lab_x = labs_x,
-        lab_y = labs_y #,
-        # theme_base = themes_base
-      )
-
-    if (!missing(colors)) {
-      if (length(colors != num_timebins))
-        stop("List elements must have same length.", call. = FALSE)
-      viz_time_params$color <- colors
-    }
-
-    viz_time_list <- purrr::pmap(viz_time_params, visualize_time_at)
-    if (arrange) {
-      num_viz <- length(viz_time_list)
-      num_cols <- floor(sqrt(num_viz))
-      # out <- do.call(gridExtra::grid.arrange, c(viz_time_list, ncol = num_cols)
-      out <-
-        do.call(gridExtra::arrangeGrob, c(viz_time_list, ncol = num_cols))
-      # out <-
-      #   gridExtra::arrangeGrob(
-      #     viz_time_list[[1]],
-      #     viz_time_list[[2]],
-      #     viz_time_list[[3]],
-      #     viz_time_list[[4]],
-      #     viz_time_list[[5]],
-      #     ncol = 2,
-      #     nrow = 3,
-      #     layout_matrix = rbind(c(1, 1), c(2, 2), c(3, 3)
-      #   )
-      if (show) {
-        gridExtra::grid.arrange(out)
-      }
+visualize_time_facet <-
+  function(..., timebin, color, facet) {
+    stopifnot(!missing(timebin))
+    stopifnot(!missing(facet))
+    timebin <- rlang::quo_text(rlang::enquo(timebin))
+    facet <- rlang::quo_text(rlang::enquo(facet))
+    if (missing(color)) {
+      color <- NULL
     } else {
-      out <- viz_time_list
-      if (show) {
-        print(out)
-      }
+      color <- rlang::quo_text(rlang::enquo(color))
     }
-    invisible(out)
+    visualize_time_facet_at(
+      ...,
+      timebin = timebin,
+      color = color,
+      facet = facet
+    )
+
   }
 
-#' @rdname visualize_time_batch
-#' @export
-visualize_time_batch <- visualize_time_batch_at
 
 #' Visualize hourly data
 #'
 #' @description Visualize time-based data aggregated over hours.
 #' @details This function is 'unique' because it calls \code{ggplot2::geom_violin()}.
+#' Also, it does not actually use \code{facet} for facetting.
 #' @inheritParams visualize_time
-#' @inheritParams visualize_time
-#' @inheritParams visualize_time_multi
-#' @param multi character. Name of column in \code{data} to use one of main axes, not for facetting.
-#' @param timebin character. Name of column in \code{data} to use for time. Probably likely something like 'hh' or 'hour'.
-#' @rdname visualize_hh_multi
+#' @inheritParams visualize_time_facet
+#' @param facet bare for NSE; character for SE. Name of column in \code{data} to use one of main axes, not for facetting.
+#' @param timebin bare for NSE; character for SE. Name of column in \code{data} to use for time. Probably likely something like 'hh' or 'hour'.
+#' @rdname visualize_time_hh
 #' @export
-visualize_hh_multi_at <-
+visualize_time_hh_at <-
   function(data = NULL,
            timebin = NULL,
-           multi = NULL,
-           color = multi,
-           color_value = "grey50",
-           lab_x = NULL,
-           lab_y = NULL,
-           lab_title = "Count Over Time",
-           lab_subtitle = "By Time of Day",
-           lab_caption = NULL,
-           theme_base = theme_tetext()) {
-    if (is.null(data))
-      stop("`data` must not be NULL.", call. = FALSE)
-    if (is_nothing(timebin))
-      stop("`timebin` must not be NULL.", call. = FALSE)
-    if (is.null(multi))
-      stop("`multi` cannot be NULL.", call. = FALSE)
+           facet = NULL,
+           color = facet,
+           scale_manual_params = scale_manual_tetext(),
+           labs_base = labs_tetext(),
+           labs_params = list(title = "Count Over Time"),
+           theme_base = theme_tetext(),
+           theme_params = list(panel.grid = ggplot2::element_blank(),
+                               legend.position = "none")) {
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(timebin), is.character(timebin))
+    stopifnot(!is.null(facet), is.character(facet))
 
-    if (is_nothing(color)) {
+    if (is.null(color)) {
       data <- data %>% dplyr::mutate(`.dummy` = "dummy")
       color <- ".dummy"
-
     }
+    # NOTE: DON'T NEED THIS!
     # data <- wrangle_color_col(data, color)
 
     viz <-
       data %>%
-      ggplot2::ggplot(ggplot2::aes_string(x = multi, y = timebin, fill = color)) +
+      ggplot2::ggplot(ggplot2::aes_string(x = facet, y = timebin, fill = color)) +
       ggplot2::scale_y_continuous(
         limits = c(1, 24),
         breaks = c(6, 12, 18),
-        labels = c("6am", "Noon", "6pm")
+        labels = c("6 AM", "Noon", "6 PM")
       ) +
-      ggplot2::scale_fill_manual(values = color_value) +
+      do_call_scale_manual(scale_manual_params, type = "fill") +
       ggplot2::geom_violin(size = 0) +
-      ggplot2::geom_hline(yintercept = seq(3, 24, by = 3),
-                          color = "grey50",
-                          size = 0.1) +
-      ggplot2::coord_flip()
-
-    viz_labs <-
-      ggplot2::labs(
-        x = lab_x,
-        y = lab_y,
-        title = lab_title,
-        subtitle = lab_subtitle,
-        caption = lab_caption
+      ggplot2::geom_hline(
+        yintercept = seq(3, 24, by = 3),
+        color = "black",
+        size = 0.1
       )
-    viz_theme <-
-      theme_base +
-      ggplot2::theme(panel.grid = ggplot2::element_blank())
 
     viz <-
       viz +
-      viz_labs +
-      viz_theme
-    viz
+      labs_base + do_call_labs(labs_params) +
+      theme_base + do_call_theme(theme_params)
+
+    viz <-
+      viz +
+      ggplot2::coord_flip()
+
   }
 
-#' @rdname visualize_hh_multi
+#' @rdname visualize_hh_facet
 #' @export
-visualize_hh_multi <- visualize_hh_multi_at
-
+visualize_time_hh <-
+  function(..., timebin, color, facet) {
+    stopifnot(!missing(timebin))
+    stopifnot(!missing(facet))
+    timebin <- rlang::quo_text(rlang::enquo(timebin))
+    facet <- rlang::quo_text(rlang::enquo(facet))
+    if (missing(color)) {
+      color <- NULL
+    } else {
+      color <- rlang::quo_text(rlang::enquo(color))
+    }
+    visualize_time_hh_at(...,
+                          timebin = timebin,
+                          color = color,
+                          facet = facet)
+  }

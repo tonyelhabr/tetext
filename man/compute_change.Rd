@@ -5,27 +5,24 @@
 \alias{compute_change}
 \title{Compute change}
 \usage{
-compute_change_at(data = NULL, word = "word", timebin = NULL,
-  bin = TRUE, timefloor = NULL, top_pct = 0.25, only_signif = FALSE,
-  signif_cutoff = 0.1, return_models = TRUE, return_data = FALSE,
-  return_both = FALSE)
-
-compute_change(data = NULL, word = "word", timebin = NULL, bin = TRUE,
+compute_change_at(data = NULL, token = NULL, timebin = NULL, bin = TRUE,
   timefloor = NULL, top_pct = 0.25, only_signif = FALSE,
   signif_cutoff = 0.1, return_models = TRUE, return_data = FALSE,
   return_both = FALSE)
+
+compute_change(..., token, timebin, timefloor)
 }
 \arguments{
 \item{data}{data.frame.}
 
-\item{word}{character. Name of column in \code{data} corresponding to n-gram.}
+\item{token}{bare for NSE; character for SE. Name of column in \code{data} corresponding to token.}
 
-\item{timebin}{character. Name of column in \code{data} specifying temporal period
+\item{timebin}{bare for NSE; character for SE. Name of column in \code{data} specifying temporal period
 to use to compute change.}
 
 \item{bin}{logical. Whether or not to call \code{lubridate::floor_date()} to truncate \code{timebin}.}
 
-\item{timefloor}{character. Name of column passed directly to \code{unit} parameter of
+\item{timefloor}{bare for NSE; character for SE. Name of column passed directly to \code{unit} parameter of
 \code{lubridate::floor_date()} if \code{bin = FALSE}.}
 
 \item{top_pct}{numeric. Number between 0 and 1. Useful primarily to limit the number of models
@@ -44,16 +41,18 @@ the \code{data} parameter in \code{stats::glm()} for creating models.
 Needed when using \code{visualize_change_at()}.}
 
 \item{return_both}{logical. Set to \code{TRUE} when \code{visualize_change_at()}.}
+
+\item{...}{dots. Parameters to pass directly to \code{visualize_time()}.}
 }
 \value{
 data.frame.
 }
 \description{
-Compute change in n-gram usage over time.
+Compute change in token usage over time.
 }
 \details{
 None.
 }
 \seealso{
-\url{https://www.tidytextmining.com/twitter.html#changes-in-word-use}
+\url{https://www.tidytextmining.com/twitter.html#changes-in-token-use}
 }

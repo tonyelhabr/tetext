@@ -14,27 +14,26 @@ if (interactive()) {
 } else {
   print(dir.exists(dir))
 }
-filepath_data <-
+path_data <-
   system.file(dir, filename_data, package = "tetext", mustWork = TRUE)
-filepath_unigrams <-
+path_unigrams <-
   system.file(dir,
               filename_unigrams,
               package = "tetext",
               mustWork = TRUE)
-filepath_bigrams <-
+path_bigrams <-
   system.file(dir,
               filename_bigrams,
               package = "tetext",
               mustWork = TRUE)
 
 
-data <- readRDS(file = filepath_data)
-unigrams <- readRDS(file = filepath_unigrams)
-bigrams <- readRDS(file = filepath_bigrams)
+data <- readRDS(file = path_data)
+unigrams <- readRDS(file = path_unigrams)
+bigrams <- readRDS(file = path_bigrams)
 
-
-colors_te <- c("red", "green", "blue", "orange", "purple", "yellow", "pink", "cyan")
-color_main <- colors_te[1]
+colors_div <- c("black", "grey", "red", "green", "blue", "orange", "purple", "yellow", "pink", "cyan")
+color_main <- colors_div[3]
 colors_main <- paste0(color_main, c("", as.character(seq(1, 4, 1))))
 
 message("Tests are in order of likely usage in script.")
@@ -42,6 +41,7 @@ message("Tests are in order of likely usage in script.")
 testthat::test_that(
   "time",
   {
+    lab_title <- "Temporal Count"
     lab_subtitle_all <-
       paste0(
         "From ",
@@ -51,139 +51,130 @@ testthat::test_that(
       )
 
     viz_time_all <-
-      visualize_time_at(
-        data = data,
-        timebin = "timestamp",
-        geom = "hist",
-        color_value = colors_te,
-        lab_subtitle = lab_subtitle_all
+      data %>%
+      visualize_time(
+        timebin = timestamp,
+        scale_manual_params = list(values = colors_div),
+        labs_params = list(title = lab_title, subtitle = lab_subtitle_all)
       )
     viz_time_all
     testthat::expect_true(ggplot2::is.ggplot(viz_time_all))
 
     viz_time_yyyy <-
-      visualize_time_at(
-        data = data,
-        timebin = "yyyy",
-        geom = "bar",
-        color_value = colors_te,
-        lab_subtitle = "By Year"
+      data %>%
+      visualize_time(
+        timebin = yyyy,
+        scale_manual_params = list(values = colors_div),
+        labs_params = list(title = lab_title, subtitle = "By Year")
       )
     viz_time_yyyy
     testthat::expect_true(ggplot2::is.ggplot(viz_time_yyyy))
+
     viz_time_mm <-
-      visualize_time_at(
-        data = data,
-        timebin = "mm",
-        geom = "bar",
-        color_value = colors_te,
-        lab_subtitle = "By Month"
+      data %>%
+      visualize_time(
+        timebin = mm,
+        scale_manual_params = list(values = colors_div),
+        labs_params = list(title = lab_title, subtitle = "By Month")
       )
     viz_time_mm
     testthat::expect_true(ggplot2::is.ggplot(viz_time_mm))
+
     viz_time_wd <-
-      visualize_time_at(
-        data = data,
-        timebin = "wd",
-        geom = "bar",
-        color_value = colors_te,
-        lab_subtitle = "By Day of Week"
+      data %>%
+      visualize_time(
+        timebin = wd,
+        scale_manual_params = list(values = colors_div),
+        labs_params = list(title = lab_title, subtitle = "By Month")
       )
     viz_time_wd
     testthat::expect_true(ggplot2::is.ggplot(viz_time_wd))
+
     viz_time_hh <-
-      visualize_time_at(
-        data = data,
-        timebin = "hh",
-        geom = "bar",
+      data %>%
+      visualize_time(
+        timebin = hh,
         add_alpha = TRUE,
-        color_value = colors_te,
-        lab_subtitle = "By Hour"
+        scale_manual_params = list(values = colors_div),
+        labs_params = list(title = lab_title, subtitle = "By Hour")
       )
     viz_time_hh
     testthat::expect_true(ggplot2::is.ggplot(viz_time_hh))
-    viz_time_list <-
-      visualize_time_batch_at(
-        data = data
-      )
-    viz_time_list
-    testthat::expect_true(is.list(viz_time_list))
-    testthat::expect_true(ggplot2::is.ggplot(viz_time_list[[1]]))
-    viz_time_list <-
-      visualize_time_batch_at(
-        data = data,
-        arrange = TRUE
-      )
-    gridExtra::grid.arrange(viz_time_list)
-    testthat::expect_true(!ggplot2::is.ggplot(viz_time_list))
-
   })
 
 testthat::test_that(
   "cnts",
   {
+
+    lab_title <- "Count"
     viz_cnts <-
-      visualize_cnts_at(
-        data = unigrams,
+      unigrams %>%
+      visualize_cnts(
+        token = word,
         num_top = 10,
-        color = NULL,
-        color_value = colors_te
+        scale_manual_params = list(values = colors_div),
+        labs_params = list(title = lab_title, subtitle = "Overall")
       )
     viz_cnts
     testthat::expect_true(ggplot2::is.ggplot(viz_cnts))
-    viz_cnts_multi <-
-      visualize_cnts_multi_at(
-        data = unigrams,
+
+    viz_cnts_facet <-
+      unigrams %>%
+      visualize_cnts_facet(
+        token = word,
+        color = yyyy,
+        facet = yyyy,
         num_top = 10,
-        color = "yyyy",
-        color_value = colors_te,
-        lab_subtitle = "By Year",
-        multi = "yyyy"
+        scale_manual_params = list(values = colors_div),
+        labs_params = list(title = lab_title, subtitle = "By Hour")
       )
-    viz_cnts_multi
-    testthat::expect_true(ggplot2::is.ggplot(viz_cnts_multi))
+    viz_cnts_facet
+    testthat::expect_true(ggplot2::is.ggplot(viz_cnts_facet))
+
     viz_cnts_wordcloud <-
-      visualize_cnts_wordcloud_at(
-        data = unigrams,
-        color_value = colors_main,
-        num_top = 50
+      unigrams %>%
+      visualize_cnts_wordcloud(
+        token = word,
+        wordcloud_params = list(colors = colors_main)
       )
     # viz_cnts_wordcloud
-    # TODO: Generate wordclouds for all 'multi' values.
-    viz_cnts_wordcloud_multi <-
-      visualize_cnts_wordcloud_multi_at(
-        data = unigrams,
-        word = "word",
-        color_value = colors_main,
-        num_top = 50,
-        multi = "yyyy",
-        value_multi = 2016
+    # TODO: Generate wordclouds for all \code{facet} values.
+
+    viz_cnts_wordcloud_facet <-
+      unigrams %>%
+      visualize_cnts_wordcloud_facet(
+        token = word,
+        facet = yyyy,
+        value_facet = 2012,
+        wordcloud_params = list(colors = colors_main)
       )
-    # viz_cnts_wordcloud_multi
-  })
+    # viz_cnts_wordcloud_facet
+  }
+)
 
 
 testthat::test_that(
   "freqs",
   {
     bigrams_freqs <-
-      compute_freqs_at(data = bigrams)
+      bigrams %>%
+      compute_freqs(token = word)
     actual <- bigrams_freqs$word[1:3]
     expect <- c("excel vba", "ut austin", "pl sql")
     testthat::expect_equal(actual, expect)
 
-    viz_bigram_freqs_multi <-
-      visualize_bigram_freqs_multi_at(
-        data = bigrams,
-        word = "word",
-        multi = "yyyy",
-        color_value = colors_te
+    viz_bigram_freqs_facet <-
+      bigrams %>%
+      visualize_bigram_freqs_facet(
+        token = word,
+        facet = yyyy,
+        color = yyyy,
+        scale_manual_params = list(values = colors_div)
       )
-    viz_bigram_freqs_multi
-    testthat::expect_true(ggplot2::is.ggplot(viz_bigram_freqs_multi))
-  })
-
-
+    viz_bigram_freqs_facet
+    testthat::expect_true(ggplot2::is.ggplot(viz_bigram_freqs_facet))
+  }
+)
 
 testthat::test_that(
   "corrs",
@@ -192,11 +183,12 @@ testthat::test_that(
     num_top_corrs <- 50
 
     unigrams_corrs <-
-      compute_corrs_at(
-        data = unigrams,
+      unigrams %>%
+      compute_corrs(
+        token = word,
+        feature = timestamp,
         num_top_ngrams = num_top_ngrams,
-        num_top_corrs = num_top_corrs,
-        feature = "timestamp"
+        num_top_corrs = num_top_corrs
       )
     actual <- unigrams_corrs$item1[1:3]
     expect <- c("excel", "austin", "oracle")
@@ -208,11 +200,12 @@ testthat::test_that(
     num_top_ngrams <- 0.1
     num_top_corrs <- 0.1
     unigrams_corrs <-
-      compute_corrs_at(
-        data = unigrams,
+      unigrams %>%
+      compute_corrs(
+        token = word,
+        feature = timestamp,
         num_top_ngrams = num_top_ngrams,
-        num_top_corrs = num_top_corrs,
-        feature = "timestamp"
+        num_top_corrs = num_top_corrs
       )
     actual <- unigrams_corrs$item1[1]
     expect <- c("candlewood")
@@ -224,11 +217,12 @@ testthat::test_that(
     num_top_ngrams <- 50
     num_top_corrs <- 50
     viz_corrs_network <-
-      visualize_corrs_network_at(
-        data = unigrams,
+      unigrams %>%
+      visualize_corrs_network(
+        token = word,
+        feature = timestamp,
         num_top_ngrams = num_top_ngrams,
-        num_top_corrs = num_top_corrs,
-        feature = "timestamp"
+        num_top_corrs = num_top_corrs
       )
     viz_corrs_network
     testthat::expect_true(ggplot2::is.ggplot(viz_corrs_network))
@@ -239,9 +233,10 @@ testthat::test_that(
   "tfidf",
   {
     unigrams_tfidf <-
-      compute_tfidf_at(
-        data = unigrams,
-        doc = "yyyy"
+      unigrams %>%
+      compute_tfidf(
+        token = word,
+        doc = yyyy
       )
     actual <- unigrams_tfidf$word[1]
     expect <- c("resistivity")
@@ -251,21 +246,24 @@ testthat::test_that(
       unigrams %>%
       dplyr::filter(yyyy == 2017) %>%
       dplyr:: mutate(hh4 = ceiling((hh + 1) / 4)) %>%
-      compute_tfidf_at(
-        doc = "hh4"
+      compute_tfidf(
+        token = word,
+        doc = hh4
       )
     actual <- unigrams_tfidf$word[1]
     expect <- c("displaying")
     testthat::expect_equal(actual, expect)
 
-    viz_unigrams_tfidf_multi <-
-      visualize_tfidf_at(
-        doc = "yyyy",
-        color_value = colors_te,
-        lab_subtitle = "By Year"
+    viz_unigrams_tfidf <-
+      unigrams %>%
+      visualize_tfidf(
+        token = word,
+        doc = yyyy,
+        scale_manual_params = list(values = colors_div),
+        labs_params = list(title = "Highest TF-IDF Tokens", subtitle = "By Hour")
       )
-    viz_unigrams_tfidf_multi
-    testthat::expect_true(ggplot2::is.ggplot(viz_unigrams_tfidf_multi))
+    viz_unigrams_tfidf
+    testthat::expect_true(ggplot2::is.ggplot(viz_unigrams_tfidf))
   })
 
 
@@ -273,9 +271,10 @@ testthat::test_that(
   "change",
   {
     unigrams_change <-
-      compute_change_at(
-        data = unigrams,
-        timebin = "timestamp",
+      unigrams %>%
+      compute_change(
+        token = word,
+        timebin = timestamp,
         timefloor = "year"
       )
     expect <- c("excel", "nutrition", "vba")
@@ -283,19 +282,23 @@ testthat::test_that(
     testthat::expect_equal(actual, expect)
 
     unigrams_change <-
-      compute_change_at(
-        data = unigrams,
-        timebin = "yyyy",
+      unigrams %>%
+      compute_change(
+        token = word,
+        timebin = yyyy,
         bin = FALSE
       )
+    actual <- unigrams_change$word[1:3]
     testthat::expect_equal(actual, expect)
 
     viz_unigrams_change <-
-      visualize_change_at(
-        data = unigrams,
-        timebin = "timestamp",
+      unigrams %>%
+      visualize_change(
+        token = word,
+        timebin = timestamp,
         timefloor = "year",
-        color_value = colors_te
+        add_labels = TRUE,
+        scale_manual_params = list(values = colors_div)
       )
     viz_unigrams_change
     testthat::expect_true(ggplot2::is.ggplot(viz_unigrams_change))

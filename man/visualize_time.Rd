@@ -3,65 +3,71 @@
 \name{visualize_time_at}
 \alias{visualize_time_at}
 \alias{visualize_time}
-\alias{visualize_time_multi_at}
-\alias{visualize_time_multi}
+\alias{visualize_time_facet_at}
+\alias{visualize_time_facet}
 \title{Visualize by time period.}
 \usage{
-visualize_time_at(data = NULL, timebin = NULL, geom = c("bar", "hist"),
-  add_alpha = FALSE, alpha_range = c(0.25, 1), color = NULL,
-  color_value = "grey50", lab_x = NULL, lab_y = NULL,
-  lab_title = "Count Over Time", lab_subtitle = NULL, lab_caption = NULL,
-  theme_base = theme_tetext())
+visualize_time_at(data = NULL, timebin = NULL, color = NULL,
+  geom = c("bar", "hist"), add_alpha = FALSE, alpha_range = c(0.25, 1),
+  scale_manual_params = scale_manual_tetext(), labs_base = labs_tetext(),
+  labs_params = list(title = "Count Over Time"),
+  theme_base = theme_tetext_dx(), theme_params = list(legend.position =
+  "none"))
 
-visualize_time(data = NULL, timebin = NULL, geom = c("bar", "hist"),
-  add_alpha = FALSE, alpha_range = c(0.25, 1), color = NULL,
-  color_value = "grey50", lab_x = NULL, lab_y = NULL,
-  lab_title = "Count Over Time", lab_subtitle = NULL, lab_caption = NULL,
-  theme_base = theme_tetext())
+visualize_time(..., timebin, color)
 
-visualize_time_multi_at(data = NULL, ..., theme_base = theme_tetext_facet(),
-  multi = NULL, facet_scales = "free", facet_ncol = 3,
-  facet_nrow = NULL, facet_strip_position = "top")
+visualize_time_facet_at(..., theme_base = theme_tetext_facet_dx(),
+  facet = NULL, facet_base = facet_tetext(facet), facet_params)
 
-visualize_time_multi(data = NULL, ..., theme_base = theme_tetext_facet(),
-  multi = NULL, facet_scales = "free", facet_ncol = 3,
-  facet_nrow = NULL, facet_strip_position = "top")
+visualize_time_facet(..., timebin, color, facet)
 }
 \arguments{
 \item{data}{data.frame.}
 
-\item{timebin}{character. Name of column in \code{data} to use for time axis.
+\item{timebin}{bare for NSE; character for SE. Name of column in \code{data} to use for time axis.
 Probably something like 'yyyy', 'mm', etc.}
 
-\item{geom}{character. 'bar' or 'hist'. 'bar' is probably best for everything except Date objects.}
+\item{color}{bare for NSE; character for SE. Name of column in \code{data} to use for color basis.
+Even if \code{fill} is the actual \code{ggplot2} aesthetic, the internal code will 'coerce' this
+column to \code{fill}.
+In order to simplify internal code, MUST be specified.}
+
+\item{geom}{character. 'bar' or 'hist'. 'bar' is probably best for everything except \code{Date} objects.}
 
 \item{add_alpha}{logical. Whether or not to use \code{ggplot2::scale_alpha()} based on count.}
 
 \item{alpha_range}{numeric (vector). Direct parameter passed to \code{range} parameter
 of \code{ggplot2::scale_alpha()}.}
 
-\item{color}{character. Name of column in \code{data} to use for color basis.
-Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+\item{scale_manual_params}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
+argument is specified, so if overwriting explicitly, then \code{values} should be included in the list.}
 
-\item{color_value}{character (vector). Hex value(s) of color. May be a vector.
-Should not be a function.}
+\item{labs_base}{\code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
+It is recommended NOT to modify this argument; isntead, the \code{_params} argument should
+be used for customization.}
 
-\item{lab_title, lab_subtitle, lab_caption, lab_x, lab_y}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
+\item{labs_params}{list. Additional parameters to pass to \code{ggplot2::labs()} to use in addition
+to and/or override the parameters set in the \code{_base} parameter.}
 
-\item{theme_base}{\code{ggplot2} theme (e.g. as \code{ggplot2::theme_minimal()}.)
-A custom \code{tetext} thems is supplied as a default.}
+\item{theme_base}{\code{ggplot2::theme()} function. (e.g. as \code{ggplot2::theme_minimal()}.)
+A custom theme is supplied as a default. As with the the \code{labs_base} argument, it is NOT
+recommended to change this directly.}
 
-\item{...}{dots. Parameters to pass directly to \code{visualize_time_at()}.}
+\item{theme_params}{list. Additional parameters to pass to \code{ggplot2::labs()}.
+Should be used in the same manner as \code{labs_params} for customization.}
 
-\item{multi}{character. Name of column in \code{data} to use for facetting.}
+\item{...}{dots. Parameters to pass directly to \code{visualize_time()}.}
 
-\item{facet_scales, facet_strip_position}{character. Direct parameters to analogous \code{ggplot2::facet_wrap()} parameters.}
+\item{facet}{bare for NSE; character for SE. Name of column in \code{data} to use for facetting.}
 
-\item{facet_ncol, facet_nrow}{numeric. Direct parameters to analogous \code{ggplot2::facet_wrap()} parameters.}
+\item{facet_base}{\code{ggplot2::facet_wrap()} function. An internal function
+sets defaults for \code{facets}, \code{scales}, \code{ncol}, \code{nrow}, and \code{strip.position}
+As with the \code{labs_base} and \code{theme_base} arguments, it is NOT recommended to set
+this argument explicitly; instead, the accompanying \code{_params} argument should be used.}
+
+\item{facet_params}{list. Additional parameters to pass to \code{ggplot2::facet_wrap()}. Parameters
+passed to this argument override thos in the \code{_base} argument.}
 }
 \value{
 gg
@@ -70,7 +76,9 @@ gg
 Visualize time-based data over time.
 }
 \details{
-'multi' version is for facetting.
+\code{facet} version is for facetting. Lists are used for
+customization arguments (instead of dots) because there
+are multiple arguments that can be customized.
 }
 \seealso{
 \url{https://juliasilge.com/blog/ten-thousand-tweets/}.

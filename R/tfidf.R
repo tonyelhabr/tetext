@@ -8,36 +8,42 @@
 #' of the \code{tidytext} package.
 #' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
-#' @param word character. Name of column in \code{data} to use
+#' @param token bare for NSE; character for SE. Name of column in \code{data} to use
 #' as \code{term} in \code{tidytext::bind_tf_idf()}.
-#' @param doc character. Name of column in \code{data} to use
+#' @param doc bare for NSE; character for SE. Name of column in \code{data} to use
 #' as \code{document} in \code{tidytext::bind_tf_idf()}.
 #' @return data.frame.
 #' @rdname compute_tfidf
 #' @export
 compute_tfidf_at <-
   function(data = NULL,
-           word = "word",
-           doc = "document") {
-    if (is.null(data))
-      stop("`data` cannot be NULL.", call. = FALSE)
+           token = NULL,
+           doc = NULL) {
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(token), is.character(token))
+    stopifnot(!is.null(doc), is.character(doc))
 
-    word_quo <- rlang::sym(word)
+    token_quo <- rlang::sym(token)
     doc_quo <- rlang::sym(doc)
 
     n <- tf_idf <- NULL
 
-    out <-
-      data %>%
-      dplyr::count(!!doc_quo, !!word_quo, sort = TRUE) %>%
-      tidytext::bind_tf_idf(!!word_quo, !!doc_quo, n) %>%
+    data %>%
+      dplyr::count(!!doc_quo, !!token_quo, sort = TRUE) %>%
+      tidytext::bind_tf_idf(!!token_quo, !!doc_quo, n) %>%
       dplyr::arrange(!!doc_quo, dplyr::desc(tf_idf))
-    out
   }
 
 #' @rdname compute_tfidf
 #' @export
-compute_tfidf <- compute_tfidf_at
+compute_tfidf <-
+  function(..., token, doc) {
+    stopifnot(!missing(token))
+    stopifnot(!missing(doc))
+    token <- rlang::quo_text(rlang::enquo(token))
+    doc <- rlang::quo_text(rlang::enquo(doc))
+    compute_tfidf_at(..., token = token, doc = doc)
+  }
 
 #' Visualize TF-IDF
 #'
@@ -54,83 +60,97 @@ compute_tfidf <- compute_tfidf_at
 #' @seealso \url{https://www.tidytextmining.com/tfidf.html}.
 #' \url{https://juliasilge.com/blog/sherlock-holmes-stm/}
 visualize_tfidf_at <-
-  function(data = NULL,
-           word = "word",
-           doc = "document",
-           multi = doc,
+  function(...,
+           token = NULL,
+           doc = NULL,
+           facet = doc,
+           color = facet,
            num_top = 10,
-           color = multi,
-           color_value = "grey50",
-           lab_x = NULL,
-           lab_y = NULL,
-           lab_title = "Highest TF-IDF Words",
-           lab_subtitle = NULL,
-           lab_caption = NULL,
-           theme_base = theme_tetext_facet()) {
+           scale_manual_params = scale_manual_tetext(),
+           labs_base = labs_tetext(),
+           labs_params = list(title = "Highest TF-IDF Tokens"),
+           theme_base = theme_tetext_facet_dy(),
+           theme_params = list(legend.position = "none"),
+           facet_base = facet_tetext(facet),
+           facet_params = list()) {
+
+    # stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(token), is.character(token))
+    stopifnot(!is.null(doc), is.character(doc))
+    stopifnot(!is.null(facet), is.character(facet))
+
     data_proc <-
       compute_tfidf_at(
-        data = data,
-        word = word,
+        # data = data,
+        ...,
+        token = token,
         doc = doc
       )
 
-    word_quo <- rlang::sym(word)
-    # tfidf_quo <- rlang::sym(tfidf)
-    multi_quo <- rlang::sym(multi)
+    token_quo <- rlang::sym(token)
+    # tfidf_quo <- rlang::sym("tf_idf")
+    facet_quo <- rlang::sym(facet)
 
-    tf_idf <- rank <- NULL
+    tf_idf <- NULL
 
-    data_viz <-
+    data_proc <-
       data_proc %>%
-      dplyr::group_by(!!multi_quo) %>%
+      dplyr::group_by(!!facet_quo) %>%
       filter_num_top_at("tf_idf", num_top) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(
-        !!word_quo := reorder_within(!!word_quo, tf_idf, !!multi_quo)
+        !!token_quo := reorder_within(!!token_quo, tf_idf, !!facet_quo)
       )
 
     if (is.null(color)) {
-      data_viz <- data_viz %>% dplyr::mutate(`.dummy` = "dummy")
+      data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
       color <- ".dummy"
-
     }
-    data_viz <- wrangle_color_col(data_viz, color)
+    # NOTE: THIS IS NEEDED!
+    data_proc <- wrangle_color_col(data_proc, color)
 
     viz <-
-      data_viz %>%
-      ggplot2::ggplot(ggplot2::aes_string(x = word, y = "tf_idf", fill = color)) +
+      data_proc %>%
+      ggplot2::ggplot(ggplot2::aes_string(x = token, y = "tf_idf", fill = color)) +
       ggplot2::geom_col() +
-      ggplot2::scale_fill_manual(values = color_value) +
-      ggplot2::facet_wrap(stats::as.formula(paste0("~ ", multi)), scales = "free") +
-      scale_x_reordered() +
-      ggplot2::coord_flip()
+      do_call_scale_manual(scale_manual_params, type = "fill") +
+      scale_x_reordered()
 
-
-    viz_labs <-
-      ggplot2::labs(
-        x = lab_x,
-        y = lab_y,
-        title = lab_title,
-        subtitle = lab_subtitle,
-        caption = lab_caption
-      )
-    viz_theme <-
-      theme_base +
-      ggplot2::theme(
-        legend.position = "none",
-        axis.text.x = ggplot2::element_blank()
-      )
+    viz <- viz + generate_facets(facet_base, facet_params)
 
     viz <-
       viz +
-      viz_labs +
-      viz_theme
+      labs_base + do_call_labs(labs_params) +
+      theme_base + do_call_theme(theme_params)
 
-    viz
+    viz <-
+      viz +
+      ggplot2::coord_flip()
   }
 
 #' @rdname visualize_tfidf
 #' @export
-visualize_tfidf <- visualize_tfidf_at
+visualize_tfidf <-
+  function(..., token, doc, facet, color) {
+    stopifnot(!missing(token))
+    stopifnot(!missing(doc))
+    token <- rlang::quo_text(rlang::enquo(token))
+    doc <- rlang::quo_text(rlang::enquo(doc))
+    if (missing(facet)) {
+      # NOTE: THIS IS 'UNIQUE' TO THIS FUNCTION.
+      # color <- NULL
+      facet <- doc
+    } else {
+      facet <- rlang::quo_text(rlang::enquo(facet))
+    }
+    if (missing(color)) {
+      # NOTE: THIS IS 'UNIQUE' TO THIS FUNCTION.
+      # color <- NULL
+      color <- facet
+    } else {
+      color <- rlang::quo_text(rlang::enquo(color))
+    }
+    visualize_tfidf_at(..., token = token, doc = doc, facet = facet, color = color)
+  }
 
 

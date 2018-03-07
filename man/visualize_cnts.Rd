@@ -3,79 +3,69 @@
 \name{visualize_cnts_at}
 \alias{visualize_cnts_at}
 \alias{visualize_cnts}
-\alias{visualize_cnts_multi_at}
-\alias{visualize_cnts_multi}
+\alias{visualize_cnts_facet_at}
+\alias{visualize_cnts_facet}
 \title{Visualize counts}
 \usage{
-visualize_cnts_at(data = NULL, word = "word", num_top = 10,
-  color = NULL, color_value = "grey50", lab_title = "Count of Words",
-  lab_subtitle = NULL, lab_caption = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = theme_tetext())
+visualize_cnts_at(data = NULL, token = NULL, color = NULL, num_top = 10,
+  scale_manual_params = scale_manual_tetext(), labs_base = labs_tetext(),
+  labs_params = list(title = "Count of Words"),
+  theme_base = theme_tetext_dy(), theme_params = list(legend.position =
+  "none"))
 
-visualize_cnts(data = NULL, word = "word", num_top = 10, color = NULL,
-  color_value = "grey50", lab_title = "Count of Words",
-  lab_subtitle = NULL, lab_caption = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = theme_tetext())
+visualize_cnts(..., token, color)
 
-visualize_cnts_multi_at(data = NULL, word = "word", num_top = 10,
-  color = NULL, color_value = "grey50", lab_title = "Count of Words",
-  lab_subtitle = NULL, lab_caption = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = theme_tetext_facet(), multi)
+visualize_cnts_facet_at(data = NULL, token = NULL, color = NULL,
+  num_top = 10, scale_manual_params = scale_manual_tetext(),
+  labs_base = labs_tetext(), labs_params = list(title = "Count Over Time"),
+  theme_base = theme_tetext_facet_dy(), theme_params = list(legend.position
+  = "none"), facet = NULL, facet_base = facet_tetext(facet), facet_params)
 
-visualize_cnts_multi(data = NULL, word = "word", num_top = 10,
-  color = NULL, color_value = "grey50", lab_title = "Count of Words",
-  lab_subtitle = NULL, lab_caption = NULL, lab_x = NULL, lab_y = NULL,
-  theme_base = theme_tetext_facet(), multi)
+visualize_cnts_facet(..., token, color, facet)
 }
 \arguments{
 \item{data}{data.frame.}
 
-\item{word}{character. Name of column in \code{data} to use for words.
+\item{token}{bare for NSE; character for SE. Name of column in \code{data} to use as unit for counting.
 Probably something like 'word' or 'bigram'.}
+
+\item{color}{bare for NSE; character for SE. Name of column in \code{data} to use for color basis.
+Even if \code{fill} is the actual \code{ggplot2} aesthetic, the internal code will 'coerce' this
+column to \code{fill}.
+In order to simplify internal code, MUST be specified.}
 
 \item{num_top}{numeric. Number of words to show. If between 0 and 1, then assumed to be a percentage.}
 
-\item{color}{character. Name of column in \code{data} to use for color basis.
-Set to \code{NULL} by default although not actually required in order to simplify internal code.}
+\item{scale_manual_params}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
+argument is specified, so if overwriting explicitly, then \code{values} should be included in the list.}
 
-\item{color_value}{character (vector). Hex value(s) of color. May be a vector.
-Should not be a function.}
+\item{labs_base}{\code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
+It is recommended NOT to modify this argument; isntead, the \code{_params} argument should
+be used for customization.}
 
-\item{lab_title}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
+\item{labs_params}{list. Additional parameters to pass to \code{ggplot2::labs()} to use in addition
+to and/or override the parameters set in the \code{_base} parameter.}
 
-\item{lab_subtitle}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
+\item{theme_base}{\code{ggplot2::theme()} function. (e.g. as \code{ggplot2::theme_minimal()}.)
+A custom theme is supplied as a default. As with the the \code{labs_base} argument, it is NOT
+recommended to change this directly.}
 
-\item{lab_caption}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
+\item{theme_params}{list. Additional parameters to pass to \code{ggplot2::labs()}.
+Should be used in the same manner as \code{labs_params} for customization.}
 
-\item{lab_x}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
+\item{...}{dots. Parameters to pass directly to \code{visualize_time()}.}
 
-\item{lab_y}{character. It is recommended NOT
-to use these parameters directly. (Instead, it is recommended that they are modified
-'after' the function is called.) Noneheless, they are provided as inputs and assigned
-reasonable defaults (e.g. 'Count Over Time')
-where appropriate. (Otherwise, they are given the value of NULL.)}
-
-\item{theme_base}{\code{ggplot2} theme (e.g. as \code{ggplot2::theme_minimal()}.)
-A custom \code{tetext} thems is supplied as a default.}
-
-\item{multi}{character. Name of column to use as 'facetting' variable. Not used
+\item{facet}{bare for NSE; character for SE. Name of column to use as 'facetting' variable. Not used
 if not specified.}
+
+\item{facet_base}{\code{ggplot2::facet_wrap()} function. An internal function
+sets defaults for \code{facets}, \code{scales}, \code{ncol}, \code{nrow}, and \code{strip.position}
+As with the \code{labs_base} and \code{theme_base} arguments, it is NOT recommended to set
+this argument explicitly; instead, the accompanying \code{_params} argument should be used.}
+
+\item{facet_params}{list. Additional parameters to pass to \code{ggplot2::facet_wrap()}. Parameters
+passed to this argument override thos in the \code{_base} argument.}
 }
 \value{
 gg.
@@ -83,10 +73,10 @@ gg.
 gg.
 }
 \description{
-Visualize n-gram counts.
+Visualize token counts.
 }
 \details{
-'multi' version is for facetting. 'y' value is calculated internally
+\code{facet} version is for facetting. 'y' value is calculated internally
 with \code{dplyr::count()}.
 
 Unfortunately, it seems difficult to combine this with \code{visualize_cnts_at()}
