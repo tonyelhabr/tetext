@@ -11,9 +11,8 @@ visualize_freqs_facet_by2_at(data = NULL, token = NULL, facet = "name_xy",
   filter_facet_params = list(), color = NULL, add_labels = TRUE,
   scale_manual_params = default_scale_manual(), labs_base = default_labs(),
   labs_params = list(title = "Relative Token Frequency"),
-  theme_base = default_theme(panel.background = ggplot2::element_rect()),
-  theme_params = list(), facet_base = default_facet("name_xy"),
-  facet_params = list())
+  theme_base = default_theme(), theme_params = list(),
+  facet_base = default_facet("name_xy"), facet_params = list())
 
 visualize_freqs_facet_by2(..., token, color, facet)
 }

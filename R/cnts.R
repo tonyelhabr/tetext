@@ -21,32 +21,34 @@ visualize_cnts_at <-
            scale_manual_params = default_scale_manual(),
            labs_base = default_labs(),
            labs_params = list(title = "Count of Words"),
-           theme_base = default_theme(panel.grid.major.y = ggplot2::element_blank()),
+           theme_base =
+             default_theme(axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
+                           panel.grid.major.y = ggplot2::element_blank()),
            theme_params = list()) {
     stopifnot(!is.null(data), is.data.frame(data))
     stopifnot(!is.null(token), is.character(token))
 
     token_quo <- rlang::sym(token)
+    color_quo <- rlang::sym(color)
 
     n <- NULL
 
+    if (is.null(color)) {
+      data <- data %>% dplyr::mutate(`.dummy` = "dummy")
+      color <- ".dummy"
+    }
     data_proc <-
       data %>%
-      dplyr::count(!!token_quo) %>%
+      dplyr::count(!!token_quo, !!color_quo) %>%
       filter_num_top_at("n", num_top) %>%
       dplyr::mutate(!!token_quo := stats::reorder(!!token_quo, n))
 
-
-    if (is.null(color)) {
-      data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
-      color <- ".dummy"
-    }
     # NOTE: DON'T NEED THIS!
     # data_proc <- wrangle_color_col(data_proc, color)
 
     viz <-
-      ggplot2::ggplot(data = data_proc,
-                      ggplot2::aes_string(x = token, y = "n", fill = color)) +
+      data_proc %>%
+      ggplot2::ggplot(ggplot2::aes_string(x = token, y = "n", fill = color)) +
       ggplot2::geom_col() +
       do_call_scale_manual(scale_manual_params, type = "fill")
 
@@ -89,7 +91,9 @@ visualize_cnts_facet_at <-
            scale_manual_params = default_scale_manual(),
            labs_base = default_labs(),
            labs_params = list(title = "Count Over Time"),
-           theme_base = default_theme(panel.grid.major.y = ggplot2::element_blank(), panel.background = ggplot2::element_rect()),
+           theme_base =
+             default_theme(axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
+                           panel.grid.major.y = ggplot2::element_blank()),
            theme_params = list(),
            facet_base = default_facet(facet),
            facet_params = list()) {

@@ -238,7 +238,7 @@ testthat::test_that(
   {
     lab_title <- "Temporal Count"
     lab_subtitle <- "By Team"
-    viz_cnts <-
+    viz_unigram_cnts <-
       unigrams %>%
       filter(id %in% id_filt) %>%
       visualize_cnts(
@@ -248,10 +248,10 @@ testthat::test_that(
         scale_manual_params = list(values = color_filt),
         labs_params = list(title = lab_title, subtitle = id_filt)
       )
-    viz_cnts
-    testthat::expect_true(ggplot2::is.ggplot(viz_cnts))
+    viz_unigram_cnts
+    testthat::expect_true(ggplot2::is.ggplot(viz_unigram_cnts))
 
-    viz_cnts_facet <-
+    viz_unigram_cnts_facet <-
       unigrams %>%
       visualize_cnts_facet(
         token = word,
@@ -261,10 +261,10 @@ testthat::test_that(
         scale_manual_params = list(values = colors_filt),
         labs_params = list(title = lab_title, subtitle = lab_subtitle)
       )
-    viz_cnts_facet
-    testthat::expect_true(ggplot2::is.ggplot(viz_cnts_facet))
+    viz_unigram_cnts_facet
+    testthat::expect_true(ggplot2::is.ggplot(viz_unigram_cnts_facet))
 
-    viz_cnts_wordcloud <-
+    viz_unigram_cnts_wordcloud <-
       unigrams %>%
       filter(id %in% id_filt) %>%
       visualize_cnts_wordcloud(
@@ -272,7 +272,7 @@ testthat::test_that(
         wordcloud_params = list(colors = color_filt)
       )
 
-    viz_cnts_wordcloud_facet <-
+    viz_unigram_cnts_wordcloud_facet <-
       unigrams %>%
       visualize_cnts_wordcloud_facet(
         token = word,
@@ -282,15 +282,17 @@ testthat::test_that(
       )
 
     par(mfrow = c(2, 3))
-    purrr::map2(
-      ids_filt,
-      colors_filt,
-      ~visualize_cnts_wordcloud_facet(
-        data = unigrams,
-        token = word,
-        facet = id,
-        value_facet = .x,
-        wordcloud_params = list(colors = .y, max.words = 15)
+    invisible(
+      purrr::map2(
+        ids_filt,
+        colors_filt,
+        ~visualize_cnts_wordcloud_facet(
+          data = unigrams,
+          token = word,
+          facet = id,
+          value_facet = .x,
+          wordcloud_params = list(colors = .y, max.words = 15)
+        )
       )
     )
     par(mfrow = c(1, 1))
@@ -320,29 +322,29 @@ testthat::test_that(
 testthat::test_that(
   "sents",
   {
-    unigrams_sent_summ <-
+    unigram_sent_summ <-
       unigrams %>%
       filter(id %in% c(id_filt)) %>%
-      comput_sent_summ(
+      compute_sent_summ(
         token = word,
         feature = status_id
       )
-    unigrams_sent_summ
+    unigram_sent_summ
 
-    actual <- nrow(unigrams_sent_summ)
+    actual <- nrow(unigram_sent_summ)
     expect <- 2
     testthat::expect_equal(actual, expect)
 
-    unigrams_sent_summ_facet <-
+    unigram_sent_summ_facet <-
       unigrams %>%
-      comput_sent_summ_facet(
+      compute_sent_summ_facet(
         token = word,
         feature = status_id,
         facet = id
       )
-    unigrams_sent_summ_facet
+    unigram_sent_summ_facet
 
-    actual <- nrow(unigrams_sent_summ_facet)
+    actual <- nrow(unigram_sent_summ_facet)
     expect <- 10
     testthat::expect_equal(actual, expect)
   }
@@ -351,19 +353,19 @@ testthat::test_that(
 testthat::test_that(
   "sents_by2",
   {
-    unigrams_sentratios <-
+    unigram_sentratios <-
       unigrams %>%
       compute_sentratios_facet_by2(
         token = word,
         facet = id
       )
-    unigrams_sentratios
+    unigram_sentratios
 
-    actual <- nrow(unigrams_sentratios)
+    actual <- nrow(unigram_sentratios)
     expect <- 962
     testthat::expect_equal(actual, expect)
 
-    unigrams_sentratios %>%
+    unigram_sentratios %>%
       dplyr::group_by(name_xy, sentiment) %>%
       dplyr::do(head(., 2))
 
@@ -374,25 +376,25 @@ testthat::test_that(
   "_by2",
   {
 
-    unigrams_freqs_facet <-
+    unigram_freqs_facet <-
       unigrams %>%
       compute_freqs_facet(
         token = word,
         facet = id
       )
 
-    unigrams_freqs_facet_by2 <-
+    unigram_freqs_facet_by2 <-
       unigrams %>%
       compute_freqs_facet_by2(
         token = word,
         facet = id
       )
-    unigrams_freqs_facet_by2
+    unigram_freqs_facet_by2
 
-    testthat::expect_true(nrow(unigrams_freqs_facet) != nrow(unigrams_freqs_facet_by2))
-    testthat::expect_true(ncol(unigrams_freqs_facet) != ncol(unigrams_freqs_facet_by2))
+    testthat::expect_true(nrow(unigram_freqs_facet) != nrow(unigram_freqs_facet_by2))
+    testthat::expect_true(ncol(unigram_freqs_facet) != ncol(unigram_freqs_facet_by2))
 
-    viz_freqs_facet_by2 <-
+    viz_unigram_freqs_facet_by2 <-
       unigrams %>%
       visualize_freqs_facet_by2(
         token = word,
@@ -400,23 +402,23 @@ testthat::test_that(
         filter_facet = TRUE,
         facet_main = id_filt
       )
-    viz_freqs_facet_by2
-    testthat::expect_true(ggplot2::is.ggplot(viz_freqs_facet_by2))
+    viz_unigram_freqs_facet_by2
+    testthat::expect_true(ggplot2::is.ggplot(viz_unigram_freqs_facet_by2))
 
-    unigrams_logratios_facet_by2 <-
+    unigram_logratios_facet_by2 <-
       unigrams %>%
       compute_logratios_facet_by2(
         token = word,
         facet = id,
         cnt_min = 50
       )
-    unigrams_logratios_facet_by2
+    unigram_logratios_facet_by2
 
-    actual <- nrow(unigrams_logratios_facet_by2)
+    actual <- nrow(unigram_logratios_facet_by2)
     expect <- 882
     testthat::expect_equal(actual, expect)
 
-    viz_logratios_facet_by2 <-
+    viz_unigram_logratios_facet_by2 <-
       unigrams %>%
       visualize_logratios_facet_by2(
         token = word,
@@ -425,10 +427,10 @@ testthat::test_that(
         facet_main = id_filt,
         num_top = 3
       )
-    viz_logratios_facet_by2
-    testthat::expect_true(ggplot2::is.ggplot(viz_logratios_facet_by2))
+    viz_unigram_logratios_facet_by2
+    testthat::expect_true(ggplot2::is.ggplot(viz_unigram_logratios_facet_by2))
 
-    viz_sentratios_facet_by2 <-
+    viz_unigram_sentratios_facet_by2 <-
       unigrams %>%
       visualize_sentratios_facet_by2(
         token = word,
@@ -439,8 +441,8 @@ testthat::test_that(
         sent_main = "positive",
         num_top = 3
       )
-    viz_sentratios_facet_by2
-    testthat::expect_true(ggplot2::is.ggplot(viz_sentratios_facet_by2))
+    viz_unigram_sentratios_facet_by2
+    testthat::expect_true(ggplot2::is.ggplot(viz_unigram_sentratios_facet_by2))
   }
 )
 

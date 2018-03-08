@@ -50,9 +50,9 @@ get_sents <- function(lexicon = c("bing", "afinn", "nrc", "loughran"),
 }
 
 
-#' @rdname comput_sent_summ
+#' @rdname compute_sent_summ
 #' @export
-comput_sent_summ_facet_at <-
+compute_sent_summ_facet_at <-
   function(data = NULL,
            token = NULL,
            feature = NULL,
@@ -91,9 +91,9 @@ comput_sent_summ_facet_at <-
       dplyr::ungroup()
   }
 
-#' @rdname comput_sent_summ
+#' @rdname compute_sent_summ
 #' @export
-comput_sent_summ_facet <-
+compute_sent_summ_facet <-
   function(..., token, feature, facet) {
     stopifnot(!missing(token))
     stopifnot(!missing(feature))
@@ -101,7 +101,7 @@ comput_sent_summ_facet <-
     token <- rlang::quo_text(rlang::enquo(token))
     feature <- rlang::quo_text(rlang::enquo(feature))
     facet <- rlang::quo_text(rlang::enquo(facet))
-    comput_sent_summ_facet_at(..., token = token, feature = feature, facet = facet)
+    compute_sent_summ_facet_at(..., token = token, feature = feature, facet = facet)
   }
 
 #' Compute sentiment scores.
@@ -119,10 +119,10 @@ comput_sent_summ_facet <-
 #' or, in the case of Twitter data, 'status_id'.
 #' @param ... dots. Parameters to pass to \code{get_sents()} internally.
 #' @return data.frame.
-#' @rdname comput_sent_summ
+#' @rdname compute_sent_summ
 #' @export
 #' @seealso Don't have an explicit url.
-comput_sent_summ_at <-
+compute_sent_summ_at <-
   function(data = NULL,
            # token = NULL,
            # feature = NULL,
@@ -141,7 +141,7 @@ comput_sent_summ_at <-
     }
 
     out <-
-      comput_sent_summ_facet_at(
+      compute_sent_summ_facet_at(
         data = data,
         facet = facet,
         ...
@@ -152,9 +152,9 @@ comput_sent_summ_at <-
     out
   }
 
-#' @rdname comput_sent_summ
+#' @rdname compute_sent_summ
 #' @export
-comput_sent_summ <-
+compute_sent_summ <-
   function(..., token, feature, facet) {
     stopifnot(!missing(token))
     stopifnot(!missing(feature))
@@ -165,7 +165,7 @@ comput_sent_summ <-
     } else {
       facet <- rlang::quo_text(rlang::enquo(facet))
     }
-    comput_sent_summ_at(..., token = token, feature = feature, facet = facet)
+    compute_sent_summ_at(..., token = token, feature = feature, facet = facet)
   }
 
 #' Compute token sentiment log ratios in pairs
@@ -294,7 +294,7 @@ visualize_sentratios_facet_by2_at <-
            labs_base = default_labs(),
            labs_params = list(title = "Most Significant Words Contributing to Sentiment Differences",
                               y = "Log Odds Ratio"),
-           theme_base = default_theme(panel.background = ggplot2::element_rect()),
+           theme_base = default_theme(),
            theme_params =
              list(legend.position = "bottom",
                   axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),

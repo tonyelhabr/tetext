@@ -12,11 +12,10 @@ visualize_logratios_facet_by2_at(data = NULL, token = NULL, facet = NULL,
   num_top = 5, scale_manual_params = default_scale_manual(values =
   c("grey50", "grey80")), labs_base = default_labs(),
   labs_params = list(title = "Most Unique Words", y = "Log Odds Ratio"),
-  theme_base = default_theme(panel.background = ggplot2::element_rect()),
-  theme_params = list(legend.position = "bottom", axis.text.y =
-  ggplot2::element_text(angle = 45, hjust = 1), panel.grid.major.y =
-  ggplot2::element_blank()), facet_base = default_facet("name_xy"),
-  facet_params = list())
+  theme_base = default_theme(), theme_params = list(legend.position =
+  "bottom", axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
+  panel.grid.major.y = ggplot2::element_blank()),
+  facet_base = default_facet("name_xy"), facet_params = list())
 
 visualize_logratios_facet_by2(..., token, color, facet)
 }

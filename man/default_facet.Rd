@@ -5,7 +5,7 @@
 \title{Default facet parameters}
 \usage{
 default_facet(facet, scales = "free", ncol = 3, nrow = NULL,
-  strip.position = "right", ...)
+  strip.position = "top", ...)
 }
 \arguments{
 \item{facet, scales, ncol, nrow, strip.position, ...}{Parameters passed directly to

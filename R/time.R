@@ -175,8 +175,7 @@ visualize_time <- function(...,
 visualize_time_facet_at <-
   function(...,
            theme_base =
-             default_theme(panel.grid.major.x = ggplot2::element_blank(),
-                           panel.background = ggplot2::element_rect()),
+             default_theme(panel.grid.major.x = ggplot2::element_blank()),
            facet = NULL,
            facet_base = default_facet(facet),
            facet_params = list()) {

@@ -166,7 +166,7 @@ visualize_logratios_facet_by2_at <-
            scale_manual_params = default_scale_manual(values = c("grey50", "grey80")),
            labs_base = default_labs(),
            labs_params = list(title = "Most Unique Words", y = "Log Odds Ratio"),
-           theme_base = default_theme(panel.background = ggplot2::element_rect()),
+           theme_base = default_theme(),
            theme_params =
              list(legend.position = "bottom",
                   axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),

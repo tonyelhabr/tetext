@@ -9,9 +9,10 @@ visualize_tfidf_at(..., token = NULL, doc = NULL, facet = doc,
   color = facet, num_top = 10,
   scale_manual_params = default_scale_manual(), labs_base = default_labs(),
   labs_params = list(title = "Highest TF-IDF Tokens"),
-  theme_base = default_theme(panel.grid.major.y = ggplot2::element_blank(),
-  panel.background = ggplot2::element_rect()), theme_params = list(),
-  facet_base = default_facet(facet), facet_params = list())
+  theme_base = default_theme(axis.text.y = ggplot2::element_text(angle = 45,
+  hjust = 1), panel.grid.major.y = ggplot2::element_blank()),
+  theme_params = list(), facet_base = default_facet(facet),
+  facet_params = list())
 
 visualize_tfidf(..., token, doc, facet, color)
 }

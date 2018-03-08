@@ -41,6 +41,6 @@ do_call_scale_manual <- function(params, type = c("color", "fill")) {
 
 do_call_wordcloud <- function(params) {
   if (!missing(params)) {
-    do.call(wordcloud::wordcloud, params)
+    invisible(do.call(wordcloud::wordcloud, params))
   }
 }

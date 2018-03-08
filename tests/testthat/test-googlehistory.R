@@ -11,12 +11,11 @@ filename_unigrams <- "unigrams-tony.rds"
 filename_bigrams <- "bigrams-tony.rds"
 if (interactive()) {
   dir.exists(file.path("inst", dir))
+  devtools::load_all()
 } else {
   print(dir.exists(dir))
 }
-if(interactive()) {
-  load_all()
-}
+
 path_data <-
   system.file(dir, filename_data, package = "tetext", mustWork = TRUE)
 path_unigrams <-

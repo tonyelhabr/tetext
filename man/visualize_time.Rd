@@ -18,8 +18,8 @@ visualize_time_at(data = NULL, timebin = NULL, bin = FALSE,
 visualize_time(..., timebin, color)
 
 visualize_time_facet_at(..., theme_base = default_theme(panel.grid.major.x =
-  ggplot2::element_blank(), panel.background = ggplot2::element_rect()),
-  facet = NULL, facet_base = default_facet(facet), facet_params = list())
+  ggplot2::element_blank()), facet = NULL,
+  facet_base = default_facet(facet), facet_params = list())
 
 visualize_time_facet(..., timebin, color, facet)
 }

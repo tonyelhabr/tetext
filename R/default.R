@@ -101,7 +101,7 @@ default_labs <-
 #' @rdname default_facet
 #' @export
 default_facet <-
-  function(facet, scales = "free", ncol = 3, nrow = NULL, strip.position = "right", ...) {
+  function(facet, scales = "free", ncol = 3, nrow = NULL, strip.position = "top", ...) {
     stopifnot(!missing(facet), is.character(facet))
     # if(!plyr::is.formula(facet)) {
     if(!grepl("~", facet)) {
