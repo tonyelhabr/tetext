@@ -12,8 +12,8 @@ visualize_change_at(..., token = NULL, num_top = 5, color = token,
   "Tokens with Most Significant Change in Frequency", caption =
   paste0("Statistical significance is determined by a logistical model\\n",
   "estimating token appearance in a given time period.")),
-  theme_base = default_theme_dx(), theme_params = list(legend.position =
-  ifelse(add_labels, "none", "bottom")))
+  theme_base = default_theme(panel.grid.major.x = ggplot2::element_blank()),
+  theme_params = list(legend.position = ifelse(add_labels, "none", "bottom")))
 
 visualize_change(..., token, timebin, timefloor, color)
 }
@@ -32,9 +32,11 @@ In order to simplify internal code, MUST be specified.}
 
 \item{add_labels}{logical. Whether or not to add labels to the lines.}
 
-\item{scale_manual_params}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
-\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
-argument is specified, so if overwriting explicitly, then \code{values} should be included in the list.}
+\item{scale_manual_params}{list. Additional parameters to pass to \code{ggplot2::scale_fill_manual()}
+or \code{ggplot2::scale_color_manual()} (e.g. \code{breaks}, \code{labels}, or \code{name}).
+The default \code{values} specified by \code{scale_manual_base = default_scale_manual()}
+can be overwritten a \code{values} argument in this list (or directly with a
+\code{values} argument in the \code{scale_manual_base} list.}
 
 \item{labs_base}{\code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
 It is recommended NOT to modify this argument; isntead, the \code{_params} argument should
@@ -50,10 +52,9 @@ recommended to change this directly.}
 \item{theme_params}{list. Additional parameters to pass to \code{ggplot2::labs()}.
 Should be used in the same manner as \code{labs_params} for customization.}
 
-\item{timebin}{bare for NSE; character for SE. Name of column in \code{data} to use for time axis.
-Probably something like 'yyyy', 'mm', etc.}
+\item{timebin}{bare for NSE; character for SE. Name of column in \code{data} to use for time axis.}
 
-\item{timefloor}{bare for NSE; character for SE. Name of column passed directly to \code{unit} parameter of
+\item{timefloor}{character. Name of column passed directly to \code{unit} parameter of
 \code{lubridate::floor_date()} if \code{bin = FALSE}.}
 }
 \value{

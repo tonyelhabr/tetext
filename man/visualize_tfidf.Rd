@@ -9,7 +9,8 @@ visualize_tfidf_at(..., token = NULL, doc = NULL, facet = doc,
   color = facet, num_top = 10,
   scale_manual_params = default_scale_manual(), labs_base = default_labs(),
   labs_params = list(title = "Highest TF-IDF Tokens"),
-  theme_base = default_theme_facet_dy(), theme_params = list(),
+  theme_base = default_theme(panel.grid.major.y = ggplot2::element_blank(),
+  panel.background = ggplot2::element_rect()), theme_params = list(),
   facet_base = default_facet(facet), facet_params = list())
 
 visualize_tfidf(..., token, doc, facet, color)
@@ -32,9 +33,11 @@ In order to simplify internal code, MUST be specified.}
 
 \item{num_top}{numeric. Number of words to show. If between 0 and 1, then assumed to be a percentage.}
 
-\item{scale_manual_params}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
-\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
-argument is specified, so if overwriting explicitly, then \code{values} should be included in the list.}
+\item{scale_manual_params}{list. Additional parameters to pass to \code{ggplot2::scale_fill_manual()}
+or \code{ggplot2::scale_color_manual()} (e.g. \code{breaks}, \code{labels}, or \code{name}).
+The default \code{values} specified by \code{scale_manual_base = default_scale_manual()}
+can be overwritten a \code{values} argument in this list (or directly with a
+\code{values} argument in the \code{scale_manual_base} list.}
 
 \item{labs_base}{\code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
 It is recommended NOT to modify this argument; isntead, the \code{_params} argument should

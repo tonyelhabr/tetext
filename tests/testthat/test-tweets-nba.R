@@ -4,46 +4,72 @@ context("funcs-tetweet")
 require("bindrcpp")
 require("dplyr")
 require("ggplot2")
+require("rtweet")
 
-dir <- file.path("tests")
+dir <- file.path("extdata")
 filename_data_facet <- "tweets-search-nba-augmented.rds"
 if (interactive()) {
   dir.exists(file.path("inst", dir))
+  devtools::load_all()
 } else {
   print(dir.exists(dir))
 }
 path_data_facet <-
   system.file(dir, filename_data_facet, package = "tetext", mustWork = TRUE)
 
-data <- readRDS(file = path_data_facet)
+pull_distinctly <- function(data, col) {
+  col <- enquo(col)
+  data %>%
+    distinct(!!col) %>%
+    arrange(!!col) %>%
+    pull(!!col)
+}
 
-idx_main <- 5
-# colors <- c("blue", "red", "cadetblue", "purple", "black")
+
+data <- readRDS(path_data_facet)
+# data <- rename(data, id = name)
+# saveRDS(data, file = path_data_facet)
+
+ids <- data %>% pull_distinctly(id)
+# colors <-
+#   c(
+#     "#061922",
+#     "#ce1141",
+#     "#7399c6",
+#     "#002b5c",
+#     "#061922"
+#   )
 colors <-
   c(
-    "#061922",
+    "#007dc5",
     "#ce1141",
-    "#7399c6",
+    "#0f586c",
     "#002b5c",
-    "#061922"
+    "#bac3c9"
   )
-color_main <- colors[idx_main]
+if (interactive()) {
+  scales::show_col(colors)
+}
 
-names <- c("DAL", "HOU", "MEM", "NOP", "SAS")
-name_main <- names[idx_main]
+ids_filt <- c("DAL", "HOU", "MEM", "NOP", "SAS")
+idxs_filt <- match(ids_filt, ids)
+colors_filt <- colors[idxs_filt]
+names(colors_filt) <- ids_filt
 
-message("Tests are in order of likely usage in script.")
+id_filt <- "SAS"
+idx_filt <- match(id_filt, ids_filt)
+color_filt <- colors_filt[idx_filt]
 
 data_facet <-
   data %>%
-  filter(name %in% names) %>%
-  clean_tweets(facet = name)
+  filter(id %in% ids_filt) %>%
+  clean_tweets(facet = id)
 
 data_facet_timefilter <-
   data_facet %>%
   compute_timefilter_facet(
     timebin = timestamp,
-    facet = name
+    facet = id
   )
 
 data_facet_trim <-
@@ -57,8 +83,8 @@ data_facet_trim <-
 testthat::test_that(
   "trim",
   {
-    actual <- data_facet %>% distinct(name) %>% arrange(name) %>% pull(name)
-    expected <- names
+    actual <- data_facet %>% pull_distinctly(id)
+    expected <- ids_filt
     testthat::expect_equal(actual, expected)
 
     testthat::expect_true(is.list(data_facet_timefilter))
@@ -71,7 +97,7 @@ testthat::test_that(
       data_facet %>%
       compute_timefilter(
         timebin = timestamp,
-        facet = name
+        facet = id
       )
     actual <- data_facet_timefilter_2
     expected <- data_facet_timefilter
@@ -81,7 +107,7 @@ testthat::test_that(
       data_facet %>%
       trim_bytime(
         timebin = timestamp,
-        facet = name
+        facet = id
       )
     actual <- data_facet_trim_2
     expected <- data_facet_trim
@@ -95,11 +121,11 @@ testthat::test_that(
   {
     viz_time_all <-
       data_facet_trim %>%
-      filter(name %in% name_main) %>%
+      filter(id %in% id_filt) %>%
       visualize_time(
         timebin = timestamp,
-        color = name,
-        scale_manual_params = list(values = color_main)
+        color = id,
+        scale_manual_params = list(values = color_filt)
       )
     viz_time_all
 
@@ -107,9 +133,9 @@ testthat::test_that(
       data_facet_trim %>%
       visualize_time_facet(
         timebin = timestamp,
-        color = name,
-        facet = name,
-        scale_manual_params = list(values = colors),
+        color = id,
+        facet = id,
+        scale_manual_params = list(values = colors_filt),
         facet_params = list(
           strip.position = "right",
           ncol = 1
@@ -120,11 +146,27 @@ testthat::test_that(
 
     viz_time_facet_hh <-
       data_facet_trim %>%
+      visualize_time_facet(
+        timebin = timestamp,
+        bin = TRUE,
+        timefloor = "hour",
+        color = id,
+        facet = id,
+        scale_manual_params = list(values = colors_filt),
+        facet_params = list(
+          strip.position = "right",
+          ncol = 1
+        )
+      )
+    viz_time_facet_hh
+
+    viz_time_facet_hh <-
+      data_facet_trim %>%
       mutate(hh4 = floor((lubridate::hour(timestamp)) / 6) + 1) %>%
       visualize_time_facet(
         timebin = hh4,
-        color = name,
-        facet = name,
+        color = id,
+        facet = id,
         scale_manual_params = list(values = colors)
       )
     viz_time_facet_hh
@@ -135,8 +177,8 @@ testthat::test_that(
       mutate(hh = (lubridate::hour(timestamp))) %>%
       visualize_time_hh(
         timebin = hh,
-        color = name,
-        facet = name,
+        color = id,
+        facet = id,
         scale_manual_params = list(values = colors)
       )
     viz_time_hh
@@ -196,37 +238,57 @@ testthat::test_that(
   {
     lab_title <- "Temporal Count"
     lab_subtitle <- "By Team"
+    viz_cnts <-
+      unigrams %>%
+      filter(id %in% id_filt) %>%
+      visualize_cnts(
+        token = word,
+        color = id,
+        num_top = 10,
+        scale_manual_params = list(values = color_filt),
+        labs_params = list(title = lab_title, subtitle = id_filt)
+      )
+    viz_cnts
+    testthat::expect_true(ggplot2::is.ggplot(viz_cnts))
+
     viz_cnts_facet <-
       unigrams %>%
       visualize_cnts_facet(
         token = word,
-        facet = name,
-        color = name,
+        facet = id,
+        color = id,
         num_top = 10,
-        scale_manual_params = list(values = colors),
+        scale_manual_params = list(values = colors_filt),
         labs_params = list(title = lab_title, subtitle = lab_subtitle)
       )
     viz_cnts_facet
     testthat::expect_true(ggplot2::is.ggplot(viz_cnts_facet))
 
+    viz_cnts_wordcloud <-
+      unigrams %>%
+      filter(id %in% id_filt) %>%
+      visualize_cnts_wordcloud(
+        token = word,
+        wordcloud_params = list(colors = color_filt)
+      )
+
     viz_cnts_wordcloud_facet <-
       unigrams %>%
       visualize_cnts_wordcloud_facet(
         token = word,
-        facet = name,
-        value_facet = name_main,
-        wordcloud_params = list(colors = color_main)
+        facet = id,
+        value_facet = id_filt,
+        wordcloud_params = list(colors = color_filt)
       )
-    # viz_cnts_wordcloud_facet
 
     par(mfrow = c(2, 3))
     purrr::map2(
-      names,
-      colors,
+      ids_filt,
+      colors_filt,
       ~visualize_cnts_wordcloud_facet(
         data = unigrams,
         token = word,
-        facet = name,
+        facet = id,
         value_facet = .x,
         wordcloud_params = list(colors = .y, max.words = 15)
       )
@@ -242,12 +304,12 @@ testthat::test_that(
     lab_subtitle <- "By Team"
     viz_bigram_freqs_facet <-
       bigrams %>%
-      visualize_bigram_freqs_facet(
+      visualize_bigram_freqs(
         token = word,
-        facet = name,
-        color = name,
+        facet = id,
+        color = id,
         num_top = 2,
-        scale_manual_params = list(values = colors),
+        scale_manual_params = list(values = colors_filt),
         labs_params = list(title = lab_title, subtitle = lab_subtitle)
       )
     viz_bigram_freqs_facet
@@ -260,7 +322,7 @@ testthat::test_that(
   {
     unigrams_sent_summ <-
       unigrams %>%
-      filter(name %in% c(name_main)) %>%
+      filter(id %in% c(id_filt)) %>%
       comput_sent_summ(
         token = word,
         feature = status_id
@@ -276,7 +338,7 @@ testthat::test_that(
       comput_sent_summ_facet(
         token = word,
         feature = status_id,
-        facet = name
+        facet = id
       )
     unigrams_sent_summ_facet
 
@@ -293,7 +355,7 @@ testthat::test_that(
       unigrams %>%
       compute_sentratios_facet_by2(
         token = word,
-        facet = name
+        facet = id
       )
     unigrams_sentratios
 
@@ -311,21 +373,19 @@ testthat::test_that(
 testthat::test_that(
   "_by2",
   {
-    # xy_grid <- create_xy_grid(names)
-    # xy_nms <- xy_grid %>% dplyr::pull(xy)
 
     unigrams_freqs_facet <-
       unigrams %>%
       compute_freqs_facet(
         token = word,
-        facet = name
+        facet = id
       )
 
     unigrams_freqs_facet_by2 <-
       unigrams %>%
       compute_freqs_facet_by2(
         token = word,
-        facet = name
+        facet = id
       )
     unigrams_freqs_facet_by2
 
@@ -336,9 +396,9 @@ testthat::test_that(
       unigrams %>%
       visualize_freqs_facet_by2(
         token = word,
-        facet = name,
+        facet = id,
         filter_facet = TRUE,
-        facet_main = name_main
+        facet_main = id_filt
       )
     viz_freqs_facet_by2
     testthat::expect_true(ggplot2::is.ggplot(viz_freqs_facet_by2))
@@ -347,7 +407,7 @@ testthat::test_that(
       unigrams %>%
       compute_logratios_facet_by2(
         token = word,
-        facet = name,
+        facet = id,
         cnt_min = 50
       )
     unigrams_logratios_facet_by2
@@ -356,14 +416,13 @@ testthat::test_that(
     expect <- 882
     testthat::expect_equal(actual, expect)
 
-    # Testing.... ----
     viz_logratios_facet_by2 <-
       unigrams %>%
       visualize_logratios_facet_by2(
         token = word,
-        facet = name,
+        facet = id,
         filter_facet = TRUE,
-        facet_main = name_main,
+        facet_main = id_filt,
         num_top = 3
       )
     viz_logratios_facet_by2
@@ -373,9 +432,9 @@ testthat::test_that(
       unigrams %>%
       visualize_sentratios_facet_by2(
         token = word,
-        facet = name,
+        facet = id,
         filter_facet = TRUE,
-        facet_main = name_main,
+        facet_main = id_filt,
         filter_sent = TRUE,
         sent_main = "positive",
         num_top = 3

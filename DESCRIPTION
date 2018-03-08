@@ -27,9 +27,12 @@ Imports:
     ggrepel,
     ggraph,
     igraph,
+    grDevices,
+    extrafont
 Suggests:
     testthat,
     covr,
     knitr,
-    rmarkdown
+    rmarkdown,
+    rtweet
 VignetteBuilder: knitr

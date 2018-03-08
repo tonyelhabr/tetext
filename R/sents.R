@@ -178,8 +178,8 @@ comput_sent_summ <-
 #' \code{compute_logratios_facet_wide_at()}, so \code{token} and \code{cnt_min} must
 #' be checked for NULL explicilty.
 #' @inheritParams wrapper_func
-#' @inheritParams compute_logratios_facet_wide_at
-#' @inheritParams compute_logratios_facet_by2_at
+#' @inheritParams compute_logratios_facet_wide
+#' @inheritParams compute_logratios_facet_by2
 #' @inheritParams get_sents
 #' @param ... dots. Adddition parameters to pass to \code{get_sents()}.
 #' @return data.frame.
@@ -207,7 +207,7 @@ compute_sentratios_facet_by2_at <-
       xy_grid <- create_xy_grid(facets)
       xy <- NULL
       xy_nms <- xy_grid %>% dplyr::pull(xy)
-      message("Generating output for all combinations of `facet`.")
+      message(sprintf("Generating output for all combinations of `%s`.", facet))
     }
 
     data_proc <-
@@ -216,6 +216,7 @@ compute_sentratios_facet_by2_at <-
         func = func,
         xy_grid = xy_grid,
         xy_nms = xy_nms,
+        col = facet,
         token = token,
         facet = facet,
         cnt_min = cnt_min
@@ -258,9 +259,9 @@ compute_sentratios_facet_by2 <-
 #'
 #' @description Visualize token sentiment log ratios across pairs of \code{facet} values.
 #' @details \code{compute_sentratios_facet_by2_at()} should NOT be called beforehand.
-#' @inheritParams compute_logratios_facet_by2_at
+#' @inheritParams compute_logratios_facet_by2
 #' @inheritParams visualize_logratios_facet_by2
-#' @inheritParams compute_sentratios_facet_by2_at
+#' @inheritParams compute_sentratios_facet_by2
 #' @param ... dots. Additional parameters to pass to \code{compute_sentratios_facet_by2_at()}.
 #' @param filter_sent logical. Whether or not to filter the sentiment values.
 #' @param sent_main bare for NSE; character for SE. Name of single sentiment value to use as basis.
@@ -293,7 +294,7 @@ visualize_sentratios_facet_by2_at <-
            labs_base = default_labs(),
            labs_params = list(title = "Most Significant Words Contributing to Sentiment Differences",
                               y = "Log Odds Ratio"),
-           theme_base = default_theme_facet(),
+           theme_base = default_theme(panel.background = ggplot2::element_rect()),
            theme_params =
              list(legend.position = "bottom",
                   axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
@@ -317,7 +318,7 @@ visualize_sentratios_facet_by2_at <-
       xy_grid <- create_xy_grid(facets)
       xy <- NULL
       xy_nms <- xy_grid %>% dplyr::pull(xy)
-      message("Generating output for all combinations of `facet`.")
+      message(sprintf("Generating output for all combinations of `%s`.", facet))
     }
 
     data_proc <-
@@ -342,7 +343,7 @@ visualize_sentratios_facet_by2_at <-
       )
 
     if(!("name_xy" %in% facet)) {
-      message("Correcting facetting variable.")
+      message("Changing facetting variable to `name_xy`.")
     }
     data_proc <-
       data_proc %>%

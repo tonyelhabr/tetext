@@ -7,15 +7,18 @@
 \alias{visualize_time_facet}
 \title{Visualize by time period.}
 \usage{
-visualize_time_at(data = NULL, timebin = NULL, color = NULL,
-  geom = c("bar", "hist"), add_alpha = FALSE, alpha_range = c(0.25, 1),
-  scale_manual_params = default_scale_manual(), labs_base = default_labs(),
-  labs_params = list(title = "Count Over Time"),
-  theme_base = default_theme_dx(), theme_params = list())
+visualize_time_at(data = NULL, timebin = NULL, bin = FALSE,
+  timefloor = NULL, color = NULL, geom = c("bar", "hist"),
+  add_alpha = FALSE, alpha_range = c(0.25, 1),
+  scale_manual_base = default_scale_manual(), scale_manual_params = list(),
+  labs_base = default_labs(), labs_params = list(title = "Count Over Time"),
+  theme_base = default_theme(panel.grid.major.x = ggplot2::element_blank()),
+  theme_params = list())
 
 visualize_time(..., timebin, color)
 
-visualize_time_facet_at(..., theme_base = default_theme_facet_dx(),
+visualize_time_facet_at(..., theme_base = default_theme(panel.grid.major.x =
+  ggplot2::element_blank(), panel.background = ggplot2::element_rect()),
   facet = NULL, facet_base = default_facet(facet), facet_params = list())
 
 visualize_time_facet(..., timebin, color, facet)
@@ -23,8 +26,12 @@ visualize_time_facet(..., timebin, color, facet)
 \arguments{
 \item{data}{data.frame.}
 
-\item{timebin}{bare for NSE; character for SE. Name of column in \code{data} to use for time axis.
-Probably something like 'yyyy', 'mm', etc.}
+\item{timebin}{bare for NSE; character for SE. Name of column in \code{data} to use for time axis.}
+
+\item{bin}{logical. Whether or not to call \code{lubridate::floor_date()} to truncate \code{timebin}.}
+
+\item{timefloor}{character. Name of column passed directly to \code{unit} parameter of
+\code{lubridate::floor_date()} if \code{bin = FALSE}.}
 
 \item{color}{bare for NSE; character for SE. Name of column in \code{data} to use for color basis.
 Even if \code{fill} is the actual \code{ggplot2} aesthetic, the internal code will 'coerce' this
@@ -38,9 +45,17 @@ In order to simplify internal code, MUST be specified.}
 \item{alpha_range}{numeric (vector). Direct parameter passed to \code{range} parameter
 of \code{ggplot2::scale_alpha()}.}
 
-\item{scale_manual_params}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+\item{scale_manual_base}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
 \code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
-argument is specified, so if overwriting explicitly, then \code{values} should be included in the list.}
+argument is specified in the internal
+function \code{default_scale_manual()},
+so if overwriting explicitly, then \code{values} should be included in the list.}
+
+\item{scale_manual_params}{list. Additional parameters to pass to \code{ggplot2::scale_fill_manual()}
+or \code{ggplot2::scale_color_manual()} (e.g. \code{breaks}, \code{labels}, or \code{name}).
+The default \code{values} specified by \code{scale_manual_base = default_scale_manual()}
+can be overwritten a \code{values} argument in this list (or directly with a
+\code{values} argument in the \code{scale_manual_base} list.}
 
 \item{labs_base}{\code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
 It is recommended NOT to modify this argument; isntead, the \code{_params} argument should

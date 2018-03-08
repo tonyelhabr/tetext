@@ -16,18 +16,22 @@ visualize_time_hh(..., timebin, color, facet)
 \arguments{
 \item{data}{data.frame.}
 
-\item{timebin}{bare for NSE; character for SE. Name of column in \code{data} to use for time. Probably likely something like 'hh' or 'hour'.}
+\item{timebin}{bare for NSE; character for SE. Name of column in \code{data}
+to use for time. Probably likely something like 'hh' or 'hour'.}
 
-\item{facet}{bare for NSE; character for SE. Name of column in \code{data} to use one of main axes, not for facetting.}
+\item{facet}{bare for NSE; character for SE. Name of column in \code{data}
+to use one of main axes, not for facetting.}
 
 \item{color}{bare for NSE; character for SE. Name of column in \code{data} to use for color basis.
 Even if \code{fill} is the actual \code{ggplot2} aesthetic, the internal code will 'coerce' this
 column to \code{fill}.
 In order to simplify internal code, MUST be specified.}
 
-\item{scale_manual_params}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
-\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
-argument is specified, so if overwriting explicitly, then \code{values} should be included in the list.}
+\item{scale_manual_params}{list. Additional parameters to pass to \code{ggplot2::scale_fill_manual()}
+or \code{ggplot2::scale_color_manual()} (e.g. \code{breaks}, \code{labels}, or \code{name}).
+The default \code{values} specified by \code{scale_manual_base = default_scale_manual()}
+can be overwritten a \code{values} argument in this list (or directly with a
+\code{values} argument in the \code{scale_manual_base} list.}
 
 \item{labs_base}{\code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
 It is recommended NOT to modify this argument; isntead, the \code{_params} argument should

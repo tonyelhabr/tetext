@@ -7,6 +7,8 @@
 #' @docType package
 #' @importFrom dplyr %>%
 #' @importFrom rlang !! !!! :=
+#' @importFrom grDevices windowsFonts
+#' @importFrom extrafont loadfonts
 NULL
 
 utils::globalVariables(c("."))

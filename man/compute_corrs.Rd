@@ -6,8 +6,8 @@
 \title{Compute correlations}
 \usage{
 compute_corrs_at(data = NULL, token = NULL, feature = NULL,
-  num_top_ngrams = 50, num_top_corrs = 50, return_corrs = TRUE,
-  return_words = FALSE, return_both = FALSE)
+  num_top_ngrams = 50, num_top_corrs = 50, adjust = FALSE,
+  return_corrs = TRUE, return_words = FALSE, return_both = FALSE)
 
 compute_corrs(..., token, feature)
 }
@@ -25,6 +25,10 @@ from hanging up. If between 0 and 1, then interpreted as a percentage.}
 
 \item{num_top_corrs}{numeric. Useful primarily to limit input to a network visualation.
 does not hang up. If between 0 and 1, then interpreted as a percentage.}
+
+\item{adjust}{logical. Indicates whether or not to scale \code{num_top_ngrams} and
+\code{num_top_corrs} (if they are between 0 and 1) to the count of unique words.
+Is is likely that the input percentage values are specified with the number of words in mind.}
 
 \item{return_corrs}{logical. Whether to return just the correlations and token pairs,
 but not the token counts. This is the default option.}

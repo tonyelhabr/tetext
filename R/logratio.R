@@ -6,7 +6,7 @@
 #' to consider a \code{num_top} or \code{top_pct} parameter that might be used if
 #' \code{cnt_min = NULL}, but this can be troublesome because \code{do.call()}
 #' does not seem to handle \code{NULL} in \code{...}.
-#' @inheritParams compute_freqs_facet_at
+#' @inheritParams compute_freqs_facet
 #' @param cnt_min numeric. If not null, serves as a filter for which to compute log ratios.
 #' @return data.frame.
 #' @rdname compute_logratios_facet_wide
@@ -75,7 +75,7 @@ compute_logratios_facet_wide <- compute_logratios_facet_wide_at
 #' \code{data} in pairs of \code{facet} values.
 #' @details Calls \code{wrapper_func} internally.
 #' @inheritParams wrapper_func
-#' @inheritParams compute_logratios_facet_wide_at
+#' @inheritParams compute_logratios_facet_wide
 #' @param ... dots. Adddition parameters to pass to \code{compute_logratios_facet_wide_at()}.
 #' @return data.frame.
 #' @rdname compute_logratios_facet_by2
@@ -101,7 +101,7 @@ compute_logratios_facet_by2_at <-
       xy_grid <- create_xy_grid(facets)
       xy <- NULL
       xy_nms <- xy_grid %>% dplyr::pull(xy)
-      message("Generating output for all combinations of `facet`.")
+      message(sprintf("Generating output for all combinations of `%s`.", facet))
     }
 
     wrapper_func(
@@ -109,6 +109,7 @@ compute_logratios_facet_by2_at <-
       func = func,
       xy_grid = xy_grid,
       xy_nms = xy_nms,
+      col = facet,
       # token = token,
       facet = facet,
       # cnt_min = cnt_min
@@ -136,9 +137,9 @@ compute_logratios_facet_by2 <-
 #'
 #' @description Visualize token log ratios across pairs of \code{facet} values.
 #' @details \code{compute_logratios_facet_by2_at()} should NOT be called beforehand.
-#' @inheritParams compute_freqs_facet_by2_at
-#' @inheritParams visualize_freqs_facet_by2_at
-#' @inheritParams compute_logratios_facet_by2_at
+#' @inheritParams compute_freqs_facet_by2
+#' @inheritParams visualize_freqs_facet_by2
+#' @inheritParams compute_logratios_facet_by2
 #' @param ... dots. Additional parameters to pass to \code{compute_logratios_facet_by2_at()}.
 #' @param num_top numeric. Number of tokens to show for each \code{facet} pair.
 #' @param lab_other bare for NSE; character for SE. Name to give to 'opposing' factor of \code{facet_main}.
@@ -165,7 +166,7 @@ visualize_logratios_facet_by2_at <-
            scale_manual_params = default_scale_manual(values = c("grey50", "grey80")),
            labs_base = default_labs(),
            labs_params = list(title = "Most Unique Words", y = "Log Odds Ratio"),
-           theme_base = default_theme_facet(),
+           theme_base = default_theme(panel.background = ggplot2::element_rect()),
            theme_params =
              list(legend.position = "bottom",
                   axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
@@ -184,7 +185,7 @@ visualize_logratios_facet_by2_at <-
       xy_grid <- create_xy_grid(facets)
       xy <- NULL
       xy_nms <- xy_grid %>% dplyr::pull(xy)
-      message("Generating output for all combinations of `facet`.")
+      message(sprintf("Generating output for all combinations of `%s`.", facet))
     }
 
     data_proc <-
@@ -207,7 +208,7 @@ visualize_logratios_facet_by2_at <-
       )
 
     if(!("name_xy" %in% facet)) {
-      message("Correcting facetting variable.")
+      message("Changing facetting variable to `name_xy`.")
     }
     data_proc <-
       data_proc %>%

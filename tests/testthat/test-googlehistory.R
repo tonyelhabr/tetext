@@ -5,7 +5,7 @@ require("bindrcpp")
 require("dplyr")
 require("ggplot2")
 
-dir <- file.path("tests")
+dir <- file.path("extdata")
 filename_data <- "data-tony-cleaned.rds"
 filename_unigrams <- "unigrams-tony.rds"
 filename_bigrams <- "bigrams-tony.rds"
@@ -13,6 +13,9 @@ if (interactive()) {
   dir.exists(file.path("inst", dir))
 } else {
   print(dir.exists(dir))
+}
+if(interactive()) {
+  load_all()
 }
 path_data <-
   system.file(dir, filename_data, package = "tetext", mustWork = TRUE)
@@ -36,30 +39,10 @@ colors_div <- c("black", "grey", "red", "green", "blue", "orange", "purple", "ye
 color_main <- colors_div[3]
 colors_main <- paste0(color_main, c("", as.character(seq(1, 4, 1))))
 
-message("Tests are in order of likely usage in script.")
-
 testthat::test_that(
   "time",
   {
     lab_title <- "Temporal Count"
-    lab_subtitle_all <-
-      paste0(
-        "From ",
-        strftime(data$timestamp[1], "%Y-%m-%d"),
-        " to ",
-        strftime(rev(data$timestamp)[1], "%Y-%m-%d")
-      )
-
-    viz_time_all <-
-      data %>%
-      visualize_time(
-        timebin = timestamp,
-        scale_manual_params = list(values = colors_div),
-        labs_params = list(title = lab_title, subtitle = lab_subtitle_all)
-      )
-    viz_time_all
-    testthat::expect_true(ggplot2::is.ggplot(viz_time_all))
-
     viz_time_yyyy <-
       data %>%
       visualize_time(
@@ -85,7 +68,7 @@ testthat::test_that(
       visualize_time(
         timebin = wd,
         scale_manual_params = list(values = colors_div),
-        labs_params = list(title = lab_title, subtitle = "By Month")
+        labs_params = list(title = lab_title, subtitle = "By Weekday")
       )
     viz_time_wd
     testthat::expect_true(ggplot2::is.ggplot(viz_time_wd))
@@ -103,84 +86,10 @@ testthat::test_that(
   })
 
 testthat::test_that(
-  "cnts",
-  {
-
-    lab_title <- "Count"
-    viz_cnts <-
-      unigrams %>%
-      visualize_cnts(
-        token = word,
-        num_top = 10,
-        scale_manual_params = list(values = colors_div),
-        labs_params = list(title = lab_title, subtitle = "Overall")
-      )
-    viz_cnts
-    testthat::expect_true(ggplot2::is.ggplot(viz_cnts))
-
-    viz_cnts_facet <-
-      unigrams %>%
-      visualize_cnts_facet(
-        token = word,
-        color = yyyy,
-        facet = yyyy,
-        num_top = 10,
-        scale_manual_params = list(values = colors_div),
-        labs_params = list(title = lab_title, subtitle = "By Hour")
-      )
-    viz_cnts_facet
-    testthat::expect_true(ggplot2::is.ggplot(viz_cnts_facet))
-
-    viz_cnts_wordcloud <-
-      unigrams %>%
-      visualize_cnts_wordcloud(
-        token = word,
-        wordcloud_params = list(colors = colors_main)
-      )
-    # viz_cnts_wordcloud
-    # TODO: Generate wordclouds for all \code{facet} values.
-
-    viz_cnts_wordcloud_facet <-
-      unigrams %>%
-      visualize_cnts_wordcloud_facet(
-        token = word,
-        facet = yyyy,
-        value_facet = 2012,
-        wordcloud_params = list(colors = colors_main)
-      )
-    # viz_cnts_wordcloud_facet
-  }
-)
-
-
-testthat::test_that(
-  "freqs",
-  {
-    bigrams_freqs <-
-      bigrams %>%
-      compute_freqs(token = word)
-    actual <- bigrams_freqs$word[1:3]
-    expect <- c("excel vba", "ut austin", "pl sql")
-    testthat::expect_equal(actual, expect)
-
-    viz_bigram_freqs_facet <-
-      bigrams %>%
-      visualize_bigram_freqs_facet(
-        token = word,
-        facet = yyyy,
-        color = yyyy,
-        scale_manual_params = list(values = colors_div)
-      )
-    viz_bigram_freqs_facet
-    testthat::expect_true(ggplot2::is.ggplot(viz_bigram_freqs_facet))
-  }
-)
-
-testthat::test_that(
   "corrs",
   {
-    num_top_ngrams <- 50
-    num_top_corrs <- 50
+    num_top_ngrams <- 100
+    num_top_corrs <- 100
 
     unigrams_corrs <-
       unigrams %>%
@@ -191,31 +100,26 @@ testthat::test_that(
         num_top_corrs = num_top_corrs
       )
     actual <- unigrams_corrs$item1[1:3]
-    expect <- c("excel", "austin", "oracle")
+    # expect <- c("excel", "austin", "oracle")
+    expect <- c("san", "excel", "potato")
     testthat::expect_equal(actual, expect)
     actual <- unigrams_corrs$item2[1:3]
-    expect <- c("vba", "ut", "sql")
+    # expect <- c("vba", "ut", "sql")
+    expect <- c("antonio", "vba", "sweet")
     testthat::expect_equal(actual, expect)
 
-    num_top_ngrams <- 0.1
-    num_top_corrs <- 0.1
-    unigrams_corrs <-
+    unigrams_corrs_2 <-
       unigrams %>%
       compute_corrs(
         token = word,
         feature = timestamp,
-        num_top_ngrams = num_top_ngrams,
-        num_top_corrs = num_top_corrs
+        num_top_ngrams = num_top_ngrams / nrow(unigrams),
+        # num_top_ngrams = num_top_ngrams / nrow(count(unigrams, word)),
+        num_top_corrs = num_top_corrs / nrow(unigrams)
+        # num_top_corrs = num_top_corrs / nrow(count(unigrams, word))
       )
-    actual <- unigrams_corrs$item1[1]
-    expect <- c("candlewood")
-    testthat::expect_equal(actual, expect)
-    actual <- unigrams_corrs$item2[1]
-    expect <- c("suites")
-    testthat::expect_equal(actual, expect)
+    testthat::expect_true(nrow(unigrams_corrs) >= nrow(unigrams_corrs_2))
 
-    num_top_ngrams <- 50
-    num_top_corrs <- 50
     viz_corrs_network <-
       unigrams %>%
       visualize_corrs_network(

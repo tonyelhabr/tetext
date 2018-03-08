@@ -22,7 +22,7 @@ to use to compute change.}
 
 \item{bin}{logical. Whether or not to call \code{lubridate::floor_date()} to truncate \code{timebin}.}
 
-\item{timefloor}{bare for NSE; character for SE. Name of column passed directly to \code{unit} parameter of
+\item{timefloor}{character. Name of column passed directly to \code{unit} parameter of
 \code{lubridate::floor_date()} if \code{bin = FALSE}.}
 
 \item{top_pct}{numeric. Number between 0 and 1. Useful primarily to limit the number of models

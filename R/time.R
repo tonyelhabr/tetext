@@ -7,7 +7,9 @@
 #' are multiple arguments that can be customized.
 #' @param data data.frame.
 #' @param timebin bare for NSE; character for SE. Name of column in \code{data} to use for time axis.
-#' Probably something like 'yyyy', 'mm', etc.
+#' @param bin logical. Whether or not to call \code{lubridate::floor_date()} to truncate \code{timebin}.
+#' @param timefloor character. Name of column passed directly to \code{unit} parameter of
+#' \code{lubridate::floor_date()} if \code{bin = FALSE}.
 #' @param color bare for NSE; character for SE. Name of column in \code{data} to use for color basis.
 #' Even if \code{fill} is the actual \code{ggplot2} aesthetic, the internal code will 'coerce' this
 #' column to \code{fill}.
@@ -16,9 +18,16 @@
 #' @param add_alpha logical. Whether or not to use \code{ggplot2::scale_alpha()} based on count.
 #' @param alpha_range numeric (vector). Direct parameter passed to \code{range} parameter
 #' of \code{ggplot2::scale_alpha()}.
-#' @param scale_manual_params list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+#' @param scale_manual_base list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
 #' \code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
-#' argument is specified, so if overwriting explicitly, then \code{values} should be included in the list.
+#' argument is specified in the internal
+#' function \code{default_scale_manual()},
+#' so if overwriting explicitly, then \code{values} should be included in the list.
+#' @param scale_manual_params list. Additional parameters to pass to \code{ggplot2::scale_fill_manual()}
+#' or \code{ggplot2::scale_color_manual()} (e.g. \code{breaks}, \code{labels}, or \code{name}).
+#' The default \code{values} specified by \code{scale_manual_base = default_scale_manual()}
+#' can be overwritten a \code{values} argument in this list (or directly with a
+#' \code{values} argument in the \code{scale_manual_base} list.
 #' @param labs_base \code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
 #' It is recommended NOT to modify this argument; isntead, the \code{_params} argument should
 #' be used for customization.
@@ -36,18 +45,35 @@
 visualize_time_at <-
   function(data = NULL,
            timebin = NULL,
+           bin = FALSE,
+           timefloor = NULL,
            color = NULL,
            geom = c("bar", "hist"),
            add_alpha = FALSE,
            alpha_range = c(0.25, 1),
-           scale_manual_params = default_scale_manual(),
+           scale_manual_base = default_scale_manual(),
+           scale_manual_params = list(),
            labs_base = default_labs(),
            labs_params = list(title = "Count Over Time"),
-           theme_base = default_theme_dx(),
+           theme_base = default_theme(panel.grid.major.x = ggplot2::element_blank()),
            theme_params = list()) {
     stopifnot(!is.null(data), is.data.frame(data))
     stopifnot(!is.null(timebin), is.character(timebin))
     geom <- match.arg(geom)
+
+    if(bin) {
+      # browser()
+      timebin_quo <- rlang::sym(timebin)
+      stopifnot(!is.null(timefloor), is.character(timefloor))
+      data <-
+        data %>%
+        dplyr::mutate(!!timebin_quo :=
+                        lubridate::floor_date(!!timebin_quo, unit = timefloor))
+
+      # data <-
+      #   data %>%
+      #   dplyr::mutate(!!timebin_quo := as.numeric(!!timebin_quo))
+    }
 
     timebin_class <- get_class(data, timebin)
     if (!(
@@ -60,12 +86,12 @@ visualize_time_at <-
         "ordered"
       )
     ) | (timebin_class %in% c("POSIXct", "POSIXt"))) {
-      change_geom <- TRUE
+      swap_geom <- TRUE
     } else {
-      change_geom <- FALSE
+      swap_geom <- FALSE
     }
 
-    if (change_geom) {
+    if (swap_geom) {
       if (geom != "hist") {
         geom <- "hist"
         message("Setting `geom = \"hist\"`.")
@@ -76,7 +102,7 @@ visualize_time_at <-
       data <- data %>% dplyr::mutate(`.dummy` = "dummy")
       color <- ".dummy"
     }
-    # NOTE: DON'T NEED THIS!
+    # NOTE: Don't need this because not facetting.
     # data <- wrangle_color_col(data, color)
 
     viz <-
@@ -107,7 +133,7 @@ visualize_time_at <-
                                 bins = 30)
     }
     viz <-
-      viz + do_call_scale_manual(scale_manual_params, type = "fill")
+      viz + generate_scale_manual(scale_manual_base, scale_manual_params, type = "fill")
 
     viz <-
       viz +
@@ -148,7 +174,9 @@ visualize_time <- function(...,
 #' @export
 visualize_time_facet_at <-
   function(...,
-           theme_base = default_theme_facet_dx(),
+           theme_base =
+             default_theme(panel.grid.major.x = ggplot2::element_blank(),
+                           panel.background = ggplot2::element_rect()),
            facet = NULL,
            facet_base = default_facet(facet),
            facet_params = list()) {
@@ -190,8 +218,10 @@ visualize_time_facet <-
 #' Also, it does not actually use \code{facet} for facetting.
 #' @inheritParams visualize_time
 #' @inheritParams visualize_time_facet
-#' @param facet bare for NSE; character for SE. Name of column in \code{data} to use one of main axes, not for facetting.
-#' @param timebin bare for NSE; character for SE. Name of column in \code{data} to use for time. Probably likely something like 'hh' or 'hour'.
+#' @param facet bare for NSE; character for SE. Name of column in \code{data}
+#' to use one of main axes, not for facetting.
+#' @param timebin bare for NSE; character for SE. Name of column in \code{data}
+#' to use for time. Probably likely something like 'hh' or 'hour'.
 #' @rdname visualize_time_hh
 #' @export
 visualize_time_hh_at <-

@@ -14,10 +14,10 @@ visualize_sentratios_facet_by2_at(data = NULL, token = NULL, facet = NULL,
   scale_manual_params = default_scale_manual(values = c("grey50", "grey80")),
   labs_base = default_labs(), labs_params = list(title =
   "Most Significant Words Contributing to Sentiment Differences", y =
-  "Log Odds Ratio"), theme_base = default_theme_facet(),
-  theme_params = list(legend.position = "bottom", axis.text.y =
-  ggplot2::element_text(angle = 45, hjust = 1), panel.grid.major.y =
-  ggplot2::element_blank()),
+  "Log Odds Ratio"), theme_base = default_theme(panel.background =
+  ggplot2::element_rect()), theme_params = list(legend.position = "bottom",
+  axis.text.y = ggplot2::element_text(angle = 45, hjust = 1), panel.grid.major.y
+  = ggplot2::element_blank()),
   facet_base = default_facet(ifelse(is.null(sent_main), "sentiment ~ name_xy",
   "name_xy")), facet_params = list())
 
@@ -67,9 +67,11 @@ In order to simplify internal code, MUST be specified.}
 
 \item{num_top}{numeric. Number of tokens to show for each \code{facet} pair.}
 
-\item{scale_manual_params}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
-\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
-argument is specified, so if overwriting explicitly, then \code{values} should be included in the list.}
+\item{scale_manual_params}{list. Additional parameters to pass to \code{ggplot2::scale_fill_manual()}
+or \code{ggplot2::scale_color_manual()} (e.g. \code{breaks}, \code{labels}, or \code{name}).
+The default \code{values} specified by \code{scale_manual_base = default_scale_manual()}
+can be overwritten a \code{values} argument in this list (or directly with a
+\code{values} argument in the \code{scale_manual_base} list.}
 
 \item{labs_base}{\code{ggplot2::labs()} function. Defaults to a pre-determined set of values.
 It is recommended NOT to modify this argument; isntead, the \code{_params} argument should

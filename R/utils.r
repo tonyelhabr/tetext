@@ -31,22 +31,28 @@ filter_num_top_at <-
     num_top <- validate_range(x = num_top, max = max, min = min)
 
     rank <- NULL
+    rank <- ".rank"
+    rank_quo <- rlang::sym(".rank")
     col_quo <- rlang::sym(col)
+
+    out <-
+      data %>%
+      dplyr::mutate(!!rank_quo := dplyr::row_number(dplyr::desc(!!col_quo)))
 
     if (num_top >= 1) {
       out <-
-        data %>%
-        dplyr::mutate(rank = dplyr::row_number(dplyr::desc(!!col_quo))) %>%
-        dplyr::filter(rank <= num_top)
+        out %>%
+        dplyr::filter(!!rank_quo <= num_top)
     } else {
+      # num_top <- (num_top) * (nrow(data))
       num_top <- invert_pct(num_top)
       out <-
-        data %>%
-        dplyr::arrange(dplyr::desc(!!col_quo)) %>%
+        out %>%
+        # dplyr::arrange(dplyr::desc(!!col_quo)) %>%
         dplyr::filter(!!col_quo >= stats::quantile(!!col_quo, num_top, na.rm = TRUE))
     }
     if(!keep_rank_col) {
-      out <- out %>% dplyr::select(-rank)
+      out <- out %>% dplyr::select(-dplyr::matches(rank))
     }
     out
   }

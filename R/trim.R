@@ -109,7 +109,7 @@ compute_timefilter_facet <-
 #' fits in a singular frame (i.e. there are not 'gaps' where data exists
 #' for one \code{facet} variable and not all others). This determination assumes
 #' that the data is continuous.
-#' @inheritParams compute_timefilter_facet_at
+#' @inheritParams compute_timefilter_facet
 #' @inheritParams compute_freqs
 #' @return list.
 #' @rdname compute_timefilter
@@ -166,7 +166,7 @@ compute_timefilter <-
 #' given an unknown data set where visualization across a single, appropriate time period
 #' is desired. (The unkown data set may have different 'max' and 'min' times
 #' for each \code{facet} column.
-#' @inheritParams compute_timefilter_facet_at
+#' @inheritParams compute_timefilter_facet
 #' @param data data.frame.
 #' @param timebin bare for NSE; character for SE. Name of columin in \code{data} to use for time filtering.
 #' @param start,end Date-time. If either is missing, then code{compute_timefilter_at()} is called.

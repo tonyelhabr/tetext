@@ -25,9 +25,9 @@ compute_freqs_old <-
     compute_freqs_at_old(..., token = token)
   }
 
-#' @inheritParams visualize_time_at
-#' @inheritParams visualize_cnts_at
-#' @inheritParams compute_freqs_at
+#' @inheritParams visualize_time
+#' @inheritParams visualize_cnts
+#' @inheritParams compute_freqs
 #' @return data.frame.
 #' @rdname compute_freqs
 #' @export
@@ -119,7 +119,7 @@ compute_freqs <-
 #' @description Manipulates output from \code{compute_freqs_facet_at()}
 #' for \code{compute_freqs_mult_by2} function.
 #' @details To be used by \code{_by2} function only.
-#' @inheritParams compute_freqs_facet_at
+#' @inheritParams compute_freqs_facet
 #' @rdname compute_freqs
 #' @export
 compute_freqs_facet_wide_at <-
@@ -162,10 +162,10 @@ compute_freqs_facet_wide_at <-
 #' @inheritParams visualize_cnts
 #' @inheritParams compute_freqs_facet
 #' @return gg.
-#' @rdname visualize_bigram_freqs_facet
+#' @rdname visualize_bigram_freqs
 #' @export
 #' @seealso \url{https://buzzfeednews.github.io/2018-01-trump-twitter-wars/}
-visualize_bigram_freqs_facet_at <-
+visualize_bigram_freqs_at <-
   function(...,
            token = NULL,
            facet = NULL,
@@ -235,9 +235,9 @@ visualize_bigram_freqs_facet_at <-
       ggplot2::coord_flip()
   }
 
-#' @rdname visualize_bigram_freqs_facet
+#' @rdname visualize_bigram_freqs
 #' @export
-visualize_bigram_freqs_facet <-
+visualize_bigram_freqs <-
   function(..., token, color, facet) {
     stopifnot(!missing(token))
     stopifnot(!missing(facet))
@@ -250,7 +250,7 @@ visualize_bigram_freqs_facet <-
     } else {
       color <- rlang::quo_text(rlang::enquo(color))
     }
-    visualize_bigram_freqs_facet_at(
+    visualize_bigram_freqs_at(
       ...,
       token = token,
       color = color,
@@ -265,7 +265,7 @@ visualize_bigram_freqs_facet <-
 #' \code{data} in pairs of \code{facet} values.
 #' @details Calls \code{wrapper_func} internally.
 #' @inheritParams wrapper_func
-#' @inheritParams compute_freqs_facet_at
+#' @inheritParams compute_freqs_facet
 #' @param ... dots. Additional parameters to pass to \code{compute_freqs_facet_wide_at()}.
 #' @return data.frame.
 #' @rdname compute_freqs_facet_by2
@@ -292,7 +292,7 @@ compute_freqs_facet_by2_at <-
       xy_grid <- create_xy_grid(facets)
       xy <- NULL
       xy_nms <- xy_grid %>% dplyr::pull(xy)
-      message("Generating output for all combinations of `facet`.")
+      message(sprintf("Generating output for all combinations of `%s`.", facet))
     }
 
     wrapper_func(
@@ -300,6 +300,7 @@ compute_freqs_facet_by2_at <-
       func = func,
       xy_grid = xy_grid,
       xy_nms = xy_nms,
+      col = facet,
       # token = token,
       facet = facet,
       ...
@@ -328,9 +329,9 @@ compute_freqs_facet_by2 <-
 #'
 #' @description Visualize token frequenceis across pairs of \code{facet} values.
 #' @details \code{compute_freqs_facet_by2_at()} should NOT be called beforehand.
-#' @inheritParams visualize_time_facet_at
-#' @inheritParams compute_freqs_facet_at
-#' @inheritParams compute_freqs_facet_by2_at
+#' @inheritParams visualize_time_facet
+#' @inheritParams compute_freqs_facet
+#' @inheritParams compute_freqs_facet_by2
 #' @param add_labels logical. Whether or not to add text labels (of the tokens).
 #' @param filter_facet logical. Whether or not to filter the \code{facet} values.
 #' \code{facet} values to include and exclude. Not used if \code{filter_facet = FALSE}.
@@ -355,7 +356,7 @@ visualize_freqs_facet_by2_at <-
            scale_manual_params = default_scale_manual(),
            labs_base = default_labs(),
            labs_params = list(title = "Relative Token Frequency"),
-           theme_base = default_theme_facet(),
+           theme_base = default_theme(panel.background = ggplot2::element_rect()),
            theme_params = list(),
            facet_base = default_facet("name_xy"),
            facet_params = list()) {
@@ -371,7 +372,7 @@ visualize_freqs_facet_by2_at <-
       xy_grid <- create_xy_grid(facets)
       xy <- NULL
       xy_nms <- xy_grid %>% dplyr::pull(xy)
-      message("Generating output for all combinations of `facet`.")
+      message(sprintf("Generating output for all combinations of `%s`.", facet))
     }
 
     data_proc <-
@@ -393,7 +394,7 @@ visualize_freqs_facet_by2_at <-
       )
 
     if(facet != "name_xy") {
-      message("Correcting facetting variable to `name_xy`.")
+      message("Changing facetting variable to `name_xy`.")
     }
     data_proc <-
       data_proc %>%

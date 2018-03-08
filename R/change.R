@@ -8,9 +8,6 @@
 #' @param token bare for NSE; character for SE. Name of column in \code{data} corresponding to token.
 #' @param timebin bare for NSE; character for SE. Name of column in \code{data} specifying temporal period
 #' to use to compute change.
-#' @param bin logical. Whether or not to call \code{lubridate::floor_date()} to truncate \code{timebin}.
-#' @param timefloor bare for NSE; character for SE. Name of column passed directly to \code{unit} parameter of
-#' \code{lubridate::floor_date()} if \code{bin = FALSE}.
 #' @param top_pct numeric. Number between 0 and 1. Useful primarily to limit the number of models
 #' that need to be computed and to reduce 'nose' regarding what is deemed significant.
 #' @param only_signif logical. Whether or not to return rows with a significant p-value.
@@ -153,7 +150,7 @@ visualize_change_at <-
            labs_params = list(title = "Tokens with Most Significant Change in Frequency",
                               caption = paste0("Statistical significance is determined by a logistical model\n",
                                                "estimating token appearance in a given time period.")),
-           theme_base = default_theme_dx(),
+           theme_base = default_theme(panel.grid.major.x = ggplot2::element_blank()),
            theme_params = list(legend.position = ifelse(add_labels, "none", "bottom"))) {
 
     stopifnot(!is.null(token), is.character(token))

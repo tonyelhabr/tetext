@@ -2,25 +2,10 @@
 % Please edit documentation in R/default.R
 \name{default_theme}
 \alias{default_theme}
-\alias{default_theme_dx}
-\alias{default_theme_dy}
-\alias{default_theme_facet}
-\alias{default_theme_facet_dx}
-\alias{default_theme_facet_dy}
 \title{Default theme parameters}
 \usage{
-default_theme(base_family = "", base_size = 11, plot_title_size = 16,
-  subtitle_size = 12, void = FALSE, ...)
-
-default_theme_dx(...)
-
-default_theme_dy(...)
-
-default_theme_facet(...)
-
-default_theme_facet_dx(...)
-
-default_theme_facet_dy(...)
+default_theme(base_family = "Arial Narrow", base_size = 11.5,
+  plot_title_size = 18, subtitle_size = 12, void = FALSE, ...)
 }
 \arguments{
 \item{base_family}{character.}
@@ -39,7 +24,4 @@ A custom \code{ggplot2} theme.
 }
 \details{
 This theme is based on \code{ggplot2::theme_minimal()}.
-}
-\seealso{
-\url{https://github.com/hrbrmstr/hrbrthemes/blob/master/R/theme-ipsum.r}
 }

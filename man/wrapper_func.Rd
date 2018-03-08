@@ -5,7 +5,7 @@
 \title{'Engine' for '_by2' functions}
 \usage{
 wrapper_func(data = NULL, func = NULL, xy_grid = NULL, xy_nms = NULL,
-  ...)
+  col = NULL, ...)
 }
 \arguments{
 \item{data}{data.frame. Data to apply a function over.}
@@ -16,6 +16,8 @@ wrapper_func(data = NULL, func = NULL, xy_grid = NULL, xy_nms = NULL,
 
 \item{xy_nms}{character (vector). Values to use to create a 'grid' of all
 combinations of values.}
+
+\item{col}{character. Name of 'id' column in \code{data}.}
 
 \item{...}{dots. Additional parameters to pass to \code{func}.}
 }

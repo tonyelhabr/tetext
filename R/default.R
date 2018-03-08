@@ -9,13 +9,16 @@
 #' @param ... dots. Additional parameters passed to \code{ggplot2::theme()}.
 #' @return function.
 #' @export
-#' @seealso \url{https://github.com/hrbrmstr/hrbrthemes/blob/master/R/theme-ipsum.r}
-default_theme <- function (base_family = "",
-                          base_size = 11,
-                          plot_title_size = 16,
-                          subtitle_size = 12,
-                          void = FALSE,
-                          ...) {
+default_theme <- function (base_family = "Arial Narrow",
+                           # base_family = "",
+                           base_size = 11.5,
+                           # base_size = 11,
+                           plot_title_size = 18,
+                           # plot_title_size = 16,
+                           subtitle_size = 12,
+                           # subtitle_size = 12,
+                           void = FALSE,
+                           ...) {
   out <-
     ggplot2::theme_minimal(base_family = base_family, base_size = base_size)
 
@@ -59,48 +62,6 @@ default_theme <- function (base_family = "",
 
   out
 }
-
-#' @rdname default_theme
-#' @export
-default_theme_dx <-
-  function(...) {
-    default_theme(panel.grid.major.x = ggplot2::element_blank(), ...)
-  }
-
-#' @rdname default_theme
-#' @export
-default_theme_dy <-
-  function(...) {
-    default_theme(panel.grid.major.y = ggplot2::element_blank(), ...)
-  }
-
-#' @rdname default_theme
-#' @export
-default_theme_facet <-
-  function(...) {
-    default_theme(panel.background = ggplot2::element_rect(), ...)
-}
-
-#' @rdname default_theme
-#' @export
-default_theme_facet_dx <- function(...) {
-  default_theme(
-    panel.background = ggplot2::element_rect(),
-    panel.grid.major.x = ggplot2::element_blank(),
-    ...
-  )
-}
-
-#' @rdname default_theme
-#' @export
-default_theme_facet_dy <- function(...) {
-  default_theme(
-    panel.background = ggplot2::element_rect(),
-    panel.grid.major.y = ggplot2::element_blank(),
-    ...
-  )
-}
-
 
 #' Default label parameters
 #'

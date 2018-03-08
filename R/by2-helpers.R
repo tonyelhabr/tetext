@@ -60,13 +60,15 @@ get_xy_info <-
 #' @details To be used exclusively by \code{wrapper_func()}.
 #' @param data data.frame. Output from \code{create_xy_grid()}.
 #' @param xy_info list. Output from \code{get_xy_info()}.
+#' @param col character. Name of 'id' column in \code{data}.
 #' @return data.frame.
-preprocess_xy_data <- function(data = NULL, xy_info = NULL) {
+preprocess_xy_data <- function(data = NULL, xy_info = NULL, col = NULL) {
   stopifnot(!is.null(data), is.data.frame(data))
   stopifnot(!is.null(xy_info), is.list(xy_info))
-  name <- NULL
+  stopifnot(!is.null(col), is.character(col))
+  col_quo <- rlang::sym(col)
   data %>%
-    dplyr::filter(name %in% c(xy_info$x, xy_info$y))
+    dplyr::filter(!!col_quo %in% c(xy_info$x, xy_info$y))
 }
 
 #' Post-process data in \code{wrapper_func()}
@@ -108,6 +110,7 @@ postprocess_xy_data <- function(data = NULL, xy_info = NULL) {
 #' Must be careful not to pass \code{NULL} in \code{...}.
 #' @inheritParams create_xy_grid
 #' @inheritParams get_xy_info
+#' @inheritParams preprocess_xy_data
 #' @param data data.frame. Data to apply a function over.
 #' @param func function. Wrapped by \code{do.call()}.
 #' @param ... dots. Additional parameters to pass to \code{func}.
@@ -117,16 +120,18 @@ wrapper_func <-
            func = NULL,
            xy_grid = NULL,
            xy_nms = NULL,
+           col = NULL,
            ...) {
     stopifnot(!is.null(data), is.data.frame(data))
     stopifnot(!is.null(func), is.function(func))
     stopifnot(!is.null(xy_grid), is.data.frame(xy_grid))
     stopifnot(!is.null(xy_nms), is.character(xy_nms))
+    stopifnot(!is.null(col), is.character(col))
 
     i <- 1
     while (i <= length(xy_nms)) {
       xy_i_info <- get_xy_info(xy_grid, xy_nms, i)
-      data_i_preproc <- preprocess_xy_data(data, xy_i_info)
+      data_i_preproc <- preprocess_xy_data(data, xy_i_info, col)
       data_i_proc <- do.call(func, list(data_i_preproc, ...))
       data_i_postproc <- postprocess_xy_data(data_i_proc, xy_i_info)
       if (i == 1) {
