@@ -142,7 +142,9 @@ compute_logratios_facet_by2 <-
 #' @inheritParams compute_logratios_facet_by2
 #' @param ... dots. Additional parameters to pass to \code{compute_logratios_facet_by2_at()}.
 #' @param num_top numeric. Number of tokens to show for each \code{facet} pair.
-#' @param lab_other bare for NSE; character for SE. Name to give to 'opposing' factor of \code{facet_main}.
+#' @param lab_other character. Name to give to 'opposing' factor of \code{facet_main}.
+#' @param color_main character. Opposite color is calculated for 'opposing' color.
+#' It is advised to use this argument instead of setting \code{values} with the \code{scale_manual_params} argument.
 #' @return gg.
 #' @rdname visualize_logratios_facet_by2
 #' @export
@@ -161,10 +163,11 @@ visualize_logratios_facet_by2_at <-
            filter_facet_base = default_filter_facet(facet_main),
            filter_facet_params = list(),
            color = NULL,
-           lab_other = "other",
+           lab_other = ifelse(!is.null(facet_main), paste0("Not ", facet_main), "Other"),
            num_top = 5,
+           color_main = "grey50",
            scale_manual_base =
-             default_scale_manual(values = c("grey50", get_color_hex_inverse("grey80"))),
+             default_scale_manual(generate_named_dual_colors(color_main, facet_main, lab_other)),
            scale_manual_params = list(),
            labs_base = default_labs(),
            labs_params = list(title = "Most Unique Words", y = "Log Odds Ratio"),
@@ -226,12 +229,9 @@ visualize_logratios_facet_by2_at <-
         num_top = num_top
       )
 
-
     logratio_dir <- logratio <- name_x <- name_y <- NULL
 
-    data_proc <-
-      data_proc %>%
-      dplyr::mutate(name_xy = paste0(name_x, " vs. ", name_y))
+    data_proc <- create_name_xy_facet_lab(data_proc)
 
     if (is.null(color)) {
       data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
@@ -250,6 +250,7 @@ visualize_logratios_facet_by2_at <-
         lab_other = lab_other
       )
 
+    # browser()
     viz <-
       data_proc %>%
       ggplot2::ggplot(ggplot2::aes_string(x = token, y = "logratio", fill = color)) +

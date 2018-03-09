@@ -81,7 +81,6 @@ default_labs <-
            caption = NULL,
            x = NULL,
            y = NULL) {
-    # ggplot2::labs(
     list(
       title = title,
       subtitle = subtitle,
@@ -102,11 +101,10 @@ default_labs <-
 #' @rdname default_facet
 #' @export
 default_facet <-
-  function(facet, scales = "free", ncol = 3, nrow = NULL, strip.position = "top", ...) {
+  function(facet, scales = "free", ncol = NULL, nrow = NULL, strip.position = "top", ...) {
     stopifnot(!missing(facet), is.character(facet))
     # if(!plyr::is.formula(facet)) {
     if(!any(grepl("~", facet))) {
-    # if(!any(stringr::str_detect("\\~", facet))) {
       if(length(facet) > 1) {
         if(length(facet) == 2) {
           facet <- paste0(facet[1], "~ ", facet[2])
@@ -124,8 +122,6 @@ default_facet <-
          strip.position = strip.position,
          ...)
   }
-
-default_facet(c("a", "b"))
 
 #' Default word cloud parameters
 #'

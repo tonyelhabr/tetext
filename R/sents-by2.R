@@ -119,10 +119,11 @@ visualize_sentratios_facet_by2_at <-
            filter_sent = TRUE,
            sent_main = NULL,
            color = NULL,
-           lab_other = "other",
+           lab_other = ifelse(!is.null(facet_main), paste0("Not ", facet_main), "Other"),
            num_top = 5,
+           color_main = "grey50",
            scale_manual_base =
-             default_scale_manual(values = c("grey50", get_color_hex_inverse("grey80"))),
+             default_scale_manual(generate_named_dual_colors(color_main, facet_main, lab_other)),
            scale_manual_params = list(),
            labs_base = default_labs(),
            labs_params = list(title = "Most Significant Words Contributing\nto Sentiment Differences",
@@ -219,9 +220,7 @@ visualize_sentratios_facet_by2_at <-
 
     logratio_dir <- logratio <- name_x <- name_y <- NULL
 
-    data_proc <-
-      data_proc %>%
-      dplyr::mutate(name_xy = paste0(name_x, " vs. ", name_y))
+    data_proc <- create_name_xy_facet_lab(data_proc)
 
     if (is.null(color)) {
       data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")

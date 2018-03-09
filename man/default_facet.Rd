@@ -4,7 +4,7 @@
 \alias{default_facet}
 \title{Default facet parameters}
 \usage{
-default_facet(facet, scales = "free", ncol = 3, nrow = NULL,
+default_facet(facet, scales = "free", ncol = NULL, nrow = NULL,
   strip.position = "top", ...)
 }
 \arguments{

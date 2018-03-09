@@ -60,14 +60,12 @@ id_filt <- "MEM"
 idx_filt <- match(id_filt, ids_filt)
 color_filt <- colors_filt[idx_filt]
 
-color_filt_inv <- get_color_hex_inverse(color_filt)
-
-lab_other <- paste0("Not ", id_filt)
-names(color_filt_inv) <- lab_other
-
-if(interactive()) {
-  scales::show_col(c(color_filt, color_filt_inv))
-}
+# color_filt_inv <- get_color_hex_inverse(color_filt)
+# lab_other <- paste0("Not ", id_filt)
+# names(color_filt_inv) <- lab_other
+# if(interactive()) {
+#   scales::show_col(c(color_filt, color_filt_inv))
+# }
 
 data_facet <-
   data %>%
@@ -134,6 +132,8 @@ testthat::test_that(
       visualize_time(
         timebin = timestamp,
         color = id,
+        theme_params = list(axis.text.y = ggplot2::element_text(size = 1),
+                            axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, size = 30)),
         scale_manual_params = list(values = color_filt)
       )
     viz_time_all
@@ -434,11 +434,10 @@ testthat::test_that(
       visualize_logratios_facet_by2(
         token = word,
         facet = id,
+        num_top = 3,
         filter_facet = TRUE,
         facet_main = id_filt,
-        lab_other = lab_other,
-        scale_manual_params = list(values = c(color_filt, color_filt_inv)),
-        num_top = 3
+        color_main = color_filt
       )
     viz_unigram_logratios_facet_by2
     testthat::expect_true(ggplot2::is.ggplot(viz_unigram_logratios_facet_by2))
@@ -458,11 +457,11 @@ testthat::test_that(
         filter_facet = TRUE,
         facet_main = id_filt,
         filter_sent = TRUE,
-        lab_other = lab_other,
+        # lab_other = lab_other,
         sent_main = "positive",
-        labs_params = list(title = lab_title, subtitle = "positive"),
-        scale_manual_params = list(values = c(color_filt, color_filt_inv)),
-
+        color_main = color_filt,
+        # scale_manual_params = list(values = c(color_filt, color_filt_inv)),
+        labs_params = list(title = lab_title, subtitle = "positive")
       )
     viz_unigram_sentratios_facet_by2
     testthat::expect_true(ggplot2::is.ggplot(viz_unigram_sentratios_facet_by2))
@@ -480,9 +479,10 @@ testthat::test_that(
           facet_main = id_filt,
           filter_sent = TRUE,
           sent_main = .x,
-          lab_other = lab_other,
-          scale_manual_params = list(values = c(color_filt, color_filt_inv)),
-          labs_params = list(title = lab_title, subtitle = .x),
+          # lab_other = lab_other,
+          color_main = color_filt,
+          # scale_manual_params = list(values = c(color_filt, color_filt_inv)),
+          labs_params = list(title = lab_title, subtitle = .x)
         )
       )
     viz_unigram_sentratios_facet_by2_list

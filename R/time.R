@@ -56,6 +56,7 @@ visualize_time_at <-
            labs_base = default_labs(),
            labs_params = list(title = "Count Over Time"),
            theme_base = default_theme(panel.grid.major.x = ggplot2::element_blank()),
+           # theme_params = ggplot2::theme()) {
            theme_params = list()) {
     stopifnot(!is.null(data), is.data.frame(data))
     stopifnot(!is.null(timebin), is.character(timebin))

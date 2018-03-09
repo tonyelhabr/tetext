@@ -10,9 +10,10 @@ visualize_sentratios_facet_by2_at(data = NULL, token = NULL, facet = NULL,
   filter_facet = TRUE, facet_main = NULL,
   filter_facet_base = default_filter_facet(facet_main),
   filter_facet_params = list(), filter_sent = TRUE, sent_main = NULL,
-  color = NULL, lab_other = "other", num_top = 5,
-  scale_manual_base = default_scale_manual(values = c("grey50",
-  get_color_hex_inverse("grey80"))), scale_manual_params = list(),
+  color = NULL, lab_other = ifelse(!is.null(facet_main), paste0("Not ",
+  facet_main), "Other"), num_top = 5, color_main = "grey50",
+  scale_manual_base = default_scale_manual(generate_named_dual_colors(color_main,
+  facet_main, lab_other)), scale_manual_params = list(),
   labs_base = default_labs(), labs_params = list(title =
   "Most Significant Words Contributing\\nto Sentiment Differences", y =
   "Log Odds Ratio"), theme_base = default_theme(),
@@ -64,9 +65,12 @@ Even if \code{fill} is the actual \code{ggplot2} aesthetic, the internal code wi
 column to \code{fill}.
 In order to simplify internal code, MUST be specified.}
 
-\item{lab_other}{bare for NSE; character for SE. Name to give to 'opposing' factor of \code{facet_main}.}
+\item{lab_other}{character. Name to give to 'opposing' factor of \code{facet_main}.}
 
 \item{num_top}{numeric. Number of tokens to show for each \code{facet} pair.}
+
+\item{color_main}{character. Opposite color is calculated for 'opposing' color.
+It is advised to use this argument instead of setting \code{values} with the \code{scale_manual_params} argument.}
 
 \item{scale_manual_base}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
 \code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}

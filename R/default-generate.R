@@ -4,11 +4,11 @@ uniquify_list <- function(x, fromLast = TRUE) {
   x[!duplicated(names(x), fromLast = fromLast)]
 }
 
-# combine_lists_old <- function(base, params) {
-#   stopifnot(!missing(base), !missing(params))
-#   params_comb <- utils::modifyList(base, params)
-#   uniquify_list(params_comb)
-# }
+combine_lists_old <- function(base, params) {
+  stopifnot(!missing(base), !missing(params))
+  params_comb <- utils::modifyList(base, params)
+  uniquify_list(params_comb)
+}
 
 combine_lists <- function(...) {
   uniquify_list(c(...))

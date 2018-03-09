@@ -1,8 +1,23 @@
 
 
+
 get_color_hex_inverse <- function(color) {
   grDevices::rgb(t(255 - grDevices::col2rgb(color)), max = 255)
 }
+
+generate_named_dual_colors <-
+  function(color_main,
+           lab_main,
+           lab_other,
+           color_default = "grey50") {
+    if (!is.null(color_main) & !is.null(lab_main)) {
+      out <- stats::setNames(c(color_main, get_color_hex_inverse(color_main)),
+                      c(lab_main, lab_other))
+    } else {
+      out <- c(color_default, get_color_hex_inverse(color_default))
+    }
+    out
+  }
 
 invert_pct <- function(num) {
   if (num < 0.5) {

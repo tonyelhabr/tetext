@@ -7,6 +7,7 @@
 #' @inheritParams visualize_time
 #' @inheritParams visualize_cnts
 #' @inheritParams compute_freqs_facet
+#' @param point_max_size numeric. Passed directly to \code{ggplot2::scale_size_area()} for the point size.
 #' @return gg.
 #' @rdname visualize_bigram_freqs
 #' @export
@@ -17,6 +18,7 @@ visualize_bigram_freqs_at <-
            facet = NULL,
            color = facet,
            num_top = 3,
+           point_max_size = 25,
            scale_manual_base = default_scale_manual(),
            scale_manual_params = list(),
            labs_base = default_labs(),
@@ -69,7 +71,7 @@ visualize_bigram_freqs_at <-
           size = "freq")
       ) +
       ggplot2::geom_point() +
-      ggplot2::scale_size_area(max_size = 25) +
+      ggplot2::scale_size_area(max_size = point_max_size) +
       ggplot2::scale_y_discrete(position = "right") +
       generate_scale_manual(scale_manual_base, scale_manual_params, type = "color")
 
