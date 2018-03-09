@@ -252,7 +252,7 @@ visualize_time_hh_at <-
         breaks = c(6, 12, 18),
         labels = c("6 AM", "Noon", "6 PM")
       ) +
-      do_call_scale_manual(scale_manual_params, type = "fill") +
+      generate_scale_manual(scale_manual_base, scale_manual_params, type = "fill") +
       ggplot2::geom_violin(size = 0) +
       ggplot2::geom_hline(
         yintercept = seq(3, 24, by = 3),

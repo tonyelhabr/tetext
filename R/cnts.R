@@ -18,11 +18,12 @@ visualize_cnts_at <-
            token = NULL,
            color = NULL,
            num_top = 10,
-           scale_manual_params = default_scale_manual(),
+           scale_manual_base = default_scale_manual(),
+           scale_manual_params = list(),
            labs_base = default_labs(),
            labs_params = list(title = "Count of Words"),
            theme_base =
-             default_theme(axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
+             default_theme(axis.text.y = ggplot2::element_text(angle = 30, hjust = 1),
                            panel.grid.major.y = ggplot2::element_blank()),
            theme_params = list()) {
     stopifnot(!is.null(data), is.data.frame(data))
@@ -50,7 +51,7 @@ visualize_cnts_at <-
       data_proc %>%
       ggplot2::ggplot(ggplot2::aes_string(x = token, y = "n", fill = color)) +
       ggplot2::geom_col() +
-      do_call_scale_manual(scale_manual_params, type = "fill")
+      generate_scale_manual(scale_manual_base, scale_manual_params, type = "fill")
 
     viz <-
       viz +
@@ -88,11 +89,12 @@ visualize_cnts_facet_at <-
            color = NULL,
            facet = NULL,
            num_top = 10,
-           scale_manual_params = default_scale_manual(),
+           scale_manual_base = default_scale_manual(),
+           scale_manual_params = list(),
            labs_base = default_labs(),
            labs_params = list(title = "Count Over Time"),
            theme_base =
-             default_theme(axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
+             default_theme(axis.text.y = ggplot2::element_text(angle = 30, hjust = 1),
                            panel.grid.major.y = ggplot2::element_blank()),
            theme_params = list(),
            facet_base = default_facet(facet),
@@ -126,7 +128,7 @@ visualize_cnts_facet_at <-
       ggplot2::ggplot(ggplot2::aes_string(x = token, y = "n", fill = color)) +
       ggplot2::geom_col() +
       scale_x_reordered() +
-      do_call_scale_manual(scale_manual_params, type = "fill")
+      generate_scale_manual(scale_manual_base, scale_manual_params, type = "fill")
 
     viz <-
       viz  +

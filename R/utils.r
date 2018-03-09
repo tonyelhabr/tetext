@@ -1,7 +1,11 @@
 
 
+get_color_hex_inverse <- function(color) {
+  grDevices::rgb(t(255 - grDevices::col2rgb(color)), max = 255)
+}
+
 invert_pct <- function(num) {
-  if(num < 0.5) {
+  if (num < 0.5) {
     # message(sprintf("Inverting %f to %f.", num, 1 - num))
     num <- 1 - num
   }
@@ -9,10 +13,10 @@ invert_pct <- function(num) {
 }
 
 validate_range <- function(x, max = 1, min = 0) {
-  if(x > max) {
+  if (x > max) {
     stop("`x` must not be greater than ", max, ".", call. = FALSE)
   }
-  if(x < min) {
+  if (x < min) {
     stop("`x` must not be less than ", min, ".", call. = FALSE)
   }
   x
@@ -24,6 +28,8 @@ filter_num_top_at <-
            num_top = NULL,
            max = nrow(data),
            min = 0,
+           desc = TRUE,
+           abs = FALSE,
            keep_rank_col = FALSE) {
     stopifnot(!is.null(data), is.data.frame(data))
     stopifnot(!is.null(col))
@@ -35,9 +41,28 @@ filter_num_top_at <-
     rank_quo <- rlang::sym(".rank")
     col_quo <- rlang::sym(col)
 
-    out <-
-      data %>%
-      dplyr::mutate(!!rank_quo := dplyr::row_number(dplyr::desc(!!col_quo)))
+    out <- data
+    if (desc) {
+      if (abs) {
+        out <-
+          out %>%
+          dplyr::mutate(!!rank_quo := dplyr::row_number(dplyr::desc(abs(!!col_quo))))
+      } else {
+        out <-
+          out %>%
+          dplyr::mutate(!!rank_quo := dplyr::row_number(dplyr::desc(!!col_quo)))
+      }
+    } else {
+      if (abs) {
+        out <-
+          out %>%
+          dplyr::mutate(!!rank_quo := dplyr::row_number((abs(!!col_quo))))
+      } else {
+        out <-
+          out %>%
+          dplyr::mutate(!!rank_quo := dplyr::row_number(!!col_quo))
+      }
+    }
 
     if (num_top >= 1) {
       out <-
@@ -51,7 +76,7 @@ filter_num_top_at <-
         # dplyr::arrange(dplyr::desc(!!col_quo)) %>%
         dplyr::filter(!!col_quo >= stats::quantile(!!col_quo, num_top, na.rm = TRUE))
     }
-    if(!keep_rank_col) {
+    if (!keep_rank_col) {
       out <- out %>% dplyr::select(-dplyr::matches(rank))
     }
     out
@@ -96,30 +121,34 @@ wrangle_color_col <-
 #     coerce_col_to_factor(data, col)
 #   }
 
-filter_if_not_null_at <- function(data = NULL, col = NULL, value = NULL, invert = FALSE) {
-  stopifnot(!is.null(data), is.data.frame(data))
+filter_if_not_null_at <-
+  function(data = NULL,
+           col = NULL,
+           value = NULL,
+           invert = FALSE) {
+    stopifnot(!is.null(data), is.data.frame(data))
 
 
-  if(is.null(col))
-    return(data)
+    if (is.null(col))
+      return(data)
 
-  if(is.null(value))
-    return(data)
+    if (is.null(value))
+      return(data)
 
-  stopifnot((col %in% names(data)))
+    stopifnot((col %in% names(data)))
 
-  col_quo <- rlang::sym(col)
-  if(!invert) {
-    out <-
-      data %>%
-      dplyr::filter(!!col_quo %in% value)
-  } else {
-    out <-
-      data %>%
-      dplyr::filter(!(!!col_quo %in% value))
+    col_quo <- rlang::sym(col)
+    if (!invert) {
+      out <-
+        data %>%
+        dplyr::filter(!!col_quo %in% value)
+    } else {
+      out <-
+        data %>%
+        dplyr::filter(!(!!col_quo %in% value))
+    }
+    out
   }
-  out
-}
 
 pull_distinctly_at <- function(data = NULL, col = NULL) {
   stopifnot(!is.null(data), is.data.frame(data))
@@ -189,3 +218,62 @@ validate_x_main <-
     data
   }
 
+
+create_name_xy_facet_lab <- function(data = NULL) {
+  data %>%
+    dplyr::mutate(name_xy = paste0(name_x, " vs. ", name_y))
+}
+
+process_logratio_by2 <-
+  function(data = NULL,
+           cols_group = NULL,
+           num_top = NULL,
+           token = NULL,
+           color = NULL,
+           facet = NULL,
+           facet_main = NULL,
+           lab_other = NULL) {
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(cols_group), is.character(cols_group))
+
+    logratio_dir <-
+      logratio <- name_xy <- name_x <- name_y <- sentiment <- NULL
+
+    cols_group_quo <- rlang::syms(cols_group)
+    data_proc <-
+      data %>%
+      dplyr::mutate(logratio_dir =
+                      ifelse(
+                        logratio > 0,
+                        ifelse(name_x < name_y, TRUE, FALSE),
+                        ifelse(name_x < name_y, FALSE, TRUE)
+                      )) %>%
+      dplyr::group_by(!!!cols_group) %>%
+      filter_num_top_at("logratio", num_top, abs = TRUE) %>%
+      dplyr::ungroup()
+
+    data_proc <- create_name_xy_facet_lab(data_proc)
+
+    if (is.null(color)) {
+      data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
+      color <- ".dummy"
+    }
+    # NOTE: Don't need this.
+    # data_proc <- wrangle_color_col(data_proc, color)
+
+    token_quo <- rlang::sym(token)
+    color_quo <- rlang::sym(color)
+    facet_quo <- rlang::sym(facet)
+    facet_other <- lab_other
+
+    data_proc <-
+      data_proc %>%
+      dplyr::mutate(!!color_quo :=
+                      ifelse(
+                        logratio_dir,
+                        ifelse(name_x > facet_other, facet_other, name_x),
+                        ifelse(name_x > facet_other, name_x, facet_other)
+                      )) %>%
+      dplyr::mutate(!!color_quo := factor(!!color_quo, levels = c(facet_main, facet_other))) %>%
+      dplyr::mutate(!!token_quo := reorder_within(!!token_quo, dplyr::desc(logratio), name_xy))
+  }

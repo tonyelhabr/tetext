@@ -66,11 +66,12 @@ visualize_tfidf_at <-
            facet = doc,
            color = facet,
            num_top = 10,
-           scale_manual_params = default_scale_manual(),
+           scale_manual_base = default_scale_manual(),
+           scale_manual_params = list(),
            labs_base = default_labs(),
            labs_params = list(title = "Highest TF-IDF Tokens"),
            theme_base =
-             default_theme(axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
+             default_theme(axis.text.y = ggplot2::element_text(angle = 30, hjust = 1),
                            panel.grid.major.y = ggplot2::element_blank()),
            theme_params = list(),
            facet_base = default_facet(facet),
@@ -115,7 +116,7 @@ visualize_tfidf_at <-
       data_proc %>%
       ggplot2::ggplot(ggplot2::aes_string(x = token, y = "tf_idf", fill = color)) +
       ggplot2::geom_col() +
-      do_call_scale_manual(scale_manual_params, type = "fill") +
+      generate_scale_manual(scale_manual_base, scale_manual_params, type = "fill") +
       scale_x_reordered()
 
     viz <- viz + generate_facets(facet_base, facet_params)

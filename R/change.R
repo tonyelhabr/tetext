@@ -145,7 +145,8 @@ visualize_change_at <-
            num_top = 5,
            color = token,
            add_labels = FALSE,
-           scale_manual_params = default_scale_manual(values = rep("grey50", num_top)),
+           scale_manual_base = default_scale_manual(values = rep("grey50", num_top)),
+           scale_manual_params = list(),
            labs_base = default_labs(),
            labs_params = list(title = "Tokens with Most Significant Change in Frequency",
                               caption = paste0("Statistical significance is determined by a logistical model\n",
@@ -194,7 +195,7 @@ visualize_change_at <-
     viz <-
       data_proc %>%
       ggplot2::ggplot(ggplot2::aes_string(x = "time_floor", y = "pct", color = color)) +
-      do_call_scale_manual(scale_manual_params, type = "color") +
+      generate_scale_manual(scale_manual_base, scale_manual_params, type = "color") +
       ggplot2::geom_line(size = 1.5) +
       ggplot2::scale_y_continuous(labels = scales::percent_format())
 

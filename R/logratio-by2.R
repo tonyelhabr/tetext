@@ -163,13 +163,15 @@ visualize_logratios_facet_by2_at <-
            color = NULL,
            lab_other = "other",
            num_top = 5,
-           scale_manual_params = default_scale_manual(values = c("grey50", "grey80")),
+           scale_manual_base =
+             default_scale_manual(values = c("grey50", get_color_hex_inverse("grey80"))),
+           scale_manual_params = list(),
            labs_base = default_labs(),
            labs_params = list(title = "Most Unique Words", y = "Log Odds Ratio"),
            theme_base = default_theme(),
            theme_params =
              list(legend.position = "bottom",
-                  axis.text.y = ggplot2::element_text(angle = 45, hjust = 1),
+                  axis.text.y = ggplot2::element_text(angle = 30, hjust = 1),
                   panel.grid.major.y = ggplot2::element_blank()),
            facet_base = default_facet("name_xy"),
            facet_params = list()) {
@@ -217,46 +219,69 @@ visualize_logratios_facet_by2_at <-
         params = combine_base_and_params(filter_facet_base, filter_facet_params)
       )
 
-    logratio_dir <- logratio <- name_xy <- name_x <- name_y <- NULL
-
     data_proc <-
       data_proc %>%
-      dplyr::mutate(logratio_dir = dplyr::if_else(logratio < 0, TRUE, FALSE)) %>%
-      dplyr::group_by(name_xy, logratio_dir) %>%
-      dplyr::arrange(name_xy, dplyr::desc(abs(logratio))) %>%
-      filter_num_top_at("logratio", num_top) %>%
-      dplyr::ungroup()
+      process_logratio_by2(
+        cols_group = c("name_xy", "logratio_dir"),
+        num_top = num_top,
+        token = token,
+        color = color,
+        facet = facet,
+        facet_main = facet_main,
+        lab_other = lab_other
+      )
 
-    data_proc <-
-      data_proc %>%
-      dplyr::mutate(name_xy = paste0(name_x, " vs. ", name_y))
+    # logratio_dir <- logratio <- name_xy <- name_x <- name_y <- NULL
+    #
+    # data_proc <-
+    #   data_proc %>%
+    #   dplyr::mutate(
+    #     logratio_dir =
+    #       ifelse(logratio > 0,
+    #              ifelse(name_x < name_y, TRUE, FALSE),
+    #              ifelse(name_x < name_y, FALSE, TRUE)
+    #       )
+    #   ) %>%
+    #   dplyr::group_by(name_xy, logratio_dir) %>%
+    #   filter_num_top_at("logratio", num_top, abs = TRUE) %>%
+    #   dplyr::ungroup()
+    #
+    # data_proc <-
+    #   data_proc %>%
+    #   dplyr::mutate(name_xy = paste0(name_x, " vs. ", name_y))
+    #
+    # if (is.null(color)) {
+    #   data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
+    #   color <- ".dummy"
+    # }
+    # # NOTE: Don't need this.
+    # # data_proc <- wrangle_color_col(data_proc, color)
+    #
+    # token_quo <- rlang::sym(token)
+    # color_quo <- rlang::sym(color)
+    # facet_quo <- rlang::sym(facet)
+    # facet_other <- lab_other
+    #
+    # data_proc <-
+    #   data_proc %>%
+    #   dplyr::mutate(
+    #     !!color_quo :=
+    #       ifelse(logratio_dir,
+    #              ifelse(name_x > facet_other, facet_other, name_x),
+    #              ifelse(name_x > facet_other, name_x, facet_other)
+    #       )
+    #   ) %>%
+    #   dplyr::mutate(!!color_quo := factor(!!color_quo, levels = c(facet_main, facet_other))) %>%
+    #   dplyr::mutate(!!token_quo := reorder_within(!!token_quo, dplyr::desc(logratio), name_xy))
 
-    if (is.null(color)) {
-      data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
-      color <- ".dummy"
-    }
-    # NOTE: Don't need this.
-    # data_proc <- wrangle_color_col(data_proc, color)
-
-    token_quo <- rlang::sym(token)
-    color_quo <- rlang::sym(color)
-    facet_quo <- rlang::sym(facet)
-    facet_other <- lab_other
-
-    data_proc <-
-      data_proc %>%
-      dplyr::mutate(!!color_quo := dplyr::if_else(logratio_dir, name_x, facet_other)) %>%
-      dplyr::mutate(!!color_quo := factor(!!color_quo, levels = c(facet_main, facet_other))) %>%
-      dplyr::mutate(!!token_quo := reorder_within(!!token_quo, dplyr::desc(logratio), name_xy))
-      # dplyr::mutate(!!token_quo := stats::reorder(!!token_quo, dplyr::desc(logratio)))
-
+    color <- ".dummy"
     viz <-
       data_proc %>%
       ggplot2::ggplot(ggplot2::aes_string(x = token, y = "logratio", fill = color)) +
       # ggplot2::geom_bar(stat = "identity") +
       ggplot2::geom_col() +
       scale_x_reordered() +
-      do_call_scale_manual(scale_manual_params, type = "fill") +
+      generate_scale_manual(scale_manual_base, scale_manual_params, type = "fill") +
       ggplot2::geom_hline(ggplot2::aes(yintercept = 0))
 
     viz <-

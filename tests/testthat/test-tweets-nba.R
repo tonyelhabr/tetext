@@ -56,9 +56,18 @@ idxs_filt <- match(ids_filt, ids)
 colors_filt <- colors[idxs_filt]
 names(colors_filt) <- ids_filt
 
-id_filt <- "SAS"
+id_filt <- "MEM"
 idx_filt <- match(id_filt, ids_filt)
 color_filt <- colors_filt[idx_filt]
+
+color_filt_inv <- get_color_hex_inverse(color_filt)
+
+lab_other <- paste0("Not ", id_filt)
+names(color_filt_inv) <- lab_other
+
+if(interactive()) {
+  scales::show_col(c(color_filt, color_filt_inv))
+}
 
 data_facet <-
   data %>%
@@ -291,7 +300,7 @@ testthat::test_that(
           token = word,
           facet = id,
           value_facet = .x,
-          wordcloud_params = list(colors = .y, max.words = 15)
+          wordcloud_params = list(colors = .y, max.words = 30)
         )
       )
     )
@@ -302,7 +311,7 @@ testthat::test_that(
 testthat::test_that(
   "freqs",
   {
-    lab_title <- "Token Frequency"
+    lab_title <- "Bigram Frequency"
     lab_subtitle <- "By Team"
     viz_bigram_freqs_facet <-
       bigrams %>%
@@ -373,7 +382,7 @@ testthat::test_that(
 )
 
 testthat::test_that(
-  "_by2",
+  "freqs_by2",
   {
 
     unigram_freqs_facet <-
@@ -404,7 +413,12 @@ testthat::test_that(
       )
     viz_unigram_freqs_facet_by2
     testthat::expect_true(ggplot2::is.ggplot(viz_unigram_freqs_facet_by2))
+  }
+)
 
+testthat::test_that(
+  "logratios_by2",
+  {
     unigram_logratios_facet_by2 <-
       unigrams %>%
       compute_logratios_facet_by2(
@@ -425,11 +439,19 @@ testthat::test_that(
         facet = id,
         filter_facet = TRUE,
         facet_main = id_filt,
+        lab_other = lab_other,
+        # facet_main = "MEM",
+        scale_manual_params = list(values = c(color_filt, color_filt_inv)),
         num_top = 3
       )
     viz_unigram_logratios_facet_by2
     testthat::expect_true(ggplot2::is.ggplot(viz_unigram_logratios_facet_by2))
+  }
+)
 
+testthat::test_that(
+  "sentratios_by2",
+  {
     viz_unigram_sentratios_facet_by2 <-
       unigrams %>%
       visualize_sentratios_facet_by2(
