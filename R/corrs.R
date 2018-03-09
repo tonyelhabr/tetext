@@ -143,7 +143,7 @@ visualize_corrs_network_at <-
            shape_point = 21,
            seed = 42,
            labs_base = default_labs(),
-           labs_params = list(title = "Network of Pairwise Correlations"),
+           labs_params = list(title = "Network of Word Pairwise Correlations"),
            theme_base = default_theme(void = TRUE),
            theme_params = list()) {
 
@@ -191,8 +191,8 @@ visualize_corrs_network_at <-
 
     viz <-
       viz +
-      labs_base + do_call_labs(labs_params) +
-      theme_base + do_call_theme(theme_params)
+      generate_labs(labs_base, labs_params) +
+      generate_theme(theme_base, theme_params)
   }
 
 #' @rdname visualize_corrs_network

@@ -97,7 +97,7 @@ visualize_freqs_facet_by2_at <-
            scale_manual_base = default_scale_manual(),
            scale_manual_params = list(),
            labs_base = default_labs(),
-           labs_params = list(title = "Relative Token Frequency"),
+           labs_params = list(title = "Relative Word Frequency"),
            theme_base = default_theme(),
            theme_params = list(),
            facet_base = default_facet("name_xy"),
@@ -142,7 +142,7 @@ visualize_freqs_facet_by2_at <-
       data_proc %>%
       filter_data_facet_at(
         filter_facet = filter_facet,
-        params = combine_base_and_params(filter_facet_base, filter_facet_params)
+        params = combine_lists(filter_facet_base, filter_facet_params)
       )
 
     name_xy <- name_x <- name_y <- NULL
@@ -189,8 +189,8 @@ visualize_freqs_facet_by2_at <-
       viz + generate_facets(facet_base, facet_params)
     viz <-
       viz +
-      labs_base + do_call_labs(labs_params) +
-      theme_base + do_call_theme(theme_params)
+      generate_labs(labs_base, labs_params) +
+      generate_theme(theme_base, theme_params)
   }
 
 #' @rdname visualize_freqs_facet_by2

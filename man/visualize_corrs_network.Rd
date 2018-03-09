@@ -8,7 +8,7 @@
 visualize_corrs_network_at(..., resize_points = TRUE, size_point = "n",
   add_point_labels = TRUE, color_point = "grey50", shape_point = 21,
   seed = 42, labs_base = default_labs(), labs_params = list(title =
-  "Network of Pairwise Correlations"), theme_base = default_theme(void =
+  "Network of Word Pairwise Correlations"), theme_base = default_theme(void =
   TRUE), theme_params = list())
 
 visualize_corrs_network(..., token, feature)

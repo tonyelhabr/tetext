@@ -20,7 +20,7 @@ visualize_bigram_freqs_at <-
            scale_manual_base = default_scale_manual(),
            scale_manual_params = list(),
            labs_base = default_labs(),
-           labs_params = list(title = "Most Frequently Used Bigram Pairs"),
+           labs_params = list(title = "Most Frequently Used Word Pairs"),
            theme_base = default_theme(),
            theme_params = list()) {
 
@@ -75,8 +75,8 @@ visualize_bigram_freqs_at <-
 
     viz <-
       viz +
-      labs_base + do_call_labs(labs_params) +
-      theme_base + do_call_theme(theme_params)
+      generate_labs(labs_base, labs_params) +
+      generate_theme(theme_base, theme_params)
 
     viz <-
       viz +
@@ -92,7 +92,7 @@ visualize_bigram_freqs <-
     token <- rlang::quo_text(rlang::enquo(token))
     facet <- rlang::quo_text(rlang::enquo(facet))
     if (missing(color)) {
-      # NOTE: THIS IS 'UNIQUE' TO THIS FUNCTION.
+      # NOTE: This is 'unique' to this function, since `color = facet` by default in the SE version.
       # color <- NULL
       color <- facet
     } else {

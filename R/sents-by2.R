@@ -125,7 +125,7 @@ visualize_sentratios_facet_by2_at <-
              default_scale_manual(values = c("grey50", get_color_hex_inverse("grey80"))),
            scale_manual_params = list(),
            labs_base = default_labs(),
-           labs_params = list(title = "Most Significant Words Contributing to Sentiment Differences",
+           labs_params = list(title = "Most Significant Words Contributing\nto Sentiment Differences",
                               y = "Log Odds Ratio"),
            theme_base = default_theme(),
            theme_params =
@@ -134,7 +134,8 @@ visualize_sentratios_facet_by2_at <-
                   panel.grid.major.y = ggplot2::element_blank()),
            facet_base =
              default_facet(ifelse(is.null(sent_main),
-                                  "sentiment ~ name_xy",
+                                  # "sentiment ~ name_xy",
+                                  c("sentiment", "name_xy"),
                                   "name_xy")),
            facet_params = list()) {
 
@@ -182,10 +183,11 @@ visualize_sentratios_facet_by2_at <-
       data_proc %>%
       filter_data_facet_at(
         filter_facet = filter_facet,
-        params = combine_base_and_params(filter_facet_base, filter_facet_params)
+        params = combine_lists(filter_facet_base, filter_facet_params)
       )
 
     # NOTE: This sentiment processing is not in the logratio function.
+    # Otherwise, the code is nearly identical.
     data_proc <-
       data_proc %>%
       validate_x_main(
@@ -194,6 +196,8 @@ visualize_sentratios_facet_by2_at <-
         xs = get_sents_valid(lexicon = lexicon),
         x_main = sent_main
       )
+
+    sentiment <- NULL
 
     if(filter_sent) {
       data_proc <-
@@ -207,66 +211,38 @@ visualize_sentratios_facet_by2_at <-
 
     data_proc <-
       data_proc %>%
-      process_logratio_by2(
-        cols_group = c("name_xy", "sentiment", "logratio_dir"),
-        num_top = num_top,
+      create_logratio_dir_at(
+        cols_group = list("name_xy", "sentiment", "logratio_dir"),
+        num_top = num_top
+      )
+
+
+    logratio_dir <- logratio <- name_x <- name_y <- NULL
+
+    data_proc <-
+      data_proc %>%
+      dplyr::mutate(name_xy = paste0(name_x, " vs. ", name_y))
+
+    if (is.null(color)) {
+      data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
+      color <- ".dummy"
+    }
+    # NOTE: Don't need this.
+    # data_proc <- wrangle_color_col(data_proc, color)
+
+    data_proc <-
+      data_proc %>%
+      process_logratio_dir_at(
         token = token,
         color = color,
         facet = facet,
         facet_main = facet_main,
         lab_other = lab_other
       )
-    # logratio_dir <- logratio <- name_xy <- name_x <- name_y <- sentiment <- NULL
-    #
-    # # NOTE: Unlike the logratio function, must also group by sentiment.
-    # # NOTE: Not sure if should use arrange with abs().
-    # data_proc <-
-    #   data_proc %>%
-    #   dplyr::mutate(
-    #     logratio_dir =
-    #       ifelse(logratio > 0,
-    #              ifelse(name_x < name_y, TRUE, FALSE),
-    #              ifelse(name_x < name_y, FALSE, TRUE)
-    #       )
-    #   ) %>%
-    #   # dplyr::group_by(name_xy, logratio_dir) %>%
-    #   dplyr::group_by(name_xy, sentiment, logratio_dir) %>%
-    #   filter_num_top_at("logratio", num_top, abs = TRUE) %>%
-    #   dplyr::ungroup()
-    #
-    # data_proc <-
-    #   data_proc %>%
-    #   dplyr::mutate(name_xy = paste0(name_x, " vs. ", name_y))
-    #
-    # if (is.null(color)) {
-    #   data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
-    #   color <- ".dummy"
-    # }
-    # # NOTE: Don't need this.
-    # # data_proc <- wrangle_color_col(data_proc, color)
-    #
-    # token_quo <- rlang::sym(token)
-    # color_quo <- rlang::sym(color)
-    # facet_quo <- rlang::sym(facet)
-    # facet_other <- lab_other
-    #
-    # data_proc <-
-    #   data_proc %>%
-    #   dplyr::mutate(
-    #     !!color_quo :=
-    #       ifelse(logratio_dir,
-    #              ifelse(name_x > facet_other, facet_other, name_x),
-    #              ifelse(name_x > facet_other, name_x, facet_other)
-    #       )
-    #   ) %>%
-    #   dplyr::mutate(!!color_quo := factor(!!color_quo, levels = c(facet_main, facet_other))) %>%
-    #   dplyr::mutate(!!token_quo := reorder_within(!!token_quo, dplyr::desc(logratio), name_xy))
 
-    color <- ".dummy"
     viz <-
       data_proc %>%
       ggplot2::ggplot(ggplot2::aes_string(x = token, y = "logratio", fill = color)) +
-      # ggplot2::geom_bar(stat = "identity") +
       ggplot2::geom_col() +
       scale_x_reordered() +
       # generate_scale_manual(scale_manual_base, scale_manual_params, type = "fill") +
@@ -279,8 +255,8 @@ visualize_sentratios_facet_by2_at <-
 
     viz <-
       viz +
-      labs_base + do_call_labs(labs_params) +
-      theme_base + do_call_theme(theme_params)
+      generate_labs(labs_base, labs_params) +
+      generate_theme(theme_base, theme_params)
 
     viz <-
       viz +

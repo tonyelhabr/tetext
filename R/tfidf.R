@@ -69,7 +69,7 @@ visualize_tfidf_at <-
            scale_manual_base = default_scale_manual(),
            scale_manual_params = list(),
            labs_base = default_labs(),
-           labs_params = list(title = "Highest TF-IDF Tokens"),
+           labs_params = list(title = "Highest TF-IDF Words"),
            theme_base =
              default_theme(axis.text.y = ggplot2::element_text(angle = 30, hjust = 1),
                            panel.grid.major.y = ggplot2::element_blank()),
@@ -123,8 +123,8 @@ visualize_tfidf_at <-
 
     viz <-
       viz +
-      labs_base + do_call_labs(labs_params) +
-      theme_base + do_call_theme(theme_params)
+      generate_labs(labs_base, labs_params) +
+      generate_theme(theme_base, theme_params)
 
     viz <-
       viz +

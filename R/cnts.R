@@ -55,8 +55,8 @@ visualize_cnts_at <-
 
     viz <-
       viz +
-      labs_base + do_call_labs(labs_params) +
-      theme_base + do_call_theme(theme_params)
+      generate_labs(labs_base, labs_params) +
+      generate_theme(theme_base, theme_params)
 
     viz <- viz + ggplot2::coord_flip()
   }
@@ -136,8 +136,8 @@ visualize_cnts_facet_at <-
 
     viz <-
       viz +
-      labs_base + do_call_labs(labs_params) +
-      theme_base + do_call_theme(theme_params)
+      generate_labs(labs_base, labs_params) +
+      generate_theme(theme_base, theme_params)
 
     viz <-
       viz +

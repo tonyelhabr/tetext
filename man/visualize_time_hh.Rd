@@ -6,8 +6,9 @@
 \title{Visualize hourly data}
 \usage{
 visualize_time_hh_at(data = NULL, timebin = NULL, facet = NULL,
-  color = facet, scale_manual_params = default_scale_manual(),
-  labs_base = default_labs(), labs_params = list(title = "Count Over Time"),
+  color = facet, scale_manual_base = default_scale_manual(),
+  scale_manual_params = list(), labs_base = default_labs(),
+  labs_params = list(title = "Count by Hour of Day"),
   theme_base = default_theme(), theme_params = list(panel.grid =
   ggplot2::element_blank()))
 
@@ -26,6 +27,12 @@ to use one of main axes, not for facetting.}
 Even if \code{fill} is the actual \code{ggplot2} aesthetic, the internal code will 'coerce' this
 column to \code{fill}.
 In order to simplify internal code, MUST be specified.}
+
+\item{scale_manual_base}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
+argument is specified in the internal
+function \code{default_scale_manual()},
+so if overwriting explicitly, then \code{values} should be included in the list.}
 
 \item{scale_manual_params}{list. Additional parameters to pass to \code{ggplot2::scale_fill_manual()}
 or \code{ggplot2::scale_color_manual()} (e.g. \code{breaks}, \code{labels}, or \code{name}).

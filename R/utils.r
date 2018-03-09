@@ -42,6 +42,7 @@ filter_num_top_at <-
     col_quo <- rlang::sym(col)
 
     out <- data
+
     if (desc) {
       if (abs) {
         out <-
@@ -220,24 +221,19 @@ validate_x_main <-
 
 
 create_name_xy_facet_lab <- function(data = NULL) {
+  name_xy <- name_x <- name_y <- NULL
   data %>%
     dplyr::mutate(name_xy = paste0(name_x, " vs. ", name_y))
 }
 
-process_logratio_by2 <-
+create_logratio_dir_at <-
   function(data = NULL,
            cols_group = NULL,
-           num_top = NULL,
-           token = NULL,
-           color = NULL,
-           facet = NULL,
-           facet_main = NULL,
-           lab_other = NULL) {
+           num_top = NULL) {
     stopifnot(!is.null(data), is.data.frame(data))
-    stopifnot(!is.null(cols_group), is.character(cols_group))
+    stopifnot(!is.null(cols_group), is.list(cols_group))
 
-    logratio_dir <-
-      logratio <- name_xy <- name_x <- name_y <- sentiment <- NULL
+    logratio_dir <- logratio <- name_x <- name_y <- NULL
 
     cols_group_quo <- rlang::syms(cols_group)
     data_proc <-
@@ -248,32 +244,41 @@ process_logratio_by2 <-
                         ifelse(name_x < name_y, TRUE, FALSE),
                         ifelse(name_x < name_y, FALSE, TRUE)
                       )) %>%
-      dplyr::group_by(!!!cols_group) %>%
+      dplyr::group_by(!!!cols_group_quo) %>%
+      # dplyr::group_by_at(cols_group) %>%
       filter_num_top_at("logratio", num_top, abs = TRUE) %>%
       dplyr::ungroup()
+  }
 
-    data_proc <- create_name_xy_facet_lab(data_proc)
 
-    if (is.null(color)) {
-      data_proc <- data_proc %>% dplyr::mutate(`.dummy` = "dummy")
-      color <- ".dummy"
-    }
-    # NOTE: Don't need this.
-    # data_proc <- wrangle_color_col(data_proc, color)
+process_logratio_dir_at <-
+  function(data = NULL,
+           token = NULL,
+           color = NULL,
+           facet = NULL,
+           facet_main = NULL,
+           lab_other = NULL) {
+    stopifnot(!is.null(data), is.data.frame(data))
+    stopifnot(!is.null(token), is.character(token))
+    stopifnot(!is.null(color), is.character(color))
+    stopifnot(!is.null(facet), is.character(facet))
+    stopifnot(!is.null(facet_main), is.character(facet_main))
+    stopifnot(!is.null(lab_other), is.character(lab_other))
 
     token_quo <- rlang::sym(token)
     color_quo <- rlang::sym(color)
     facet_quo <- rlang::sym(facet)
-    facet_other <- lab_other
+
+    logratio_dir <- logratio <- name_x <- name_xy <- NULL
 
     data_proc <-
-      data_proc %>%
+      data %>%
       dplyr::mutate(!!color_quo :=
                       ifelse(
                         logratio_dir,
-                        ifelse(name_x > facet_other, facet_other, name_x),
-                        ifelse(name_x > facet_other, name_x, facet_other)
+                        ifelse(name_x > lab_other, lab_other, name_x),
+                        ifelse(name_x > lab_other, name_x, lab_other)
                       )) %>%
-      dplyr::mutate(!!color_quo := factor(!!color_quo, levels = c(facet_main, facet_other))) %>%
+      dplyr::mutate(!!color_quo := factor(!!color_quo, levels = c(facet_main, lab_other))) %>%
       dplyr::mutate(!!token_quo := reorder_within(!!token_quo, dplyr::desc(logratio), name_xy))
   }

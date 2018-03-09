@@ -6,10 +6,10 @@
 \title{Visualize TF-IDF}
 \usage{
 visualize_tfidf_at(..., token = NULL, doc = NULL, facet = doc,
-  color = facet, num_top = 10,
-  scale_manual_params = default_scale_manual(), labs_base = default_labs(),
-  labs_params = list(title = "Highest TF-IDF Tokens"),
-  theme_base = default_theme(axis.text.y = ggplot2::element_text(angle = 45,
+  color = facet, num_top = 10, scale_manual_base = default_scale_manual(),
+  scale_manual_params = list(), labs_base = default_labs(),
+  labs_params = list(title = "Highest TF-IDF Words"),
+  theme_base = default_theme(axis.text.y = ggplot2::element_text(angle = 30,
   hjust = 1), panel.grid.major.y = ggplot2::element_blank()),
   theme_params = list(), facet_base = default_facet(facet),
   facet_params = list())
@@ -33,6 +33,12 @@ column to \code{fill}.
 In order to simplify internal code, MUST be specified.}
 
 \item{num_top}{numeric. Number of words to show. If between 0 and 1, then assumed to be a percentage.}
+
+\item{scale_manual_base}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
+argument is specified in the internal
+function \code{default_scale_manual()},
+so if overwriting explicitly, then \code{values} should be included in the list.}
 
 \item{scale_manual_params}{list. Additional parameters to pass to \code{ggplot2::scale_fill_manual()}
 or \code{ggplot2::scale_color_manual()} (e.g. \code{breaks}, \code{labels}, or \code{name}).

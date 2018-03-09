@@ -62,7 +62,6 @@ visualize_time_at <-
     geom <- match.arg(geom)
 
     if(bin) {
-      # browser()
       timebin_quo <- rlang::sym(timebin)
       stopifnot(!is.null(timefloor), is.character(timefloor))
       data <-
@@ -133,12 +132,13 @@ visualize_time_at <-
                                 bins = 30)
     }
     viz <-
-      viz + generate_scale_manual(scale_manual_base, scale_manual_params, type = "fill")
+      viz +
+      generate_scale_manual(scale_manual_base, scale_manual_params, type = "fill")
 
     viz <-
       viz +
-      labs_base + do_call_labs(labs_params) +
-      theme_base + do_call_theme(theme_params)
+      generate_labs(labs_base, labs_params) +
+      generate_theme(theme_base, theme_params)
   }
 
 #' @rdname visualize_time
@@ -228,9 +228,10 @@ visualize_time_hh_at <-
            timebin = NULL,
            facet = NULL,
            color = facet,
-           scale_manual_params = default_scale_manual(),
+           scale_manual_base = default_scale_manual(),
+           scale_manual_params = list(),
            labs_base = default_labs(),
-           labs_params = list(title = "Count Over Time"),
+           labs_params = list(title = "Count by Hour of Day"),
            theme_base = default_theme(),
            theme_params = list(panel.grid = ggplot2::element_blank())) {
     stopifnot(!is.null(data), is.data.frame(data))
@@ -262,8 +263,8 @@ visualize_time_hh_at <-
 
     viz <-
       viz +
-      labs_base + do_call_labs(labs_params) +
-      theme_base + do_call_theme(theme_params)
+      generate_labs(labs_base, labs_params) +
+      generate_theme(theme_base, theme_params)
 
     viz <-
       viz +

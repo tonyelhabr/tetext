@@ -9,10 +9,11 @@ visualize_freqs_facet_by2_at(data = NULL, token = NULL, facet = "name_xy",
   xy_nms, xy_grid, filter_facet = FALSE, facet_main = NULL,
   filter_facet_base = default_filter_facet(facet_main),
   filter_facet_params = list(), color = NULL, add_labels = TRUE,
-  scale_manual_params = default_scale_manual(), labs_base = default_labs(),
-  labs_params = list(title = "Relative Token Frequency"),
-  theme_base = default_theme(), theme_params = list(),
-  facet_base = default_facet("name_xy"), facet_params = list())
+  scale_manual_base = default_scale_manual(), scale_manual_params = list(),
+  labs_base = default_labs(), labs_params = list(title =
+  "Relative Word Frequency"), theme_base = default_theme(),
+  theme_params = list(), facet_base = default_facet("name_xy"),
+  facet_params = list())
 
 visualize_freqs_facet_by2(..., token, color, facet)
 }
@@ -43,6 +44,12 @@ column to \code{fill}.
 In order to simplify internal code, MUST be specified.}
 
 \item{add_labels}{logical. Whether or not to add text labels (of the tokens).}
+
+\item{scale_manual_base}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
+argument is specified in the internal
+function \code{default_scale_manual()},
+so if overwriting explicitly, then \code{values} should be included in the list.}
 
 \item{scale_manual_params}{list. Additional parameters to pass to \code{ggplot2::scale_fill_manual()}
 or \code{ggplot2::scale_color_manual()} (e.g. \code{breaks}, \code{labels}, or \code{name}).

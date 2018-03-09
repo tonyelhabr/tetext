@@ -56,12 +56,12 @@ default_theme <- function (base_family = "Arial Narrow",
         rect = ggplot2::element_blank(),
         axis.text = ggplot2::element_blank(),
         axis.ticks = ggplot2::element_blank()
-      ) +
-      ggplot2::theme()
+      )
   }
 
   out
 }
+z <- combine_lists(default_theme(), list())
 
 #' Default label parameters
 #'
@@ -81,7 +81,8 @@ default_labs <-
            caption = NULL,
            x = NULL,
            y = NULL) {
-    ggplot2::labs(
+    # ggplot2::labs(
+    list(
       title = title,
       subtitle = subtitle,
       caption = caption,
@@ -104,7 +105,8 @@ default_facet <-
   function(facet, scales = "free", ncol = 3, nrow = NULL, strip.position = "top", ...) {
     stopifnot(!missing(facet), is.character(facet))
     # if(!plyr::is.formula(facet)) {
-    if(!grepl("~", facet)) {
+    if(!any(grepl("~", facet))) {
+    # if(!any(stringr::str_detect("\\~", facet))) {
       if(length(facet) > 1) {
         if(length(facet) == 2) {
           facet <- paste0(facet[1], "~ ", facet[2])
@@ -122,6 +124,8 @@ default_facet <-
          strip.position = strip.position,
          ...)
   }
+
+default_facet(c("a", "b"))
 
 #' Default word cloud parameters
 #'

@@ -6,10 +6,10 @@
 \title{Visualize bigrams}
 \usage{
 visualize_bigram_freqs_at(..., token = NULL, facet = NULL, color = facet,
-  num_top = 3, scale_manual_params = default_scale_manual(),
-  labs_base = default_labs(), labs_params = list(title =
-  "Most Frequently Used Bigram Pairs"), theme_base = default_theme(),
-  theme_params = list())
+  num_top = 3, scale_manual_base = default_scale_manual(),
+  scale_manual_params = list(), labs_base = default_labs(),
+  labs_params = list(title = "Most Frequently Used Word Pairs"),
+  theme_base = default_theme(), theme_params = list())
 
 visualize_bigram_freqs(..., token, color, facet)
 }
@@ -27,6 +27,12 @@ column to \code{fill}.
 In order to simplify internal code, MUST be specified.}
 
 \item{num_top}{numeric. Number of words to show. If between 0 and 1, then assumed to be a percentage.}
+
+\item{scale_manual_base}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
+argument is specified in the internal
+function \code{default_scale_manual()},
+so if overwriting explicitly, then \code{values} should be included in the list.}
 
 \item{scale_manual_params}{list. Additional parameters to pass to \code{ggplot2::scale_fill_manual()}
 or \code{ggplot2::scale_color_manual()} (e.g. \code{breaks}, \code{labels}, or \code{name}).

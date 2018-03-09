@@ -6,9 +6,9 @@
 \title{Visualize change}
 \usage{
 visualize_change_at(..., token = NULL, num_top = 5, color = token,
-  add_labels = FALSE, scale_manual_params = default_scale_manual(values =
-  rep("grey50", num_top)), labs_base = default_labs(),
-  labs_params = list(title =
+  add_labels = FALSE, scale_manual_base = default_scale_manual(values =
+  rep("grey50", num_top)), scale_manual_params = list(),
+  labs_base = default_labs(), labs_params = list(title =
   "Tokens with Most Significant Change in Frequency", caption =
   paste0("Statistical significance is determined by a logistical model\\n",
   "estimating token appearance in a given time period.")),
@@ -31,6 +31,12 @@ column to \code{fill}.
 In order to simplify internal code, MUST be specified.}
 
 \item{add_labels}{logical. Whether or not to add labels to the lines.}
+
+\item{scale_manual_base}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
+argument is specified in the internal
+function \code{default_scale_manual()},
+so if overwriting explicitly, then \code{values} should be included in the list.}
 
 \item{scale_manual_params}{list. Additional parameters to pass to \code{ggplot2::scale_fill_manual()}
 or \code{ggplot2::scale_color_manual()} (e.g. \code{breaks}, \code{labels}, or \code{name}).

@@ -11,15 +11,16 @@ visualize_sentratios_facet_by2_at(data = NULL, token = NULL, facet = NULL,
   filter_facet_base = default_filter_facet(facet_main),
   filter_facet_params = list(), filter_sent = TRUE, sent_main = NULL,
   color = NULL, lab_other = "other", num_top = 5,
-  scale_manual_params = default_scale_manual(values = c("grey50", "grey80")),
+  scale_manual_base = default_scale_manual(values = c("grey50",
+  get_color_hex_inverse("grey80"))), scale_manual_params = list(),
   labs_base = default_labs(), labs_params = list(title =
-  "Most Significant Words Contributing to Sentiment Differences", y =
+  "Most Significant Words Contributing\\nto Sentiment Differences", y =
   "Log Odds Ratio"), theme_base = default_theme(),
   theme_params = list(legend.position = "bottom", axis.text.y =
-  ggplot2::element_text(angle = 45, hjust = 1), panel.grid.major.y =
+  ggplot2::element_text(angle = 30, hjust = 1), panel.grid.major.y =
   ggplot2::element_blank()),
-  facet_base = default_facet(ifelse(is.null(sent_main), "sentiment ~ name_xy",
-  "name_xy")), facet_params = list())
+  facet_base = default_facet(ifelse(is.null(sent_main), c("sentiment",
+  "name_xy"), "name_xy")), facet_params = list())
 
 visualize_sentratios_facet_by2(..., token, color, facet)
 }
@@ -66,6 +67,12 @@ In order to simplify internal code, MUST be specified.}
 \item{lab_other}{bare for NSE; character for SE. Name to give to 'opposing' factor of \code{facet_main}.}
 
 \item{num_top}{numeric. Number of tokens to show for each \code{facet} pair.}
+
+\item{scale_manual_base}{list. Parameters to pass to \code{ggplot2::scale_fill_manual()} or
+\code{ggplot2::scale_color_manual()}, depending on the aesthetic mapping. A default \code{values}
+argument is specified in the internal
+function \code{default_scale_manual()},
+so if overwriting explicitly, then \code{values} should be included in the list.}
 
 \item{scale_manual_params}{list. Additional parameters to pass to \code{ggplot2::scale_fill_manual()}
 or \code{ggplot2::scale_color_manual()} (e.g. \code{breaks}, \code{labels}, or \code{name}).

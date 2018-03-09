@@ -145,10 +145,7 @@ testthat::test_that(
         color = id,
         facet = id,
         scale_manual_params = list(values = colors_filt),
-        facet_params = list(
-          strip.position = "right",
-          ncol = 1
-        )
+        facet_params = list(scales = "free_y")
       )
     viz_time_facet_all
     testthat::expect_true(ggplot2::is.ggplot(viz_time_facet_all))
@@ -266,7 +263,7 @@ testthat::test_that(
         token = word,
         facet = id,
         color = id,
-        num_top = 10,
+        num_top = 5,
         scale_manual_params = list(values = colors_filt),
         labs_params = list(title = lab_title, subtitle = lab_subtitle)
       )
@@ -440,7 +437,6 @@ testthat::test_that(
         filter_facet = TRUE,
         facet_main = id_filt,
         lab_other = lab_other,
-        # facet_main = "MEM",
         scale_manual_params = list(values = c(color_filt, color_filt_inv)),
         num_top = 3
       )
@@ -452,19 +448,45 @@ testthat::test_that(
 testthat::test_that(
   "sentratios_by2",
   {
+    lab_title <- "Most Signifcant Words Contributing to Sentiment Differences"
     viz_unigram_sentratios_facet_by2 <-
       unigrams %>%
       visualize_sentratios_facet_by2(
         token = word,
         facet = id,
+        num_top = 3,
         filter_facet = TRUE,
         facet_main = id_filt,
         filter_sent = TRUE,
+        lab_other = lab_other,
         sent_main = "positive",
-        num_top = 3
+        labs_params = list(title = lab_title, subtitle = "positive"),
+        scale_manual_params = list(values = c(color_filt, color_filt_inv)),
+
       )
     viz_unigram_sentratios_facet_by2
     testthat::expect_true(ggplot2::is.ggplot(viz_unigram_sentratios_facet_by2))
+
+
+    viz_unigram_sentratios_facet_by2_list <-
+      purrr::map(
+        c("positive", "negative"),
+        ~visualize_sentratios_facet_by2(
+          data = unigrams,
+          token = word,
+          facet = id,
+          num_top = 3,
+          filter_facet = TRUE,
+          facet_main = id_filt,
+          filter_sent = TRUE,
+          sent_main = .x,
+          lab_other = lab_other,
+          scale_manual_params = list(values = c(color_filt, color_filt_inv)),
+          labs_params = list(title = lab_title, subtitle = .x),
+        )
+      )
+    viz_unigram_sentratios_facet_by2_list
+    testthat::expect_true(is.list(viz_unigram_sentratios_facet_by2_list))
   }
 )
 
