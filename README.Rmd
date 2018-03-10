@@ -37,11 +37,11 @@ logo <- magick::image_read(filepath_logo)
 magick::image_write(magick::image_scale(logo, "120"), path = filepath_logo)
 ```
 
-# temisc <img src="man/figures/logo.png" align="right"/>
+# teproj <img src="man/figures/logo.png" align="right"/>
 
 ##  Introduction
 
-This package containts functions that I often use.
+This package contains functions that I use for quick and "tidy" text analysis.
 
 ### Installation
 
@@ -86,15 +86,15 @@ Here are some short descriptions of the functions, grouped generally
 by usage. Functions are listed in order of
 recommended use in a script (and in the order in which I wrote them).
 
-+ __time:__ `visualize_time()`, `visualize_time_multi()`, `visualize_time_hh()`: 
++ __time:__ `visualize_time()`, `visualize_time_facet()`, `visualize_time_hh()`: 
 Visualize data over time.
 + __tidify:__ `tidify_to_unigrams()`, `tidify_to_bigrams()`: 
 Tokenize data to tidy format with unigrams or bigrams.
-+ __cnts:__ `visualize_cnts()`, `visualize_cnts_multi()`, 
-`visualize_cnts_wordcloud()`, `visualize_cnts_wordcloud_multi()`: Visualize counts of n-grams.
-+ __freqs:__ `compute_freqs()`, `compute_freqs_multi()`,
-`visualize_bigrams_freqs_multi()`, `compute_freqs_multi_by2()`,
-`visualize_freqs_multi_by2()`: 
++ __cnts:__ `visualize_cnts()`, `visualize_cnts_facet()`, 
+`visualize_cnts_wordcloud()`, `visualize_cnts_wordcloud_facet()`: Visualize counts of n-grams.
++ __freqs:__ `compute_freqs()`, `compute_freqs_facet()`,
+`visualize_bigrams_freqs_facet()`, `compute_freqs_facet_by2()`,
+`visualize_freqs_facet_by2()`: 
 Compute and visualize frequencies of n-grams.
 + __corrs:__ `compute_corrs()`, `visualize_corrs_network()`: 
 Compute and visualize pairwise correlations (of bigrams).
@@ -102,18 +102,18 @@ Compute and visualize pairwise correlations (of bigrams).
 Compute and visualize change in n-gram usage across documents.
 + __change:__ `compute_change()`, `visualize_change()`: 
 Compute and visualize change in n-gram usage across documents.
-+ __sents:__ `compute_sent_summary()`, `compute_sent_summary_multi()`
++ __sents:__ `compute_sent_summary()`, `compute_sent_summary_facet()`
 Compute sentiment scores for n-grams.
-+ __xy:__ `compute_freqs_multi_by2()`, `visualize_freqs_multi_by2()`, 
-`compute_logratios_multi_by2()`, `visualize_logratios_multi_by2()`,
-`compute_sentratios_multi_by2()`, `visualize_sentratios_multi_by2()`,
-Compute metrics across multiple `multi` entities. Uses a handful of internal
++ __xy:__ `compute_freqs_facet_by2()`, `visualize_freqs_facet_by2()`, 
+`compute_logratios_facet_by2()`, `visualize_logratios_facet_by2()`,
+`compute_sentratios_facet_by2()`, `visualize_sentratios_facet_by2()`,
+Compute metrics across facets `facet` entities. Uses a handful of internal
 function that are not intended to be called directly (although they can be).
 These internal functions include the following:
 `create_xy_grid()`, `filter_xy_grid()`, `preprocess_xy_data()`, `postprocess_xy_data()`, 
 `wrapper_func()`, `add_dummy_cols()`.
 Also, there are more specific internal functions, such as:
-`compute_freqs_multi_wide()`, `compute_logratios_multi_wide()`, `compute_sentratios_multi_wide()`
+`compute_freqs_facet_wide()`, `compute_logratios_facet_wide()`, `compute_sentratios_facet_wide()`
 
 ### Function Idioms
 
@@ -171,7 +171,7 @@ Additionally, see
 to see code that are similar
 to the code used to implement this package's functions:
 
-Additionally, one can review the tests files for further function usage
+Finally, the tests files can provide worthwhile examples of function usage
 
 ```{r echo = FALSE}
 # library("tetext")

@@ -3,6 +3,7 @@ Type: Package
 Title: Tony's Personal Package for Text Analysis
 Version: 0.0.0.9000
 Author: Tony ElHabr <anthonyelhabr@gmail.com>
+Authors@R: person("Tony", "ElHabr", email = "anthonyelhabr@gmail.com", role = c("aut", "cre"))
 Maintainer: Tony ElHabr <anthonyelhabr@gmail.com>
 Description: A package for Tony's text functions.
 License: MIT + file LICENSE

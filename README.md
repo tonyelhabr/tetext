@@ -1,11 +1,11 @@
 
-temisc <img src="man/figures/logo.png" align="right"/>
+teproj <img src="man/figures/logo.png" align="right"/>
 ======================================================
 
 Introduction
 ------------
 
-This package containts functions that I often use.
+This package contains functions that I use for quick and "tidy" text analysis.
 
 ### Installation
 
@@ -27,30 +27,31 @@ The following is a list is a list of the **main** functions in the package. (Not
     #>  [1] "compute_change"                 "compute_corrs"                 
     #>  [3] "compute_freqs"                  "compute_freqs_facet"           
     #>  [5] "compute_freqs_facet_by2"        "compute_logratios_facet_by2"   
-    #>  [7] "compute_logratios_facet_wide"   "compute_sentratios_facet_by2"  
-    #>  [9] "compute_tfidf"                  "compute_time_elapsed"          
-    #> [11] "compute_timefilter"             "compute_timefilter_facet"      
-    #> [13] "tidify_to_bigrams"              "tidify_to_unigrams"            
-    #> [15] "trim_bytime"                    "visualize_bigram_freqs_facet"  
-    #> [17] "visualize_change"               "visualize_cnts"                
-    #> [19] "visualize_cnts_facet"           "visualize_cnts_wordcloud"      
-    #> [21] "visualize_cnts_wordcloud_facet" "visualize_corrs_network"       
-    #> [23] "visualize_freqs_facet_by2"      "visualize_logratios_facet_by2" 
-    #> [25] "visualize_sentratios_facet_by2" "visualize_tfidf"               
-    #> [27] "visualize_time"                 "visualize_time_facet"          
-    #> [29] "visualize_time_hh"
+    #>  [7] "compute_logratios_facet_wide"   "compute_sent_summ"             
+    #>  [9] "compute_sent_summ_facet"        "compute_sentratios_facet_by2"  
+    #> [11] "compute_tfidf"                  "compute_time_elapsed"          
+    #> [13] "compute_timefilter"             "compute_timefilter_facet"      
+    #> [15] "tidify_to_bigrams"              "tidify_to_unigrams"            
+    #> [17] "trim_bytime"                    "visualize_bigram_freqs"        
+    #> [19] "visualize_change"               "visualize_cnts"                
+    #> [21] "visualize_cnts_facet"           "visualize_cnts_wordcloud"      
+    #> [23] "visualize_cnts_wordcloud_facet" "visualize_corrs_network"       
+    #> [25] "visualize_freqs_facet_by2"      "visualize_logratios_facet_by2" 
+    #> [27] "visualize_sentratios_facet_by2" "visualize_tfidf"               
+    #> [29] "visualize_time"                 "visualize_time_facet"          
+    #> [31] "visualize_time_hh"
 
 Here are some short descriptions of the functions, grouped generally by usage. Functions are listed in order of recommended use in a script (and in the order in which I wrote them).
 
--   **time:** `visualize_time()`, `visualize_time_multi()`, `visualize_time_hh()`: Visualize data over time.
+-   **time:** `visualize_time()`, `visualize_time_facet()`, `visualize_time_hh()`: Visualize data over time.
 -   **tidify:** `tidify_to_unigrams()`, `tidify_to_bigrams()`: Tokenize data to tidy format with unigrams or bigrams.
--   **cnts:** `visualize_cnts()`, `visualize_cnts_multi()`, `visualize_cnts_wordcloud()`, `visualize_cnts_wordcloud_multi()`: Visualize counts of n-grams.
--   **freqs:** `compute_freqs()`, `compute_freqs_multi()`, `visualize_bigrams_freqs_multi()`, `compute_freqs_multi_by2()`, `visualize_freqs_multi_by2()`: Compute and visualize frequencies of n-grams.
+-   **cnts:** `visualize_cnts()`, `visualize_cnts_facet()`, `visualize_cnts_wordcloud()`, `visualize_cnts_wordcloud_facet()`: Visualize counts of n-grams.
+-   **freqs:** `compute_freqs()`, `compute_freqs_facet()`, `visualize_bigrams_freqs_facet()`, `compute_freqs_facet_by2()`, `visualize_freqs_facet_by2()`: Compute and visualize frequencies of n-grams.
 -   **corrs:** `compute_corrs()`, `visualize_corrs_network()`: Compute and visualize pairwise correlations (of bigrams).
 -   **tfidf:** `compute_tfidf()`, `visualize_tfidf()`: Compute and visualize change in n-gram usage across documents.
 -   **change:** `compute_change()`, `visualize_change()`: Compute and visualize change in n-gram usage across documents.
--   **sents:** `compute_sent_summary()`, `compute_sent_summary_multi()` Compute sentiment scores for n-grams.
--   **xy:** `compute_freqs_multi_by2()`, `visualize_freqs_multi_by2()`, `compute_logratios_multi_by2()`, `visualize_logratios_multi_by2()`, `compute_sentratios_multi_by2()`, `visualize_sentratios_multi_by2()`, Compute metrics across multiple `multi` entities. Uses a handful of internal function that are not intended to be called directly (although they can be). These internal functions include the following: `create_xy_grid()`, `filter_xy_grid()`, `preprocess_xy_data()`, `postprocess_xy_data()`, `wrapper_func()`, `add_dummy_cols()`. Also, there are more specific internal functions, such as: `compute_freqs_multi_wide()`, `compute_logratios_multi_wide()`, `compute_sentratios_multi_wide()`
+-   **sents:** `compute_sent_summary()`, `compute_sent_summary_facet()` Compute sentiment scores for n-grams.
+-   **xy:** `compute_freqs_facet_by2()`, `visualize_freqs_facet_by2()`, `compute_logratios_facet_by2()`, `visualize_logratios_facet_by2()`, `compute_sentratios_facet_by2()`, `visualize_sentratios_facet_by2()`, Compute metrics across facets `facet` entities. Uses a handful of internal function that are not intended to be called directly (although they can be). These internal functions include the following: `create_xy_grid()`, `filter_xy_grid()`, `preprocess_xy_data()`, `postprocess_xy_data()`, `wrapper_func()`, `add_dummy_cols()`. Also, there are more specific internal functions, such as: `compute_freqs_facet_wide()`, `compute_logratios_facet_wide()`, `compute_sentratios_facet_wide()`
 
 ### Function Idioms
 
@@ -76,4 +77,4 @@ Check out [this blog post analyzing the text in *R Weekly posts*](https://tonyel
 
 Additionally, see [this blog post analyzing personal Google search history](https://tonyelhabr.rbind.io/posts/tidy-text-analysis-google-search-history/) to see code that are similar to the code used to implement this package's functions:
 
-Additionally, one can review the tests files for further function usage
+Finally, the tests files can provide worthwhile examples of function usage
